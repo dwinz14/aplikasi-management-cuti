@@ -28,7 +28,7 @@ class RekapController extends Controller
         $divisionId = $validated['division_id'] ?? null;
         $startDate = $validated['start_date'] ?? null;
         $endDate = $validated['end_date'] ?? null;
-        $perPage = $validated['per_page'] ?? 10;
+        $perPage = $validated['per_page'] ?? 5;
 
         // Query optimized dengan select specific columns dan eager loading
         $query = Leave::select([

@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')->group(function () {
     Route::get('quota', [QuotaController::class, 'index'])->name('quota.index');
     Route::post('quota/reset', [QuotaController::class, 'resetAll'])->name('quota.reset');
+    Route::post('quota/reset-division', [QuotaController::class, 'resetDivision'])->name('quota.resetDivision');
     Route::post('quota/{user}', [QuotaController::class, 'update'])->name('quota.update');
 });
 

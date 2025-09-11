@@ -24,8 +24,8 @@
 
         <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <div class="flex-shrink-0 flex items-center px-4">
-                <x-application-logo class="block h-9 w-auto" style="filter: brightness(0) invert(1);" />
-                <span class="ml-3 text-white font-semibold text-lg">ACC</span>
+                <x-application-logo class="block h-9 w-auto" />
+                <span class="ml-3 text-white font-semibold text-lg">PORTAL-CUTI</span>
             </div>
             <nav class="mt-5 px-2 space-y-1">
                 {{-- Kita akan buatkan file menu-items-mobile nanti jika diperlukan --}}
@@ -45,8 +45,8 @@
 
         <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div class="flex items-center flex-shrink-0 px-4">
-                <x-application-logo class="block h-9 w-auto" style="filter: brightness(0) invert(1);" />
-                <span class="ml-3 text-white font-semibold text-lg">ACC</span>
+                <x-application-logo class="block h-9 w-auto" />
+                <span class="ml-3 text-white font-semibold text-lg">PORTAL-CUTI</span>
             </div>
             <nav class="mt-8 flex-1 px-3 space-y-2">
                 @include('layouts.partials.menu-items') {{-- Menu items versi desktop --}}

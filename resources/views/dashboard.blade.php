@@ -148,7 +148,7 @@
                             <div class="bg-green-500 h-2 rounded-full"
                                 style="width: {{ $sisaCuti > 0 ? min(($sisaCuti / 12) * 100, 100) : 0 }}%"></div>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">dari total cuti tahunan</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">dari total cuti tahun ini</p>
                     </div>
 
                     <!-- Used Leave Card -->

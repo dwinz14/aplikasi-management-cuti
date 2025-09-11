@@ -6,7 +6,7 @@
                     class=" border-l-[5px] border-primary-700 pl-5 font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                     {{ __('Riwayat Persetujuan Cuti') }}
                 </h2>
-                <p class="text-sm text-gray-500 mt-1">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Riwayat semua persetujuan cuti yang telah diproses.
                 </p>
             </div>
