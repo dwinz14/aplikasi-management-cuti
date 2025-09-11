@@ -2,7 +2,8 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class=" border-l-[5px] border-primary-700 pl-5 font-semibold text-xl text-gray-800 leading-tight">
+                <h2
+                    class=" border-l-[5px] border-primary-700 pl-5 font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                     {{ __('Rekapitulasi Cuti Karyawan') }}
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">

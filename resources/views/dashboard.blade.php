@@ -2,11 +2,12 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="border-l-[5px] border-primary-700 pl-5 font-semibold text-xl text-gray-800 leading-tight">
+                <h2
+                    class="border-l-[5px] border-primary-700 pl-5 font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                     {{ __('Dashboard') }}
                 </h2>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
                 {{ now()->format('l, d F Y') }}
             </div>
         </div>
