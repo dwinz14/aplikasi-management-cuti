@@ -9,7 +9,7 @@
         x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
         x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="-translate-x-full"
-        class="relative flex-1 flex flex-col max-w-xs w-full bg-gradient-to-br from-sky-600 to-indigo-700">
+        class="relative flex-1 flex flex-col max-w-xs w-full bg-gradient-to-br from-primary-700/40 to-primary-800/80 backdrop-blur-md">
 
         <div class="absolute top-0 right-0 -mr-12 pt-2">
             <button @click="sidebarOpen = false" type="button"
@@ -40,8 +40,8 @@
 <div class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:top-4 lg:left-4 lg:bottom-4 lg:z-50">
     <div
         class="flex-1 flex flex-col min-h-0
-                bg-primary-700 backdrop-blur-xl
-                rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5">
+                bg-primary-700/80 backdrop-blur-md
+                rounded-2xl shadow-2xl ring-1 ring-primary-700/40">
 
         <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div class="flex items-center flex-shrink-0 px-4">

@@ -85,7 +85,7 @@ class LeaveController extends Controller
         }
 
         //  Validasi masih ada pengajuan aktif
-        $hasActiveLeave = \App\Models\Leave::where('user_id', $user->id)
+        $hasActiveLeave = Leave::where('user_id', $user->id)
             ->whereIn('status_final', ['pending'])
             ->where(function ($q) {
                 $q->where('end_date', '>=', now()->toDateString()); // masih berjalan
@@ -96,9 +96,44 @@ class LeaveController extends Controller
             return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending, tidak bisa ajukan cuti baru.']);
         }
 
+        // Validasi pengganti tidak sedang cuti
+        $penggantiOnLeave = Leave::where('user_id', $request->pengganti_id)
+            ->whereIn('status_final', ['approved', 'pending'])
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
+                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->where('start_date', '<=', $request->start_date)
+                            ->where('end_date', '>=', $request->end_date);
+                    });
+            })
+            ->exists();
+
+        if ($penggantiOnLeave) {
+            return back()->withErrors(['msg' => 'Pengganti yang dipilih sedang cuti pada tanggal tersebut.']);
+        }
+
+        // Validasi pengganti tidak double approve di rentang waktu sama
+        $penggantiOverlap = Leave::where('pengganti_id', $request->pengganti_id)
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
+                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->where('start_date', '<=', $request->start_date)
+                            ->where('end_date', '>=', $request->end_date);
+                    });
+            })
+            ->whereNotIn('status_final', ['rejected']) //  semua selain rejected dianggap blocking
+            ->exists();
+
+        if ($penggantiOverlap) {
+            return back()->withErrors(['msg' => 'Pengganti yang dipilih sudah ditugaskan pada cuti lain di tanggal tersebut.']);
+        }
+
         return DB::transaction(function () use ($request, $user, $totalHari) {
             $leave = Leave::create([
                 'user_id'     => $user->id,
+                'pengganti_id' => $request->pengganti_id,
                 'start_date'  => $request->start_date,
                 'end_date'    => $request->end_date,
                 'total_hari'  => $totalHari,
@@ -168,27 +203,27 @@ class LeaveController extends Controller
      */
     public function update(Request $request, Leave $leave)
     {
-        $request->validate([
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'alasan' => 'required|string',
-            'pengganti_id' => 'nullable|exists:users,id',
-            'kadiv_id' => 'nullable|exists:users,id',
-        ]);
+        // $request->validate([
+        //     'start_date' => 'required|date|after_or_equal:today',
+        //     'end_date' => 'required|date|after_or_equal:start_date',
+        //     'alasan' => 'required|string',
+        //     'pengganti_id' => 'nullable|exists:users,id',
+        //     'kadiv_id' => 'nullable|exists:users,id',
+        // ]);
 
-        $totalHari = (new \Carbon\Carbon($request->start_date))
-            ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
+        // $totalHari = (new \Carbon\Carbon($request->start_date))
+        //     ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
 
-        $leave->update([
-            'pengganti_id' => $request->pengganti_id,
-            'kadiv_id' => $request->kadiv_id,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'total_hari' => $totalHari,
-            'alasan' => $request->alasan,
-        ]);
+        // $leave->update([
+        //     'pengganti_id' => $request->pengganti_id,
+        //     'kadiv_id' => $request->kadiv_id,
+        //     'start_date' => $request->start_date,
+        //     'end_date' => $request->end_date,
+        //     'total_hari' => $totalHari,
+        //     'alasan' => $request->alasan,
+        // ]);
 
-        return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil diperbarui.');
+        // return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil diperbarui.');
     }
 
     /**

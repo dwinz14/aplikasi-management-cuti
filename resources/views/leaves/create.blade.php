@@ -115,6 +115,30 @@
         </div>
     </div>
 
+    <!-- Modal untuk error sisa cuti -->
+    @if ($errors->has('msg'))
+        <div x-data="{ showModal: true }" x-show="showModal" x-transition
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                        </path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-red-600 dark:text-red-400">Peringatan</h3>
+                </div>
+                <p class="mt-4 text-gray-700 dark:text-gray-300">{{ $errors->first('msg') }}</p>
+                <div class="mt-6 flex justify-end">
+                    <button @click="showModal = false"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition ease-in-out duration-150">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <script>
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('start_date').min = today;

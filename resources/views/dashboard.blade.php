@@ -8,7 +8,7 @@
                 </h2>
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400">
-                {{ now()->format('l, d F Y') }}
+                {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
             </div>
         </div>
     </x-slot>
@@ -119,9 +119,15 @@
                 </div>
             </div>
         @endif
+
+        <!-- Pending Leave Applications with Progress -->
+        <div class="pt-5">
+            <x-stepper-progress :pendingLeaves="$pendingLeaves" />
+        </div>
+
         @if (auth()->user()->role !== 'super_admin')
             <div>
-                <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-500 mb-6">Ringkasan Cuti Anda</h3>
+                <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-500 mb-6">Ringkasan Informasi Cuti</h3>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
 
                     {{-- Enhanced stat cards with progress bars and better styling --}}
@@ -132,8 +138,9 @@
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Sisa Cuti Tahunan</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ $sisaCuti }} <span
-                                        class="text-lg text-gray-500">Hari</span></p>
+                                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ $sisaCuti }}
+                                    <span class="text-lg text-gray-500">Hari</span>
+                                </p>
                             </div>
                             <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
                                 <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none"
@@ -156,7 +163,8 @@
                         class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-blue-500">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cuti Sudah Digunakan</p>
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cuti Sudah Digunakan
+                                </p>
                                 <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ $cutiDigunakan }}
                                     <span class="text-lg text-gray-500">Hari</span>
                                 </p>
@@ -185,7 +193,7 @@
                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Menunggu Persetujuan
                                 </p>
                                 <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                    {{ $menungguPersetujuan }}
+                                    {{ $pendingApprovals }}
                                     <span class="text-lg text-gray-500">Pengajuan</span>
                                 </p>
                             </div>
@@ -197,7 +205,7 @@
                                 </svg>
                             </div>
                         </div>
-                        @if ($menungguPersetujuan > 0)
+                        @if ($pendingApprovals > 0)
                             <div
                                 class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4">
                                 <p class="text-sm text-yellow-800 dark:text-yellow-200">
@@ -216,6 +224,8 @@
                 </div>
             </div>
         @endif
+
+
         <!-- Recent Activity Section -->
         {{-- <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
             <div class="flex items-center justify-between mb-6">

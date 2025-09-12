@@ -84,4 +84,5 @@
             @endforelse
         </div>
     </div>
+    <x-toast-notification />
 </x-app-layout>

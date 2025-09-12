@@ -14,22 +14,6 @@
     </x-slot>
 
     <div class="space-y-6">
-        {{-- Notifikasi --}}
-        @if (session('success'))
-            <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 4000)"
-                class="flex items-center p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-200">
-                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-sm font-medium">{{ session('success') }}</span>
-                <button @click="show = false"
-                    class="ml-auto text-green-500 hover:text-green-700 dark:hover:text-green-300">
-                    ✕
-                </button>
-            </div>
-        @endif
-
         {{-- Filter & Search --}}
         <div class="bg-white dark:bg-slate-800 shadow-lg rounded-xl p-6 transition-all">
             <div class="flex items-center justify-between mb-5">
@@ -139,7 +123,7 @@
                         @csrf
                         <div class="space-y-3">
                             <select name="division_id" required
-                                class="w-full rounded-md border-yellow-300 dark:border-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-200 text-sm focus:border-yellow-500 focus:ring-yellow-500">
+                                class="w-full rounded-lg border-yellow-300 dark:border-yellow-600 dark:bg-yellow-900/70 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-s">
                                 <option value="">-- Pilih Divisi --</option>
                                 @foreach ($divisions as $division)
                                     <option value="{{ $division->id }}">{{ $division->nama_divisi }}</option>
@@ -231,4 +215,5 @@
             @endif
         </div>
     </div>
+    <x-toast-notification />
 </x-app-layout>

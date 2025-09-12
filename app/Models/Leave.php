@@ -11,10 +11,15 @@ class Leave extends Model
 
     protected $fillable = [
         'user_id',
+        'pengganti_id',
+        'kadiv_id',
         'start_date',
         'end_date',
         'total_hari',
         'alasan',
+        'status_pengganti',
+        'status_kadiv',
+        'status_hrd',
         'status_final',
     ];
 
