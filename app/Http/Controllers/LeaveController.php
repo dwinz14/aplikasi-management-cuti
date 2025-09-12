@@ -81,7 +81,19 @@ class LeaveController extends Controller
 
         // cegah minus sisa_cuti (kecuali direksi auto approve; untuk simplicity tetap validasi juga)
         if ($user->sisa_cuti < $totalHari && $user->role !== 'direksi') {
-            return back()->withErrors(['sisa_cuti' => 'Sisa cuti tidak mencukupi.'])->withInput();
+            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+        }
+
+        //  Validasi masih ada pengajuan aktif
+        $hasActiveLeave = \App\Models\Leave::where('user_id', $user->id)
+            ->whereIn('status_final', ['pending', 'approved'])
+            ->where(function ($q) {
+                $q->where('end_date', '>=', now()->toDateString()); // masih berjalan
+            })
+            ->exists();
+
+        if ($hasActiveLeave) {
+            return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending, tidak bisa ajukan cuti baru.']);
         }
 
         return DB::transaction(function () use ($request, $user, $totalHari) {
