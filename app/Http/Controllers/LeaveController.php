@@ -86,7 +86,7 @@ class LeaveController extends Controller
 
         //  Validasi masih ada pengajuan aktif
         $hasActiveLeave = \App\Models\Leave::where('user_id', $user->id)
-            ->whereIn('status_final', ['pending', 'approved'])
+            ->whereIn('status_final', ['pending'])
             ->where(function ($q) {
                 $q->where('end_date', '>=', now()->toDateString()); // masih berjalan
             })
@@ -123,21 +123,26 @@ class LeaveController extends Controller
                 return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti disetujui otomatis.');
             }
 
-            // buat list approver sesuai urutan
-            $stepOrder = 1;
+            // buat list approver sesuai urutan, hindari duplikasi approver
+            $uniqueApprovers = [];
             foreach ($steps as $symbol) {
                 if ($symbol === 'auto') {
                     continue;
                 } // pemohon non-direksi tidak pakai auto
                 $approverId = $this->resolveApproverId($symbol, $user, $request->pengganti_id);
-                if ($approverId) {
-                    Approval::create([
-                        'leave_id'    => $leave->id,
-                        'approver_id' => $approverId,
-                        'step'        => $stepOrder++,
-                        'status'      => 'pending',
-                    ]);
+                if ($approverId && !in_array($approverId, $uniqueApprovers)) {
+                    $uniqueApprovers[] = $approverId;
                 }
+            }
+
+            // buat approval dengan step berurutan
+            foreach ($uniqueApprovers as $index => $approverId) {
+                Approval::create([
+                    'leave_id'    => $leave->id,
+                    'approver_id' => $approverId,
+                    'step'        => $index + 1,
+                    'status'      => 'pending',
+                ]);
             }
 
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');

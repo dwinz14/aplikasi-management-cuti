@@ -31,7 +31,7 @@ class ApprovalController extends Controller
         $histories = ApprovalHistory::with(['leave.user', 'approver'])
             ->where('approved_by', Auth::id())
             ->latest()
-            ->paginate(15);
+            ->paginate(5);
 
         return view('approvals.history', compact('histories'));
     }
