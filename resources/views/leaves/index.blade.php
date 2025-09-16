@@ -116,6 +116,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50">
+                {{ $leaves->links() }}
+            </div>
         </div>
     </div>
 

@@ -51,7 +51,7 @@ class LeaveController extends Controller
 
     public function index()
     {
-        $leaves = Leave::with('approvals.approver')->where('user_id', Auth::id())->latest()->get();
+        $leaves = Leave::with('approvals.approver')->where('user_id', Auth::id())->latest()->paginate(5);
         return view('leaves.index', compact('leaves'));
     }
 

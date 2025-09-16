@@ -1,6 +1,6 @@
         @if ($pendingLeaves->count() > 0)
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Proses Approval Cuti Sedang
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Proses Approval Cuti Sedang
                     Berlangsung</h3>
                 <div class="space-y-6">
                     @foreach ($pendingLeaves as $leave)

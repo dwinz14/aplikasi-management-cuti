@@ -35,13 +35,6 @@ class DashboardController extends Controller
             ->where('status_final', 'pending')
             ->count();
 
-        // Hitung pending approvals untuk user ini
-        $pendingApprovals = 0;
-        if ($user->role !== 'super_admin') {
-            $pendingApprovals = \App\Models\Approval::where('approver_id', $user->id)
-                ->where('status', 'pending')
-                ->count();
-        }
 
         // Ambil pengajuan cuti pending user dengan approvals
         $pendingLeaves = Leave::with(['approvals.approver'])
@@ -56,7 +49,6 @@ class DashboardController extends Controller
             'sisaCuti' => $sisaCuti,
             'cutiDigunakan' => $cutiDigunakan,
             'menungguPersetujuan' => $menungguPersetujuan,
-            'pendingApprovals' => $pendingApprovals,
             'pendingLeaves' => $pendingLeaves,
         ]);
     }
