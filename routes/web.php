@@ -80,4 +80,9 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
     Route::post('quota/{user}', [QuotaController::class, 'update'])->name('quota.update');
 });
 
+// route master divisi for super admin
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('divisions', \App\Http\Controllers\DivisionController::class);
+});
+
 require __DIR__ . '/auth.php';

@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             [
+                'nik' => '1',
                 'name' => 'Super Admin',
                 'email' => 'admin@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP001',
                 'name' => 'Direksi User',
                 'email' => 'direksi@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -36,6 +38,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP002',
                 'name' => 'HRD User',
                 'email' => 'hrd@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -46,6 +49,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP003',
                 'name' => 'staff User',
                 'email' => 'staff@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -56,6 +60,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP004',
                 'name' => 'staff User 2',
                 'email' => 'staff2@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -66,6 +71,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP005',
                 'name' => 'kasie User',
                 'email' => 'kasie@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -76,6 +82,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'nik' => 'AP006',
                 'name' => 'kadiv User',
                 'email' => 'kadiv@cutiapp.com',
                 'password' => Hash::make('password'),

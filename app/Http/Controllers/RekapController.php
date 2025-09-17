@@ -12,10 +12,8 @@ class RekapController extends Controller
 {
     public function index(Request $request)
     {
-        // Cache divisions untuk 1 jam
-        $divisions = Cache::remember('divisions_list', 3600, function () {
-            return Division::select('id', 'nama_divisi')->get();
-        });
+        $divisions = Division::all();
+        $divisionId = $request->get('division_id');
 
         // Validasi input
         $validated = $request->validate([
