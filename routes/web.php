@@ -9,6 +9,8 @@ use App\Http\Controllers\KadivController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
 
@@ -80,9 +82,11 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
     Route::post('quota/{user}', [QuotaController::class, 'update'])->name('quota.update');
 });
 
-// route master divisi for super admin
+// route master for super admin
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('divisions', \App\Http\Controllers\DivisionController::class);
+    Route::resource('divisions', DivisionController::class);
+    Route::resource('users', MasterUserController::class);
+    Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
 });
 
 require __DIR__ . '/auth.php';
