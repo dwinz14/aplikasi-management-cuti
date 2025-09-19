@@ -20,8 +20,23 @@ if (!function_exists('getFilteredMenuItems')) {
         $filteredItems = [];
 
         foreach ($menuConfig as $item) {
+            // Check roles for parent menu
             if (in_array($userRole, $item['roles'])) {
-                $filteredItems[] = $item;
+                // If has children, filter children by role as well
+                if (isset($item['children'])) {
+                    $filteredChildren = [];
+                    foreach ($item['children'] as $child) {
+                        if (in_array($userRole, $child['roles'])) {
+                            $filteredChildren[] = $child;
+                        }
+                    }
+                    if (!empty($filteredChildren)) {
+                        $item['children'] = $filteredChildren;
+                        $filteredItems[] = $item;
+                    }
+                } else {
+                    $filteredItems[] = $item;
+                }
             }
         }
 
