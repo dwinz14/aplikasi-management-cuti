@@ -130,6 +130,23 @@ class LeaveController extends Controller
             return back()->withErrors(['msg' => 'Pengganti yang dipilih sudah ditugaskan pada cuti lain di tanggal tersebut.']);
         }
 
+        // Validasi user tidak sedang sebagai pengganti di rentang waktu tersebut
+        $userAsReplacement = Leave::where('pengganti_id', $user->id)
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
+                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->where('start_date', '<=', $request->start_date)
+                            ->where('end_date', '>=', $request->end_date);
+                    });
+            })
+            ->whereNotIn('status_final', ['rejected'])
+            ->exists();
+
+        if ($userAsReplacement) {
+            return back()->withErrors(['msg' => 'Anda sedang ditugaskan sebagai pengganti pada tanggal tersebut, tidak bisa ajukan cuti.']);
+        }
+
         return DB::transaction(function () use ($request, $user, $totalHari) {
             $leave = Leave::create([
                 'user_id'     => $user->id,
@@ -233,5 +250,11 @@ class LeaveController extends Controller
     {
         $leave->delete();
         return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dihapus.');
+    }
+
+    public function replacements()
+    {
+        $leaves = Leave::with('user')->where('pengganti_id', Auth::id())->latest()->paginate(10);
+        return view('replacements.index', compact('leaves'));
     }
 }

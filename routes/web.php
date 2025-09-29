@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
             ->only(['index', 'create', 'store', 'destroy']); // tambah edit/update/destroy kalau perlu
     });
 
+    Route::get('/replacements', [LeaveController::class, 'replacements'])->name('replacements.index');
+
     Route::prefix('approval')->name('approval.')->group(function () {
         Route::get('/', [ApprovalController::class, 'index'])->name('index');
         Route::get('/history', [ApprovalController::class, 'history'])->name('history');
