@@ -83,10 +83,10 @@ class UserSeeder extends Seeder
             ],
             [
                 'nik' => 'AP006',
-                'name' => 'kadiv User',
-                'email' => 'kadiv@cutiapp.com',
+                'name' => 'kabag User',
+                'email' => 'kabag@cutiapp.com',
                 'password' => Hash::make('password'),
-                'role' => 'kadiv',
+                'role' => 'kabag',
                 'division_id' => 3,
                 'sisa_cuti' => 12,
                 'created_at' => now(),

@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
         // return match ($role) {
         //     'super_admin' => redirect('/admin/dashboard'),
         //     'hrd' => redirect('/hrd/dashboard'),
-        //     'kadiv' => redirect('/kadiv/dashboard'),
+        //     'kabag' => redirect('/kabag/dashboard'),
         //     'staff' => redirect('/staff/dashboard'),
         //     default => redirect('/dashboard'),
         // };

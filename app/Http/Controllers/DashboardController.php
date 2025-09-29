@@ -18,7 +18,7 @@ class DashboardController extends Controller
             'super_admin' => 'Super Admin Dashboard',
             'direksi' => 'DIreksi Dashboard',
             'hrd' => 'HRD Dashboard',
-            'kadiv' => 'Kepala Divisi Dashboard',
+            'kabag' => 'Kepala Divisi Dashboard',
             'kasie' => 'Kasie Dashboard',
             'staff' => 'Staff Dashboard',
             default => 'Dashboard',
@@ -66,9 +66,9 @@ class DashboardController extends Controller
     {
         return view('hrd.dashboard');
     }
-    public function kadiv()
+    public function kabag()
     {
-        return view('kadiv.dashboard');
+        return view('kabag.dashboard');
     }
     public function kasie()
     {

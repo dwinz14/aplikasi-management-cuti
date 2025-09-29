@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HRDController;
 use App\Http\Controllers\StaffController;
-use App\Http\Controllers\KadivController;
+use App\Http\Controllers\kabagController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
@@ -40,8 +40,8 @@ Route::middleware(['auth', 'role:hrd,super_admin'])
 //     Route::get('/hrd/dashboard', [DashboardController::class, 'hrd'])->name('hrd.dashboard');
 // });
 
-// Route::middleware(['auth', 'role:kadiv'])->group(function () {
-//     Route::get('/kadiv/dashboard', [DashboardController::class, 'kadiv'])->name('kadiv.dashboard');
+// Route::middleware(['auth', 'role:kabag'])->group(function () {
+//     Route::get('/kabag/dashboard', [DashboardController::class, 'kabag'])->name('kabag.dashboard');
 // });
 // Route::middleware(['auth', 'role:kasie'])->group(function () {
 //     Route::get('/kasie/dashboard', [DashboardController::class, 'kasie'])->name('kasie.dashboard');

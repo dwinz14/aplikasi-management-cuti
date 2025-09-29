@@ -43,7 +43,7 @@ class MasterUserController extends Controller
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users',
             'password'    => 'required|min:6',
-            'role'        => 'required|in:super_admin,hrd,kadiv,kasie,staff,direksi',
+            'role'        => 'required|in:super_admin,hrd,kabag,kasie,staff,direksi',
             'division_id' => 'nullable|exists:divisions,id',
             'sisa_cuti'   => 'required|integer|min:0',
         ]);
@@ -71,7 +71,7 @@ class MasterUserController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,
-            'role'        => 'required|in:super_admin,hrd,kadiv,kasie,staff,direksi',
+            'role'        => 'required|in:super_admin,hrd,kabag,kasie,staff,direksi',
             'division_id' => 'nullable|exists:divisions,id',
             'sisa_cuti'   => 'required|integer|min:0',
         ]);

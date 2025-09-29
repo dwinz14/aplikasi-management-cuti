@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kadiv', 'kasie', 'staff']);
+            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kabag', 'kasie', 'staff']);
             // $table->foreignId('division_id')->nullable()->constrained('divisions')->nullOnDelete();
             $table->unsignedBigInteger('division_id')->nullable();
             $table->integer('sisa_cuti')->default(12);

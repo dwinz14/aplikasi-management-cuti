@@ -30,12 +30,12 @@ class LeaveController extends Controller
         if ($step === 'atasan_divisi') {
             $kasie = User::where('division_id', $requester->division_id)->where('role', 'kasie')->first();
             if ($kasie) return $kasie->id;
-            $kadiv = User::where('division_id', $requester->division_id)->where('role', 'kadiv')->first();
-            return $kadiv?->id;
+            $kabag = User::where('division_id', $requester->division_id)->where('role', 'kabag')->first();
+            return $kabag?->id;
         }
 
-        if ($step === 'kadiv') {
-            return User::where('division_id', $requester->division_id)->where('role', 'kadiv')->value('id');
+        if ($step === 'kabag') {
+            return User::where('division_id', $requester->division_id)->where('role', 'kabag')->value('id');
         }
 
         if ($step === 'direksi') {
@@ -58,7 +58,7 @@ class LeaveController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kadiv'], true);
+        $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag'], true);
         $penggantiList = $requiresReplacement
             ? User::where('division_id', $user->division_id)->where('id', '!=', $user->id)->get()
             : collect();
@@ -74,7 +74,7 @@ class LeaveController extends Controller
             'start_date'    => 'required|date|after_or_equal:today',
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => 'required|string',
-            'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kadiv'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
+            'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 
         $totalHari = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
@@ -191,11 +191,11 @@ class LeaveController extends Controller
     //         ->where('id', '!=', $user->id)
     //         ->get();
 
-    //     $kadivList = User::where('role', 'kadiv')
+    //     $kabagList = User::where('role', 'kabag')
     //         ->where('division_id', $user->division_id)
     //         ->get();
 
-    //     return view('cuti.edit', compact('leave', 'penggantiList', 'kadivList'));
+    //     return view('cuti.edit', compact('leave', 'penggantiList', 'kabagList'));
     // }
 
     /**
@@ -208,7 +208,7 @@ class LeaveController extends Controller
         //     'end_date' => 'required|date|after_or_equal:start_date',
         //     'alasan' => 'required|string',
         //     'pengganti_id' => 'nullable|exists:users,id',
-        //     'kadiv_id' => 'nullable|exists:users,id',
+        //     'kabag_id' => 'nullable|exists:users,id',
         // ]);
 
         // $totalHari = (new \Carbon\Carbon($request->start_date))
@@ -216,7 +216,7 @@ class LeaveController extends Controller
 
         // $leave->update([
         //     'pengganti_id' => $request->pengganti_id,
-        //     'kadiv_id' => $request->kadiv_id,
+        //     'kabag_id' => $request->kabag_id,
         //     'start_date' => $request->start_date,
         //     'end_date' => $request->end_date,
         //     'total_hari' => $totalHari,

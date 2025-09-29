@@ -63,7 +63,7 @@
                              <option value="">-- Semua Role --</option>
                              <option value="staff" {{ $role == 'staff' ? 'selected' : '' }}>Staff</option>
                              <option value="kasie" {{ $role == 'kasie' ? 'selected' : '' }}>Kasie</option>
-                             <option value="kadiv" {{ $role == 'kadiv' ? 'selected' : '' }}>Kadiv</option>
+                             <option value="kabag" {{ $role == 'kabag' ? 'selected' : '' }}>kabag</option>
                              <option value="hrd" {{ $role == 'hrd' ? 'selected' : '' }}>HRD</option>
                          </select>
                      </div>
@@ -178,7 +178,7 @@
                                          class="px-1.5 py-0.5 text-xs font-semibold rounded-full
                                         @if ($user->role == 'staff') bg-blue-100 text-blue-800 dark:bg-blue-600 dark:text-white
                                         @elseif($user->role == 'kasie') bg-green-100 text-green-800 dark:bg-green-600 dark:text-white
-                                        @elseif($user->role == 'kadiv') bg-purple-100 text-purple-800 dark:bg-purple-600 dark:text-white
+                                        @elseif($user->role == 'kabag') bg-purple-100 text-purple-800 dark:bg-purple-600 dark:text-white
                                         @else bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white @endif">
                                          {{ ucfirst($user->role) }}
                                      </span>
