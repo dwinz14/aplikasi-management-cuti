@@ -3,7 +3,7 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome Back</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome Back</h2>
         <p class="text-gray-600 dark:text-gray-400">Sign in to your account</p>
     </div>
 
