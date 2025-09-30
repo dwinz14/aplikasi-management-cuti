@@ -40,15 +40,26 @@ class MasterUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'nik'        => [
+                'required',
+                'string',
+                'size:11',
+                'regex:/^[A-Z]{2}[0-9]{9}$/',
+                'unique:users,nik',
+            ],
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users',
             'password'    => 'required|min:6',
             'role'        => 'required|in:super_admin,hrd,kabag,kasie,staff,direksi',
             'division_id' => 'nullable|exists:divisions,id',
             'sisa_cuti'   => 'required|integer|min:0',
+        ], [
+            // Pesan error kustom (opsional)
+            'nik.regex' => 'Format NIK salah.',
         ]);
 
         User::create([
+            'nik'        => $request->nik,
             'name'        => $request->name,
             'email'       => $request->email,
             'password'    => Hash::make($request->password),
@@ -69,14 +80,24 @@ class MasterUserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
+            'nik'        => [
+                'required',
+                'string',
+                'size:11',
+                'regex:/^[A-Z]{2}[0-9]{9}$/',
+                'unique:users,nik',
+            ],
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,
             'role'        => 'required|in:super_admin,hrd,kabag,kasie,staff,direksi',
             'division_id' => 'nullable|exists:divisions,id',
             'sisa_cuti'   => 'required|integer|min:0',
+        ], [
+            // Pesan error kustom (opsional)
+            'nik.regex' => 'Format NIK salah.',
         ]);
 
-        $user->update($request->only(['name', 'email', 'role', 'division_id', 'sisa_cuti']));
+        $user->update($request->only(['nik', 'name', 'email', 'role', 'division_id', 'sisa_cuti']));
 
         return redirect()->route('admin.users.index')->with('success', ' Data User berhasil diperbarui.');
     }

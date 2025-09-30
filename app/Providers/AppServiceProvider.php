@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('http');
         }
 
+        // Set timezone to WIB (Asia/Jakarta)
+        config(['app.timezone' => 'Asia/Jakarta']);
+        date_default_timezone_set('Asia/Jakarta');
+
         Carbon::setLocale('id');
     }
 }

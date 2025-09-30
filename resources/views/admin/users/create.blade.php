@@ -20,6 +20,14 @@
                 @csrf
 
                 <div>
+                    <x-input-label for="nik" value="NIK" />
+                    <x-text-input id="nik" name="nik" type="text" value="{{ old('nik') }}"
+                        placeholder="Masukkan NIK..." required />
+                    @error('nik')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <x-input-label for="name" value="Nama" />
                     <x-text-input id="name" name="name" type="text" value="{{ old('name') }}"
                         placeholder="Masukkan nama user..." required />
