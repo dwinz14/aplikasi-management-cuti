@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -26,9 +27,12 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = Auth::user();
+        DB::table('users')->where('id', $user->id)->update(['last_login_at' => now()]);
+
         $request->session()->regenerate();
 
-        $role = Auth::user()->role;
+        $role = $user->role;
 
         // return match ($role) {
         //     'super_admin' => redirect('/admin/dashboard'),
