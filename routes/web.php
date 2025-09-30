@@ -89,6 +89,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::resource('divisions', DivisionController::class);
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
+    Route::get('user-activity', [App\Http\Controllers\UserActivityController::class, 'index'])->name('user-activity.index');
 });
 
 require __DIR__ . '/auth.php';
