@@ -23,7 +23,8 @@ class User extends Authenticatable
         'password',
         'role',
         'division_id',
-        'sisa_cuti'
+        'sisa_cuti',
+        'last_login_at'
     ];
 
     /**
