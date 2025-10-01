@@ -4,10 +4,10 @@
             <div>
                 <h2
                     class="border-l-4 border-primary-700 pl-5 font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-                    {{ __('Aktivitas User') }}
+                    {{ __('User Managment') }}
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">
-                    Pantau status online/offline semua user di aplikasi.
+                    Manage semua user di aplikasi.
                 </p>
             </div>
         </div>
@@ -116,5 +116,4 @@
             </div>
         </div>
     </div>
-    <x-toast-notification />
 </x-app-layout>
