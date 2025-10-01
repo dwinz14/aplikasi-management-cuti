@@ -223,9 +223,12 @@
             </div>
 
             <!-- Modal delete user -->
-            <div x-show="confirmDelete"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div x-show="confirmDelete" x-transition x-cloak style="display: none;"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 ease-out"
+                    x-show="confirmDelete" x-transition:enter="scale-95 opacity-0"
+                    x-transition:enter-end="scale-100 opacity-100" x-transition:leave="scale-100 opacity-100"
+                    x-transition:leave-end="scale-95 opacity-0">
                     <h2 class="text-lg font-semibold mb-4">Delete User</h2>
                     <p class="mb-4">
                         Apakah Anda yakin ingin menghapus user
@@ -238,11 +241,11 @@
                         @method('DELETE')
                         <div class="flex justify-end space-x-2">
                             <button type="button" @click="confirmDelete = false"
-                                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
+                                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition-colors">
                                 Batal
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-md">
+                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-md transition-colors">
                                 Hapus
                             </button>
                         </div>
@@ -251,9 +254,12 @@
             </div>
 
             <!-- Modal Reset Password -->
-            <div x-show="confirmReset"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div x-show="confirmReset" x-transition x-cloak style="display: none;"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 ease-out"
+                    x-show="confirmReset" x-transition:enter="scale-95 opacity-0"
+                    x-transition:enter-end="scale-100 opacity-100" x-transition:leave="scale-100 opacity-100"
+                    x-transition:leave-end="scale-95 opacity-0">
                     <h2 class="text-lg font-semibold mb-4">Reset Password</h2>
                     <p class="mb-4">
                         Apakah Anda yakin ingin mereset password untuk user
@@ -266,11 +272,11 @@
                         @csrf
                         <div class="flex justify-end space-x-2">
                             <button type="button" @click="confirmReset = false"
-                                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md">
+                                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition-colors">
                                 Batal
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-md">
+                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-md transition-colors">
                                 Reset
                             </button>
                         </div>
