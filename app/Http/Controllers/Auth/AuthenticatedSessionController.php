@@ -28,6 +28,13 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $user = Auth::user();
+
+        // Check if user must change password
+        if ($user->must_change_password) {
+            // Redirect to force change password page
+            return redirect()->route('password.force-change');
+        }
+
         DB::table('users')->where('id', $user->id)->update(['last_login_at' => now()]);
 
         $request->session()->regenerate();

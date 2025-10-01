@@ -116,11 +116,11 @@ class MasterUserController extends Controller
 
             $user->update([
                 'password' => Hash::make($defaultPassword),
-                // Optional: tambahkan flag kalau mau paksa user ganti password
-                // 'must_change_password' => true,
+                // Set flag to force user to change password on next login
+                'must_change_password' => true,
             ]);
 
-            $message = "Password user berhasil direset ke default.";
+            $message = "Password user berhasil direset ke default dan user harus mengganti password saat login berikutnya.";
 
             if (request()->expectsJson()) {
                 return response()->json([

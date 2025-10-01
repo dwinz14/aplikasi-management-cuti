@@ -24,7 +24,8 @@ class User extends Authenticatable
         'role',
         'division_id',
         'sisa_cuti',
-        'last_login_at'
+        'last_login_at',
+        'must_change_password'
     ];
 
     /**
