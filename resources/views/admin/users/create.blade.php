@@ -47,8 +47,9 @@
 
                 <div>
                     <x-input-label for="password" value="Password" />
-                    <x-text-input id="password" name="password" type="password" placeholder="Masukkan password..."
-                        required />
+                    <x-text-input id="password" name="password" type="password" class="block"
+                        value="{{ config('app.default_user_password') }}" placeholder="Masukkan password..." required
+                        readonly />
                     @error('password')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror

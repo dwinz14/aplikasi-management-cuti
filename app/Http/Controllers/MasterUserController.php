@@ -66,6 +66,7 @@ class MasterUserController extends Controller
             'role'        => $request->role,
             'division_id' => $request->division_id,
             'sisa_cuti'   => $request->sisa_cuti,
+            'must_change_password' => true,
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
@@ -85,7 +86,7 @@ class MasterUserController extends Controller
                 'string',
                 'size:11',
                 'regex:/^[A-Z]{2}[0-9]{9}$/',
-                'unique:users,nik',
+                // 'unique:users,nik',
             ],
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,

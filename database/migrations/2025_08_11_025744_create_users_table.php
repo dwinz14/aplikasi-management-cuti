@@ -24,11 +24,11 @@ return new class extends Migration
             $table->integer('sisa_cuti')->default(12);
             $table->rememberToken();
             $table->timestamps();
-
+            $table->softDeletes();
 
             $table->foreign('division_id')
                 ->references('id')->on('divisions')
-                ->onDelete('cascade'); // kalau divisi dihapus, user ikut kehapus
+                ->onDelete('set null'); // kalau divisi dihapus, user tidak ikut kehapus, division_id jadi null
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

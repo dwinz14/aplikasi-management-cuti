@@ -1,7 +1,7 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Informasi Profile') }}
+            {{ __('Update Informasi Profile') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -18,9 +18,16 @@
         @method('patch')
 
         <div>
+            <x-input-label for="nik" :value="__('NIK')" />
+            <x-text-input id="nik" name="nik" type="text" class="mt-1 block w-full" :value="old('nik', $user->nik)"
+                required autofocus autocomplete="nik" />
+            <x-input-error class="mt-2" :messages="$errors->get('nik')" />
+        </div>
+
+        <div>
             <x-input-label for="name" :value="__('Nama')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)"
-                required autofocus autocomplete="name" />
+                required autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
@@ -51,25 +58,8 @@
         </div>
 
         <div>
-            <x-input-label for="nik" :value="__('NIK')" />
-            <x-text-input id="nik" name="nik" type="text" class="mt-1 block w-full" :value="old('nik', $user->nik)"
-                required autocomplete="nik" />
-            <x-input-error class="mt-2" :messages="$errors->get('nik')" />
-        </div>
-
-        <div>
-            <x-input-label for="division_id" :value="__('Divisi')" />
-            <select id="division_id" name="division_id"
-                class="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                <option value="">{{ __('Select Division') }}</option>
-                @foreach ($divisions as $division)
-                    <option value="{{ $division->id }}"
-                        {{ old('division_id', $user->division_id) == $division->id ? 'selected' : '' }}>
-                        {{ $division->nama_divisi }}
-                    </option>
-                @endforeach
-            </select>
-            <x-input-error class="mt-2" :messages="$errors->get('division_id')" />
+            <x-input-label for="division" :value="__('Divisi')" />
+            <x-text-input id="division" type="text" class="mt-1 block w-full" :value="$user->division->nama_divisi ?? ''" readonly />
         </div>
 
         <div class="flex items-center gap-4">
