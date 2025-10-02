@@ -43,7 +43,7 @@
                                 <x-text-input id="current_password" name="current_password" type="password"
                                     class="mt-1 block w-full" autocomplete="current-password"
                                     placeholder="Masukkan password saat ini" />
-                                <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+                                <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
                             </div>
 
                             <!-- New Password -->
@@ -51,7 +51,7 @@
                                 <x-input-label for="password" :value="__('Password Baru')" />
                                 <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
                                     autocomplete="new-password" placeholder="Masukkan password baru" />
-                                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                                <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
                             </div>
 
                             <!-- Confirm New Password -->
@@ -60,7 +60,7 @@
                                 <x-text-input id="password_confirmation" name="password_confirmation" type="password"
                                     class="mt-1 block w-full" autocomplete="new-password"
                                     placeholder="Konfirmasi password baru" />
-                                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                                <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
                             </div>
                         </div>
 
