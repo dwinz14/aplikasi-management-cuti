@@ -29,6 +29,12 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        // Check if user status is approved
+        if ($user->status !== 'approved') {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['email' => 'Akun Anda belum disetujui oleh admin.']);
+        }
+
         // Check if user must change password
         if ($user->must_change_password) {
             // Redirect to force change password page

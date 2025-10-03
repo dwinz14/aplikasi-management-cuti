@@ -39,10 +39,10 @@
                 <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
             </label>
 
-            @if (Route::has('password.request'))
+            @if (Route::has('register'))
                 <a class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 underline focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 rounded-md"
-                    href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+                    href="{{ route('register') }}">
+                    {{ __('Belum Punya Akun?') }}
                 </a>
             @endif
         </div>

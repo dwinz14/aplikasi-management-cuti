@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class UserActivityController extends Controller
 {
@@ -27,6 +29,7 @@ class UserActivityController extends Controller
                 users.name,
                 users.email,
                 users.role,
+                users.status,
                 users.last_login_at,
                 divisions.nama_divisi as division_name,
                 CASE WHEN max_sessions.max_last_activity > ? THEN 1 ELSE 0 END as is_online
@@ -49,6 +52,70 @@ class UserActivityController extends Controller
             ->where('max_sessions.max_last_activity', '>', $threshold)
             ->count();
 
-        return view('admin.user-activity.index', compact('users', 'onlineCount'));
+        // Get pending users for approval
+        $pendingUsers = User::with('division')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $pendingCount = $pendingUsers->count();
+
+        // Get approval history from user_registration_approvals
+        $approvalHistory = DB::table('user_registration_approvals')
+            ->leftJoin('users', 'user_registration_approvals.approved_by', '=', 'users.id')
+            ->select(
+                'user_registration_approvals.user_name as name',
+                'user_registration_approvals.user_email as email',
+                'user_registration_approvals.status',
+                'user_registration_approvals.updated_at',
+                'users.name as approved_by'
+            )
+            ->orderBy('user_registration_approvals.updated_at', 'desc')
+            ->limit(20)
+            ->get();
+
+        return view('admin.user-management.index', compact('users', 'onlineCount', 'pendingUsers', 'pendingCount', 'approvalHistory'));
+    }
+
+    public function approve($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['status' => 'approved']);
+
+        // Save approval history
+        DB::table('user_registration_approvals')->insert([
+            'user_name' => $user->name,
+            'user_email' => $user->email,
+            'user_role' => $user->role,
+            'division_name' => $user->division->nama_divisi ?? null,
+            'approved_by' => Auth::id(),
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'User berhasil disetujui.');
+    }
+
+    public function reject($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Save approval history before deleting user
+        DB::table('user_registration_approvals')->insert([
+            'user_name' => $user->name,
+            'user_email' => $user->email,
+            'user_role' => $user->role,
+            'division_name' => $user->division->nama_divisi ?? null,
+            'approved_by' => Auth::id(),
+            'status' => 'rejected',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Delete user from users table
+        $user->delete();
+
+        return redirect()->back()->with('success', 'User berhasil ditolak dan dihapus.');
     }
 }

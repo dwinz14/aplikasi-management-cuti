@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
         'division_id',
         'sisa_cuti',
         'last_login_at',

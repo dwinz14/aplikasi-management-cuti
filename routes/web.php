@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HRDController;
@@ -11,6 +11,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\MasterUserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
 
@@ -74,7 +75,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     Route::get('/force-change-password', function () {
         return view('auth.force-change-password');
     })->name('password.force-change');
@@ -94,6 +94,8 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
     Route::get('user-activity', [App\Http\Controllers\UserActivityController::class, 'index'])->name('user-activity.index');
+    Route::patch('user-activity/{id}/approve', [App\Http\Controllers\UserActivityController::class, 'approve'])->name('user-activity.approve');
+    Route::patch('user-activity/{id}/reject', [App\Http\Controllers\UserActivityController::class, 'reject'])->name('user-activity.reject');
 });
 
 require __DIR__ . '/auth.php';

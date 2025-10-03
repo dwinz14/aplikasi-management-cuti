@@ -30,21 +30,28 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
+            'nik' => ['required', 'string', 'size:11', 'regex:/^[A-Z]{2}\d{9}$/', 'unique:' . User::class],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
+            'nik' => $request->nik,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'division_id' => $request->division_id,
+            'sisa_cuti' => 12,
+            'status' => 'pending',
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        // Do not auto-login, redirect to pending approval page
+        return redirect(route('registration.pending', absolute: false));
     }
 }
