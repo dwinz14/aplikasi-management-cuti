@@ -56,4 +56,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Division::class);
     }
+
+    /**
+     * Get the username field for authentication.
+     */
+    public function username()
+    {
+        return 'nik';
+    }
 }

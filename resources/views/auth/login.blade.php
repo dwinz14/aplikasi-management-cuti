@@ -10,13 +10,14 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-6">
         @csrf
 
-        <!-- Email Address -->
+        <!-- NIK -->
         <div>
-            <x-input-label for="email" :value="__('Email')" class="text-gray-700 dark:text-gray-300" />
-            <x-text-input id="email"
+            <x-input-label for="nik" :value="__('NIK')" class="text-gray-700 dark:text-gray-300" />
+            <x-text-input id="nik"
                 class="block mt-1 w-full bg-gray-50 dark:bg-slate-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
-                type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                type="text" name="nik" :value="old('nik')" required autofocus autocomplete="nik"
+                placeholder="Masukkan NIK..." />
+            <x-input-error :messages="$errors->get('nik')" class="mt-2" />
         </div>
 
         <!-- Password -->
@@ -32,13 +33,6 @@
 
         <!-- Remember Me -->
         <div class="flex items-center justify-between">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-slate-700 focus:ring-primary-500 dark:focus:ring-primary-400"
-                    name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-
             @if (Route::has('register'))
                 <a class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 underline focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 rounded-md"
                     href="{{ route('register') }}">

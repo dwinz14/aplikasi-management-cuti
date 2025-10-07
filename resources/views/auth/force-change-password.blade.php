@@ -52,6 +52,12 @@
                                 <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
                                     autocomplete="new-password" placeholder="Masukkan password baru" />
                                 <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
+                                <div id="password-validation" class="mt-1 text-sm" style="display: none;">
+                                    <div id="password-rule-1">Karakter pertama harus huruf besar</div>
+                                    <div id="password-rule-2">Minimal 8 karakter</div>
+                                    <div id="password-rule-3">Harus ada karakter angka</div>
+                                    <div id="password-rule-4">Harus ada karakter simbol</div>
+                                </div>
                             </div>
 
                             <!-- Confirm New Password -->
@@ -86,6 +92,46 @@
         // Prevent clicking outside the modal to close it
         document.querySelector('.fixed.inset-0.bg-gray-500').addEventListener('click', function(e) {
             e.stopPropagation();
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const validationDiv = document.getElementById('password-validation');
+            if (password.trim() === '') {
+                validationDiv.style.display = 'none';
+                return;
+            }
+            validationDiv.style.display = 'block';
+            const rules = [{
+                    id: 'password-rule-1',
+                    regex: /^[A-Z]/,
+                    message: 'Karakter pertama harus huruf besar'
+                },
+                {
+                    id: 'password-rule-2',
+                    regex: /.{8,}/,
+                    message: 'Minimal 8 karakter'
+                },
+                {
+                    id: 'password-rule-3',
+                    regex: /\d/,
+                    message: 'Harus ada karakter angka'
+                },
+                {
+                    id: 'password-rule-4',
+                    regex: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+                    message: 'Harus ada karakter simbol'
+                }
+            ];
+
+            rules.forEach(rule => {
+                const element = document.getElementById(rule.id);
+                if (rule.regex.test(password)) {
+                    element.className = 'text-green-600';
+                } else {
+                    element.className = 'text-red-600';
+                }
+            });
         });
     </script>
 </x-app-layout>

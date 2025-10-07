@@ -19,7 +19,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.auth', ['mode' => 'register']);
     }
 
     /**
@@ -30,12 +30,12 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'nik' => ['required', 'string', 'size:11', 'regex:/^[A-Z]{2}\d{9}$/', 'unique:' . User::class],
+            'nik' => ['required', 'string', 'size:11', 'regex:/^AP\d{9}$/', 'unique:' . User::class],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
             'division_id' => ['nullable', 'exists:divisions,id'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'regex:/^[A-Z].{7,}$/', 'regex:/.*\d.*/', 'regex:/.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?].*/'],
         ]);
 
         $user = User::create([

@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.auth', ['mode' => 'login']);
     }
 
     /**
@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         // Check if user status is approved
         if ($user->status !== 'approved') {
             Auth::logout();
-            return redirect()->route('login')->withErrors(['email' => 'Akun Anda belum disetujui oleh admin.']);
+            return redirect()->route('login')->withErrors(['nik' => 'Akun Anda belum disetujui oleh admin.']);
         }
 
         // Check if user must change password

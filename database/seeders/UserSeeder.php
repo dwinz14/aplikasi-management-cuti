@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP001',
+                'nik' => 'AP000000001',
                 'name' => 'Direksi User',
                 'email' => 'direksi@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP002',
+                'nik' => 'AP000000002',
                 'name' => 'HRD User',
                 'email' => 'hrd@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP003',
+                'nik' => 'AP000000003',
                 'name' => 'staff User',
                 'email' => 'staff@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -64,7 +64,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP004',
+                'nik' => 'AP000000004',
                 'name' => 'staff User 2',
                 'email' => 'staff2@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -76,7 +76,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP005',
+                'nik' => 'AP000000005',
                 'name' => 'kasie User',
                 'email' => 'kasie@cutiapp.com',
                 'password' => Hash::make('password'),
@@ -88,7 +88,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nik' => 'AP006',
+                'nik' => 'AP000000006',
                 'name' => 'kabag User',
                 'email' => 'kabag@cutiapp.com',
                 'password' => Hash::make('password'),

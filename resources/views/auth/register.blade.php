@@ -6,8 +6,9 @@
         <div>
             <x-input-label for="nik" :value="__('NIK')" />
             <x-text-input id="nik" class="block mt-1 w-full" type="text" name="nik" :value="old('nik')" required
-                autofocus autocomplete="nik" placeholder="AA123456789" />
+                autofocus autocomplete="nik" placeholder="AP123456789" />
             <x-input-error :messages="$errors->get('nik')" class="mt-2" />
+            <div id="nik-validation" class="mt-1 text-sm" style="display: none;"></div>
         </div>
 
         <!-- Name -->
@@ -64,6 +65,12 @@
                 autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <div id="password-validation" class="mt-1 text-sm" style="display: none;">
+                <div id="password-rule-1">Karakter pertama harus huruf besar</div>
+                <div id="password-rule-2">Minimal 8 karakter</div>
+                <div id="password-rule-3">Harus ada karakter angka</div>
+                <div id="password-rule-4">Harus ada karakter simbol</div>
+            </div>
         </div>
 
         <!-- Confirm Password -->
@@ -87,4 +94,63 @@
             </x-primary-button>
         </div>
     </form>
+
+    <script>
+        document.getElementById('nik').addEventListener('input', function() {
+            const nik = this.value;
+            const validationDiv = document.getElementById('nik-validation');
+            if (nik.trim() === '') {
+                validationDiv.style.display = 'none';
+                return;
+            }
+            validationDiv.style.display = 'block';
+            if (/^AP\d{9}$/.test(nik)) {
+                validationDiv.textContent = 'NIK valid';
+                validationDiv.className = 'mt-1 text-sm text-green-600';
+            } else {
+                validationDiv.textContent = 'NIK harus dimulai dengan "AP" diikuti 9 angka';
+                validationDiv.className = 'mt-1 text-sm text-red-600';
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const validationDiv = document.getElementById('password-validation');
+            if (password.trim() === '') {
+                validationDiv.style.display = 'none';
+                return;
+            }
+            validationDiv.style.display = 'block';
+            const rules = [{
+                    id: 'password-rule-1',
+                    regex: /^[A-Z]/,
+                    message: 'Karakter pertama harus huruf besar'
+                },
+                {
+                    id: 'password-rule-2',
+                    regex: /.{8,}/,
+                    message: 'Minimal 8 karakter'
+                },
+                {
+                    id: 'password-rule-3',
+                    regex: /\d/,
+                    message: 'Harus ada karakter angka'
+                },
+                {
+                    id: 'password-rule-4',
+                    regex: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+                    message: 'Harus ada karakter simbol'
+                }
+            ];
+
+            rules.forEach(rule => {
+                const element = document.getElementById(rule.id);
+                if (rule.regex.test(password)) {
+                    element.className = 'text-green-600';
+                } else {
+                    element.className = 'text-red-600';
+                }
+            });
+        });
+    </script>
 </x-guest-layout>

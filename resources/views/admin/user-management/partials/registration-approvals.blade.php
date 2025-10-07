@@ -13,11 +13,11 @@
                                     {{ $user->name }}</h4>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
                                 </p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                                     Role: {{ ucfirst($user->role) }} • Divisi:
                                     {{ $user->division->nama_divisi ?? 'Tidak ada' }}
                                 </p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500">
+                                <p class="text-xs text-gray-600 dark:text-gray-400">
                                     Daftar:
                                     {{ \Carbon\Carbon::parse($user->created_at)->format('d/m/Y H:i') }}
                                 </p>

@@ -14,6 +14,7 @@ use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
+use App\Http\Controllers\UserManagementController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -93,9 +94,9 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::resource('divisions', DivisionController::class);
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
-    Route::get('user-activity', [App\Http\Controllers\UserActivityController::class, 'index'])->name('user-activity.index');
-    Route::patch('user-activity/{id}/approve', [App\Http\Controllers\UserActivityController::class, 'approve'])->name('user-activity.approve');
-    Route::patch('user-activity/{id}/reject', [App\Http\Controllers\UserActivityController::class, 'reject'])->name('user-activity.reject');
+    Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');
+    Route::patch('user-activity/{id}/approve', [UserManagementController::class, 'approve'])->name('user-activity.approve');
+    Route::patch('user-activity/{id}/reject', [UserManagementController::class, 'reject'])->name('user-activity.reject');
 });
 
 require __DIR__ . '/auth.php';

@@ -1,7 +1,7 @@
 <x-guest-layout>
 
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan dari admin. Anda akan menerima email konfirmasi setelah akun disetujui.') }}
+        {{ __('Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan dari admin. Silahkan menghubungi admin untuk konfirmasi aktivasi akun anda .') }}
     </div>
 
     <div class="flex items-center justify-between mt-4">

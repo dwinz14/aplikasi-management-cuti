@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
-class UserActivityController extends Controller
+class UserManagementController extends Controller
 {
     public function index()
     {
