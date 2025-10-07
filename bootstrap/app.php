@@ -18,11 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChangeMiddleware::class,
+            \App\Http\Middleware\PreventBackAfterLoginLogout::class,
         ]);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'force.password.change' => \App\Http\Middleware\ForcePasswordChangeMiddleware::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackAfterLoginLogout::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
