@@ -16,36 +16,80 @@
     </script>
 
     <title>{{ config('app.name', 'ACC') }}</title>
+    <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
-    <div class="min-h-screen flex">
-        <div
-            class="hidden lg:flex w-1/2 items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800 p-12 text-white relative overflow-hidden">
-            <div class="absolute -top-1/4 -left-1/4 w-96 h-96 bg-primary-500/30 rounded-full animate-pulse"></div>
-            <div
-                class="absolute -bottom-1/4 -right-1/4 w-96 h-96 bg-primary-700/30 rounded-full animate-pulse delay-75">
+<body class="font-sans antialiased">
+    <div class="min-h-screen flex flex-col lg:flex-row">
+        <!-- Left Panel - Hidden on mobile, optimized for tablet/desktop -->
+        <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 items-center justify-center p-6 xl:p-12 relative overflow-hidden bg-cover bg-center"
+            style="background-image: url('{{ asset('img/bg-auth.jpeg') }}');">
+
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-blue-900/50 to-slate-900/70"></div>
+
+            <!-- Content Container -->
+            <div class="relative z-10 w-full max-w-lg">
+                <!-- Glassmorphism Card -->
+                <div
+                    class="bg-gradient-to-r from-primary-700/30 to-primary-600/30 backdrop-blur-md rounded-3xl p-8 xl:p-12 shadow-2xl">
+                    <!-- Logo -->
+                    <a href="/" class="block mb-8">
+                        <x-application-logo
+                            class="w-20 h-20 xl:w-24 xl:h-24 mx-auto text-white hover:scale-105 transition-transform duration-300" />
+                    </a>
+
+                    <!-- Title -->
+                    <h1 class="text-3xl xl:text-4xl font-bold mb-4 text-center text-white drop-shadow-lg">
+                        PORTAL-CUTI
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="text-white/90 text-center text-base xl:text-lg leading-relaxed">
+                        Website Cuti Karyawan<br>
+                        <span class="text-blue-300 font-semibold">PT BPR Artha Pamenang</span>
+                    </p>
+                </div>
             </div>
-            <div class="relative z-10 text-center">
-                <a href="/">
-                    <x-application-logo
-                        class="w-24 h-24 mx-auto mb-6 text-gray-500 dark:text-gray-400 transition-colors duration-300" />
-                </a>
-                <h1 class="text-4xl font-bold mb-3">PORTAL-CUTI</h1>
-                <p class="text-primary-200">Website Cuti Karyawan PT BPR Artha Pamenang.</p>
+
+            <!-- Animated Background Elements -->
+            <div aria-hidden="true"
+                class="absolute -top-32 -left-32 w-72 h-72 xl:w-96 xl:h-96 bg-gradient-to-tr from-blue-400/20 to-blue-600/30 rounded-full blur-3xl animate-pulse">
+            </div>
+            <div aria-hidden="true"
+                class="absolute -bottom-32 -right-32 w-72 h-72 xl:w-96 xl:h-96 bg-gradient-to-br from-blue-300/20 to-blue-500/30 rounded-full blur-3xl animate-pulse"
+                style="animation-delay: 1s;">
             </div>
         </div>
 
-        <div class="w-full lg:w-1/2 flex items-center justify-center bg-gray-100 dark:bg-slate-900 p-4 sm:p-8 md:p-12">
-            <!-- Theme Toggle -->
-            <div class="absolute top-4 right-4">
-                <x-theme-toggle />
-            </div>
-            <div class="w-full max-w-md">
-                {{ $slot }}
+        <!-- Right Panel - Form Container -->
+        <div
+            class="w-full lg:w-7/12 xl:w-1/2 flex items-center justify-center bg-white dark:bg-slate-900 transition-colors duration-300">
+            <div class="w-full h-full flex flex-col">
+                <!-- Header with Theme Toggle -->
+                <div class="flex items-center justify-between p-4 sm:p-6 lg:p-8">
+                    <!-- Mobile Logo -->
+                    <a href="/" class="lg:hidden">
+                        <x-application-logo class="w-10 h-10 text-primary-600 dark:text-primary-400" />
+                    </a>
+
+                    <div class="lg:hidden"></div> <!-- Spacer -->
+
+                    <!-- Theme Toggle - Better positioned -->
+                    <div class="ml-auto">
+                        <x-theme-toggle />
+                    </div>
+                </div>
+
+                <!-- Form Content - Scrollable with proper padding -->
+                <div class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-8">
+                    <div class="w-full max-w-md mx-auto">
+                        {{ $slot }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
