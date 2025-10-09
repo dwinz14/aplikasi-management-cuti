@@ -15,9 +15,9 @@ class DivisionSeeder extends Seeder
     {
         DB::table('divisions')->insert([
             ['nama_divisi' => 'direksi', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'HRD', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'operasional', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'Marketing', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'human resource', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'divisi-coba', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'marketing', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
