@@ -59,8 +59,8 @@
                     </div>
                     <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
                         <div>
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $leave->user->name }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100"> Pengganti Untuk :
+                                {{ Str::title($leave->user->name) }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $leave->user->role }}</p>
                         </div>
                         <div class="hidden sm:block md:hidden">

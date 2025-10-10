@@ -10,12 +10,12 @@
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $user->name }}</h4>
+                                    {{ Str::title($user->name) }}</h4>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
                                 </p>
                                 <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                                     Role: {{ ucfirst($user->role) }} • Divisi:
-                                    {{ $user->division->nama_divisi ?? 'Tidak ada' }}
+                                    {{ $user->division?->nama_divisi ? Str::title($user->division?->nama_divisi) : '-' }}
                                 </p>
                                 <p class="text-xs text-gray-600 dark:text-gray-400">
                                     Daftar:

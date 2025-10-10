@@ -14,6 +14,11 @@ class DivisionController extends Controller
     public function index()
     {
         $divisions = Division::all();
+        // Transform nama_divisi to uppercase for display
+        $divisions->transform(function ($division) {
+            $division->nama_divisi = strtoupper($division->nama_divisi);
+            return $division;
+        });
         return view('admin.divisions.index', compact('divisions'));
     }
 
@@ -31,11 +36,14 @@ class DivisionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_divisi' => 'required|string|max:255|unique:divisions,nama_divisi',
+            'nama_divisi' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:divisions,nama_divisi',
         ]);
 
+        // Sanitize and normalize: trim and convert to lowercase
+        $nama_divisi = strtolower(trim($request->nama_divisi));
+
         Division::create([
-            'nama_divisi' => $request->nama_divisi,
+            'nama_divisi' => $nama_divisi,
         ]);
 
         return redirect()->route('admin.divisions.index')->with('success', 'Divisi berhasil ditambahkan.');
@@ -46,6 +54,8 @@ class DivisionController extends Controller
      */
     public function edit(Division $division)
     {
+        // Transform nama_divisi to uppercase for display in form
+        $division->nama_divisi = strtoupper($division->nama_divisi);
         return view('admin.divisions.edit', compact('division'));
     }
 
@@ -55,11 +65,14 @@ class DivisionController extends Controller
     public function update(Request $request, Division $division)
     {
         $request->validate([
-            'nama_divisi' => 'required|string|max:255|unique:divisions,nama_divisi,' . $division->id,
+            'nama_divisi' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:divisions,nama_divisi,' . $division->id,
         ]);
 
+        // Sanitize and normalize: trim and convert to lowercase
+        $nama_divisi = strtolower(trim($request->nama_divisi));
+
         $division->update([
-            'nama_divisi' => $request->nama_divisi,
+            'nama_divisi' => $nama_divisi,
         ]);
 
         return redirect()->route('admin.divisions.index')->with('success', 'Divisi berhasil diperbarui.');

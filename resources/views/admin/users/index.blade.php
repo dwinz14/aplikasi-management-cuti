@@ -147,7 +147,7 @@
                                     {{ $users->firstItem() + $index }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                                    {{ $user->name }}</td>
+                                    {{ Str::title($user->name) }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">
@@ -163,7 +163,8 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $user->division?->nama_divisi ?? '-' }}</td>
+                                    {{ $user->division?->nama_divisi ? Str::title($user->division?->nama_divisi) : '-' }}
+                                </td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->sisa_cuti }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">

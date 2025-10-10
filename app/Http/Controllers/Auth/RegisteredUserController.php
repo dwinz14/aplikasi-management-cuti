@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -24,27 +25,50 @@ class RegisteredUserController extends Controller
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        // Trim inputs and normalize data before validation
+        $input = $request->all();
+        $input['nik'] = trim($input['nik'] ?? '');
+        $input['name'] = strtolower(trim($input['name'] ?? ''));
+        $input['email'] = strtolower(trim($input['email'] ?? ''));
+        $input['role'] = trim($input['role'] ?? '');
+        $input['division_id'] = $input['division_id'] ?? null;
+        $input['password'] = $input['password'] ?? '';
+        $input['password_confirmation'] = $input['password_confirmation'] ?? '';
+
+        $validator = Validator::make($input, [
             'nik' => ['required', 'string', 'size:11', 'regex:/^AP\d{9}$/', 'unique:' . User::class],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
             'division_id' => ['nullable', 'exists:divisions,id'],
-            'password' => ['required', 'confirmed', 'regex:/^[A-Z].{7,}$/', 'regex:/.*\d.*/', 'regex:/.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?].*/'],
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^[A-Z].*/', // starts with uppercase letter
+                'regex:/\d/',       // contains at least one digit
+                'regex:/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/' // contains special char
+            ],
+        ], [
+            'name.regex' => 'Nama hanya boleh berisi huruf dan spasi.',
+            'password.regex' => 'Kata sandi harus dimulai dengan huruf besar, mengandung setidaknya satu digit dan satu karakter khusus.',
+            'nik.regex' => 'Format NIK tidak valid. Harus diawali dengan "AP" diikuti 9 digit.',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->route('register')->withErrors($validator)->withInput();
+        }
+
         $user = User::create([
-            'nik' => $request->nik,
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'division_id' => $request->division_id,
+            'nik' => $input['nik'],
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+            'role' => $input['role'],
+            'division_id' => $input['division_id'],
             'sisa_cuti' => 12,
             'status' => 'pending',
         ]);
