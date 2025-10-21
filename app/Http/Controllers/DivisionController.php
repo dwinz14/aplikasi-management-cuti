@@ -11,14 +11,12 @@ class DivisionController extends Controller
     /**
      * Display a listing of the divisions.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $divisions = Division::all();
-        // Transform nama_divisi to uppercase for display
-        $divisions->transform(function ($division) {
-            $division->nama_divisi = strtoupper($division->nama_divisi);
-            return $division;
-        });
+
+        $divisions = Division::query()
+            ->paginate(10);
+
         return view('admin.divisions.index', compact('divisions'));
     }
 
