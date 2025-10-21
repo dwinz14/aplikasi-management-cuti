@@ -15,39 +15,39 @@ class LeaveController extends Controller
 {
 
     // helper private agar controller tetap bersih & konsisten via config
-    private function getApprovalStepsFor(User $user): array
-    {
-        $map = config('approval_flow');
-        return $map[$user->role] ?? [];
-    }
+    // private function getApprovalStepsFor(User $user): array
+    // {
+    //     $map = config('approval_flow');
+    //     return $map[$user->role] ?? [];
+    // }
 
-    private function resolveApproverId(string $step, User $requester, ?int $replacementIdFromForm): ?int
-    {
-        if ($step === 'pengganti') {
-            return $replacementIdFromForm;
-        }
+    // private function resolveApproverId(string $step, User $requester, ?int $replacementIdFromForm): ?int
+    // {
+    //     if ($step === 'pengganti') {
+    //         return $replacementIdFromForm;
+    //     }
 
-        if ($step === 'atasan_divisi') {
-            $kasie = User::where('division_id', $requester->division_id)->where('role', 'kasie')->first();
-            if ($kasie) return $kasie->id;
-            $kabag = User::where('division_id', $requester->division_id)->where('role', 'kabag')->first();
-            return $kabag?->id;
-        }
+    //     if ($step === 'atasan_divisi') {
+    //         $kasie = User::where('division_id', $requester->division_id)->where('role', 'kasie')->first();
+    //         if ($kasie) return $kasie->id;
+    //         $kabag = User::where('division_id', $requester->division_id)->where('role', 'kabag')->first();
+    //         return $kabag?->id;
+    //     }
 
-        if ($step === 'kabag') {
-            return User::where('division_id', $requester->division_id)->where('role', 'kabag')->value('id');
-        }
+    //     if ($step === 'kabag') {
+    //         return User::where('division_id', $requester->division_id)->where('role', 'kabag')->value('id');
+    //     }
 
-        if ($step === 'direksi') {
-            return User::where('role', 'direksi')->value('id'); // asumsi minimal 1
-        }
+    //     if ($step === 'direksi') {
+    //         return User::where('role', 'direksi')->value('id'); // asumsi minimal 1
+    //     }
 
-        if ($step === 'auto') {
-            return null;
-        }
+    //     if ($step === 'auto') {
+    //         return null;
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
     public function index()
     {
@@ -63,7 +63,14 @@ class LeaveController extends Controller
             ? User::where('division_id', $user->division_id)->where('id', '!=', $user->id)->get()
             : collect();
 
-        return view('leaves.create', compact('penggantiList', 'requiresReplacement'));
+        $requiresAtasan = !in_array($user->role, ['direksi'], true);
+        $atasanList = $requiresAtasan
+            ? ($user->role === 'hrd'
+                ? User::where('role', 'direksi')->get()
+                : User::where('division_id', $user->division_id)->whereIn('role', ['kasie', 'kabag'])->get())
+            : collect();
+
+        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan'));
     }
 
     public function store(Request $request)
@@ -75,6 +82,7 @@ class LeaveController extends Controller
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => 'required|string',
             'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
+            'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 
         $totalHari = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
@@ -86,7 +94,7 @@ class LeaveController extends Controller
 
         //  Validasi masih ada pengajuan aktif
         $hasActiveLeave = Leave::where('user_id', $user->id)
-            ->whereIn('status_final', ['pending'])
+            ->whereIn('status_final', ['pending', 'approved'])
             ->where(function ($q) {
                 $q->where('end_date', '>=', now()->toDateString()); // masih berjalan
             })
@@ -158,10 +166,8 @@ class LeaveController extends Controller
                 'status_final' => 'pending',
             ]);
 
-            $steps = $this->getApprovalStepsFor($user);
-
             // direksi -> auto approve
-            if ($user->role === 'direksi' || (count($steps) === 1 && $steps[0] === 'auto')) {
+            if ($user->role === 'direksi') {
                 $leave->update(['status_final' => 'approved']);
                 $leave->user->decrement('sisa_cuti', $leave->total_hari);
 
@@ -175,20 +181,14 @@ class LeaveController extends Controller
                 return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti disetujui otomatis.');
             }
 
-            // buat list approver sesuai urutan, hindari duplikasi approver
-            $uniqueApprovers = [];
-            foreach ($steps as $symbol) {
-                if ($symbol === 'auto') {
-                    continue;
-                } // pemohon non-direksi tidak pakai auto
-                $approverId = $this->resolveApproverId($symbol, $user, $request->pengganti_id);
-                if ($approverId && !in_array($approverId, $uniqueApprovers)) {
-                    $uniqueApprovers[] = $approverId;
-                }
+            // buat approval steps: pengganti dulu jika berbeda, lalu atasan
+            $approvers = [];
+            if ($request->pengganti_id && $request->pengganti_id != $request->atasan_id) {
+                $approvers[] = $request->pengganti_id;
             }
+            $approvers[] = $request->atasan_id;
 
-            // buat approval dengan step berurutan
-            foreach ($uniqueApprovers as $index => $approverId) {
+            foreach ($approvers as $index => $approverId) {
                 Approval::create([
                     'leave_id'    => $leave->id,
                     'approver_id' => $approverId,
