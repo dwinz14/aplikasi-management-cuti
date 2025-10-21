@@ -70,6 +70,9 @@
                                 <h4 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-2">Detail
                                     Pengajuan</h4>
                                 <div class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                                    <p><span class="font-medium">Approval sebagai:</span>
+                                        {{ $approval->approver_id == $approval->leave->pengganti_id ? 'Pengganti' : 'Atasan' }}
+                                    </p>
                                     <p><span class="font-medium">Tanggal:</span>
                                         {{ \Carbon\Carbon::parse($approval->leave->start_date)->isoFormat('dddd, D MMMM YYYY') }}
                                         s/d
