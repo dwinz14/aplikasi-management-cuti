@@ -254,7 +254,7 @@
                                 Batal
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-md transition-colors">
+                                class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-md transition-colors">
                                 Hapus
                             </button>
                         </div>

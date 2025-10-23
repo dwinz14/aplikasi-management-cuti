@@ -10,14 +10,6 @@
                     Tambahkan jabatan baru ke dalam sistem.
                 </p>
             </div>
-            <a href="{{ route('admin.positions.index') }}"
-                class="inline-flex items-center px-3 py-2 bg-gray-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Kembali
-            </a>
         </div>
     </x-slot>
 
@@ -31,16 +23,19 @@
                     <x-text-input id="nama_jabatan" name="nama_jabatan" type="text" class="mt-1 block w-full"
                         :value="old('nama_jabatan')" required autofocus autocomplete="nama_jabatan" />
                     <x-input-error :messages="$errors->get('nama_jabatan')" class="mt-2" />
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Masukkan nama jabatan (hanya huruf dan spasi diperbolehkan).
-                    </p>
                 </div>
 
-                <div class="flex items-center justify-end">
+                <div class="flex items-center justify-end space-x-3" x-data="{ previousUrl: '{{ url()->previous() }}' }">
+                    <button type="button" @click="window.location = previousUrl"
+                        class="inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-slate-600 border border-gray-300 dark:border-gray-500 rounded-full font-semibold text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-slate-800 disabled:opacity-25 transition ease-in-out duration-150">
+                        Batal
+                    </button>
+
                     <x-primary-button>
                         {{ __('Simpan') }}
                     </x-primary-button>
                 </div>
+
             </form>
         </div>
     </div>
