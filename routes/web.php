@@ -10,12 +10,14 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\MasterOfficeController;
+use App\Http\Controllers\MasterPositionController;
 use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
 use App\Http\Controllers\UserManagementController;
-use App\Http\Controllers\PositionController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -93,7 +95,8 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
 // route master for super admin
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('divisions', DivisionController::class);
-    Route::resource('positions', PositionController::class);
+    Route::resource('positions', MasterPositionController::class);
+    Route::resource('offices', MasterOfficeController::class);
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');
