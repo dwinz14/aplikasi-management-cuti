@@ -25,6 +25,8 @@ class User extends Authenticatable
         'role',
         'status',
         'division_id',
+        'position_id',
+        'office_id',
         'sisa_cuti',
         'last_login_at',
         'must_change_password'
@@ -55,6 +57,16 @@ class User extends Authenticatable
     public function division()
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
     }
 
     /**

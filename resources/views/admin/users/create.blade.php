@@ -86,11 +86,45 @@
                                     @foreach ($divisions as $division)
                                         <option value="{{ $division->id }}"
                                             {{ old('division_id') == $division->id ? 'selected' : '' }}>
-                                            {{ $division->nama_divisi }}
+                                            {{ strtoupper($division->nama_divisi) }}
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('division_id')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="position_id" value="Jabatan" />
+                                <select id="position_id" name="position_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2">
+                                    <option value="">-- Pilih Jabatan --</option>
+                                    @foreach ($positions as $position)
+                                        <option value="{{ $position->id }}"
+                                            {{ old('position_id') == $position->id ? 'selected' : '' }}>
+                                            {{ strtoupper($position->nama_jabatan) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('position_id')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-input-label for="office_id" value="Kantor" />
+                                <select id="office_id" name="office_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2">
+                                    <option value="">-- Pilih Kantor --</option>
+                                    @foreach ($offices as $office)
+                                        <option value="{{ $office->id }}"
+                                            {{ old('office_id') == $office->id ? 'selected' : '' }}>
+                                            {{ strtoupper($office->nama_kantor) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('office_id')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>

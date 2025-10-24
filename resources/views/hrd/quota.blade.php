@@ -48,7 +48,7 @@
                              @foreach ($divisions as $division)
                                  <option value="{{ $division->id }}"
                                      {{ $divisionId == $division->id ? 'selected' : '' }}>
-                                     {{ $division->nama_divisi }}
+                                     {{ strtoupper($division->nama_divisi) }}
                                  </option>
                              @endforeach
                          </select>
@@ -126,7 +126,8 @@
                                  class="w-full rounded-md border-yellow-300 dark:border-yellow-600 dark:bg-yellow-900/70 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-xs">
                                  <option value="">-- Pilih Divisi --</option>
                                  @foreach ($divisions as $division)
-                                     <option value="{{ $division->id }}">{{ $division->nama_divisi }}</option>
+                                     <option value="{{ $division->id }}">{{ strtoupper($division->nama_divisi) }}
+                                     </option>
                                  @endforeach
                              </select>
                              <div class="flex gap-2">
@@ -169,10 +170,11 @@
                      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                          @forelse($users as $user)
                              <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/40">
-                                 <td class="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}
+                                 <td class="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">
+                                     {{ Str::title($user->name) }}
                                  </td>
                                  <td class="px-4 py-2 text-gray-500 dark:text-gray-400">
-                                     {{ $user->division->nama_divisi ?? '-' }}</td>
+                                     {{ strtoupper($user->division->nama_divisi) ?? '-' }}</td>
                                  <td class="px-4 py-2">
                                      <span
                                          class="px-1.5 py-0.5 text-xs font-semibold rounded-full

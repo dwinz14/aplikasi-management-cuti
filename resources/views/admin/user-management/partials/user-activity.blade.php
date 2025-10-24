@@ -42,7 +42,7 @@
                         {{ $users->firstItem() + $index }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                        {{ $user->name }}
+                        {{ Str::title($user->name) }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                         {{ $user->email }}
@@ -60,7 +60,7 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                        {{ $user->division_name ?? '-' }}
+                        {{ strtoupper($user->division_name) ?? '-' }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                         {{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->format('d/m/Y H:i') : '-' }}

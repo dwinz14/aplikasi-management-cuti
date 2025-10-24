@@ -26,7 +26,7 @@
                             <option value="">-- Semua Divisi --</option>
                             @foreach ($divisions as $division)
                                 <option value="{{ $division->id }}" @selected($divisionId == $division->id)>
-                                    {{ $division->nama_divisi }}
+                                    {{ strtoupper($division->nama_divisi) }}
                                 </option>
                             @endforeach
                         </select>
@@ -91,9 +91,9 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition duration-150">
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $leave->user->name }}</td>
+                                    {{ Str::title($leave->user->name) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $leave->user->division->nama_divisi ?? '-' }}</td>
+                                    {{ strtoupper($leave->user->division->nama_divisi) ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ \Carbon\Carbon::parse($leave->start_date)->isoFormat('D MMM YYYY') }} -
                                     {{ \Carbon\Carbon::parse($leave->end_date)->isoFormat('D MMM YYYY') }}
@@ -122,7 +122,7 @@
                                     @php
                                         $lastApproval = $leave->approvalHistories()->latest()->first();
                                     @endphp
-                                    {{ $lastApproval ? $lastApproval->approver->name : '-' }}
+                                    {{ $lastApproval ? Str::title($lastApproval->approver->name) : '-' }}
                                 </td>
                             </tr>
                         @empty

@@ -96,7 +96,32 @@
                             @foreach ($divisions as $division)
                                 <option value="{{ $division->id }}"
                                     {{ $division->id == $divisionId ? 'selected' : '' }}>
-                                    {{ $division->nama_divisi }}
+                                    {{ strtoupper($division->nama_divisi) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Jabatan</label>
+                        <select name="position_id"
+                            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-3 py-2">
+                            <option value="">Semua Jabatan</option>
+                            @foreach ($positions as $position)
+                                <option value="{{ $position->id }}"
+                                    {{ $position->id == $positionId ? 'selected' : '' }}>
+                                    {{ strtoupper($position->nama_jabatan) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Kantor</label>
+                        <select name="office_id"
+                            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-3 py-2">
+                            <option value="">Semua Kantor</option>
+                            @foreach ($offices as $office)
+                                <option value="{{ $office->id }}" {{ $office->id == $officeId ? 'selected' : '' }}>
+                                    {{ strtoupper($office->nama_kantor) }}
                                 </option>
                             @endforeach
                         </select>
@@ -142,6 +167,12 @@
                                 Divisi</th>
                             <th
                                 class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Jabatan</th>
+                            <th
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Kantor</th>
+                            <th
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Sisa Cuti</th>
                             <th
                                 class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -171,7 +202,13 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $user->division?->nama_divisi ? Str::title($user->division?->nama_divisi) : '-' }}
+                                    {{ $user->division?->nama_divisi ? strtoupper($user->division?->nama_divisi) : '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $user->position?->nama_jabatan ? strtoupper($user->position?->nama_jabatan) : '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $user->office?->nama_kantor ? strtoupper($user->office?->nama_kantor) : '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->sisa_cuti }}
                                 </td>
@@ -216,7 +253,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7"
+                                <td colspan="9"
                                     class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Division;
+use App\Models\Position;
+use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -17,16 +19,22 @@ class MasterUserController extends Controller
         $search     = $request->get('search');
         $role       = $request->get('role');
         $divisionId = $request->get('division_id');
+        $positionId = $request->get('position_id');
+        $officeId   = $request->get('office_id');
 
-        $users = User::with('division')
+        $users = User::with(['division', 'position', 'office'])
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
             ->when($role, fn($q) => $q->where('role', $role))
             ->when($divisionId, fn($q) => $q->where('division_id', $divisionId))
+            ->when($positionId, fn($q) => $q->where('position_id', $positionId))
+            ->when($officeId, fn($q) => $q->where('office_id', $officeId))
             ->orderBy('name')
-            ->paginate(10)
+            ->paginate(8)
             ->withQueryString();
 
         $divisions = Cache::remember('divisions_all', 3600, fn() => Division::all());
+        $positions = Cache::remember('positions_all', 3600, fn() => Position::all());
+        $offices = Cache::remember('offices_all', 3600, fn() => Office::all());
 
         // // Convert user names to title case for display
         // $users->getCollection()->transform(function ($user) {
@@ -38,13 +46,15 @@ class MasterUserController extends Controller
         //     return $divisions;
         // });
 
-        return view('admin.users.index', compact('users', 'divisions', 'search', 'role', 'divisionId'));
+        return view('admin.users.index', compact('users', 'divisions', 'positions', 'offices', 'search', 'role', 'divisionId', 'positionId', 'officeId'));
     }
 
     public function create()
     {
         $divisions = Cache::remember('divisions_all', 3600, fn() => Division::all());
-        return view('admin.users.create', compact('divisions'));
+        $positions = Cache::remember('positions_all', 3600, fn() => Position::all());
+        $offices = Cache::remember('offices_all', 3600, fn() => Office::all());
+        return view('admin.users.create', compact('divisions', 'positions', 'offices'));
     }
 
     public function store(Request $request)
@@ -61,6 +71,8 @@ class MasterUserController extends Controller
             'email'       => ['required', 'email', 'unique:users,email'],
             'role'        => ['required', 'in:super_admin,hrd,kadiv,kasie,staff,direksi'],
             'division_id' => ['nullable', 'exists:divisions,id'],
+            'position_id' => ['nullable', 'exists:positions,id'],
+            'office_id'   => ['nullable', 'exists:offices,id'],
             'sisa_cuti'   => ['required', 'integer', 'min:0'],
 
             // Pesan error kustom (opsional)
@@ -84,7 +96,9 @@ class MasterUserController extends Controller
     public function edit(User $user)
     {
         $divisions = Cache::remember('divisions_all', 3600, fn() => Division::all());
-        return view('admin.users.edit', compact('user', 'divisions'));
+        $positions = Cache::remember('positions_all', 3600, fn() => Position::all());
+        $offices = Cache::remember('offices_all', 3600, fn() => Office::all());
+        return view('admin.users.edit', compact('user', 'divisions', 'positions', 'offices'));
     }
 
     public function update(Request $request, User $user)
@@ -101,6 +115,8 @@ class MasterUserController extends Controller
             'email'       => ['required', 'email', 'unique:users,email,' . $user->id],
             'role'        => ['required', 'in:super_admin,hrd,kabag,kasie,staff,direksi'],
             'division_id' => ['nullable', 'exists:divisions,id'],
+            'position_id' => ['nullable', 'exists:positions,id'],
+            'office_id'   => ['nullable', 'exists:offices,id'],
             'sisa_cuti'   => ['required', 'integer', 'min:0'],
 
             // Pesan error kustom (opsional)

@@ -62,7 +62,7 @@
                 </div>
 
                 <x-primary-button
-                    class="w-full justify-center py-3.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 focus:ring-4 focus:ring-primary-500/30 dark:focus:ring-primary-400/30 transition-all duration-200 rounded-xl shadow-lg shadow-primary-500/20 font-semibold drop-shadow-lg drop-shadow-indigo-500/50">
+                    class="w-full justify-center py-3.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 focus:ring-4 focus:ring-primary-500/30 dark:focus:ring-primary-400/30 transition-all duration-200 rounded-full shadow-lg shadow-primary-500/20 font-semibold drop-shadow-lg drop-shadow-indigo-500/50">
                     {{ __('Sign In') }}
                 </x-primary-button>
             </form>
@@ -129,7 +129,7 @@
                     </div>
 
                     <button type="button" @click="step = 2"
-                        class="w-full py-3.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/20 focus:outline-none focus:ring-4 focus:ring-primary-500/30">
+                        class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-medium rounded-full transition-all duration-200 shadow-md shadow-primary-500/20 focus:outline-none focus:ring-2 focus:ring-primary-500/30 text-sm">
                         Lanjutkan
                     </button>
                 </div>
@@ -138,41 +138,37 @@
                 <div x-show="step === 2" x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="space-y-5">
 
-                    <!-- Role & Division in Grid -->
+                    <!-- Role, Division, Position & Office in Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Role -->
-                        <div>
-                            <x-input-label for="role" :value="__('Role')"
-                                class="mb-2 text-gray-800 dark:text-gray-200 font-medium" />
-                            <select id="role" name="role" required
-                                class="block w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200">
-                                <option value="">Pilih Role</option>
-                                <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
-                                <option value="kasie" {{ old('role') == 'kasie' ? 'selected' : '' }}>Kasie</option>
-                                <option value="kabag" {{ old('role') == 'kabag' ? 'selected' : '' }}>Kabag</option>
-                                <option value="hrd" {{ old('role') == 'hrd' ? 'selected' : '' }}>HRD</option>
-                                <option value="direksi" {{ old('role') == 'direksi' ? 'selected' : '' }}>Direksi
-                                </option>
-                            </select>
-                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-                        </div>
+                        <x-select-dropdown name="role" label="Role" :options="[
+                            ['id' => 'staff', 'name' => 'Staff'],
+                            ['id' => 'kasie', 'name' => 'Kasie'],
+                            ['id' => 'kabag', 'name' => 'Kabag'],
+                            ['id' => 'hrd', 'name' => 'HRD'],
+                            ['id' => 'direksi', 'name' => 'Direksi'],
+                        ]" :selected="old('role')"
+                            placeholder="Pilih Role" />
 
                         <!-- Division -->
-                        <div>
-                            <x-input-label for="division_id" :value="__('Divisi')"
-                                class="mb-2 text-gray-800 dark:text-gray-200 font-medium" />
-                            <select id="division_id" name="division_id" required
-                                class="block w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200">
-                                <option value="">Pilih Divisi</option>
-                                @foreach (\App\Models\Division::all() as $division)
-                                    <option value="{{ $division->id }}"
-                                        {{ old('division_id') == $division->id ? 'selected' : '' }}>
-                                        {{ $division->nama_divisi }}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('division_id')" class="mt-2" />
-                        </div>
+                        <x-select-dropdown name="division_id" label="Divisi" :options="collect(\App\Models\Division::all())
+                            ->map(fn($d) => ['id' => $d->id, 'name' => strtoupper($d->nama_divisi)])
+                            ->toArray()" :selected="old('division_id')"
+                            placeholder="Pilih Divisi" />
+
+                        <!-- Position -->
+                        <x-select-dropdown name="position_id" label="Jabatan" :options="collect(\App\Models\Position::all())
+                            ->map(fn($p) => ['id' => $p->id, 'name' => strtoupper($p->nama_jabatan)])
+                            ->toArray()" :selected="old('position_id')"
+                            placeholder="Pilih Jabatan" />
+
+                        <!-- Office -->
+                        <x-select-dropdown name="office_id" label="Kantor" :options="collect(\App\Models\Office::all())
+                            ->map(fn($o) => ['id' => $o->id, 'name' => strtoupper($o->nama_kantor)])
+                            ->toArray()" :selected="old('office_id')"
+                            placeholder="Pilih Kantor" />
                     </div>
+
 
                     <!-- Password -->
                     <div>
@@ -241,11 +237,11 @@
                     <!-- Action Buttons -->
                     <div class="flex gap-3">
                         <button type="button" @click="step = 1"
-                            class="px-6 py-3.5 bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-800 dark:text-gray-200 font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-gray-300/50 dark:focus:ring-slate-500/50">
+                            class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-800 dark:text-gray-200 font-medium rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300/50 dark:focus:ring-slate-500/50 text-sm">
                             Kembali
                         </button>
                         <x-primary-button
-                            class="flex-1 justify-center py-3.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 focus:ring-4 focus:ring-primary-500/30 dark:focus:ring-primary-400/30 transition-all duration-200 rounded-xl shadow-lg shadow-primary-500/20 font-semibold">
+                            class="flex-1 justify-center py-2.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 focus:ring-2 focus:ring-primary-500/30 dark:focus:ring-primary-400/30 transition-all duration-200 rounded-full shadow-md shadow-primary-500/20 font-medium text-sm">
                             {{ __('Daftar Sekarang') }}
                         </x-primary-button>
                     </div>

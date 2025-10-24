@@ -31,6 +31,8 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'position_id' => ['nullable', 'exists:positions,id'],
+            'office_id' => ['nullable', 'exists:offices,id'],
         ];
     }
 }

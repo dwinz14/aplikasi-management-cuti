@@ -35,6 +35,8 @@ class RegisteredUserController extends Controller
         $input['email'] = strtolower(trim($input['email'] ?? ''));
         $input['role'] = trim($input['role'] ?? '');
         $input['division_id'] = $input['division_id'] ?? null;
+        $input['position_id'] = $input['position_id'] ?? null;
+        $input['office_id'] = $input['office_id'] ?? null;
         $input['password'] = $input['password'] ?? '';
         $input['password_confirmation'] = $input['password_confirmation'] ?? '';
 
@@ -44,6 +46,8 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
             'division_id' => ['nullable', 'exists:divisions,id'],
+            'position_id' => ['nullable', 'exists:positions,id'],
+            'office_id' => ['nullable', 'exists:offices,id'],
             'password' => [
                 'required',
                 'confirmed',
@@ -69,6 +73,8 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($input['password']),
             'role' => $input['role'],
             'division_id' => $input['division_id'],
+            'position_id' => $input['position_id'],
+            'office_id' => $input['office_id'],
             'sisa_cuti' => 12,
             'status' => 'pending',
         ]);
