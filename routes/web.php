@@ -13,6 +13,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\MasterOfficeController;
 use App\Http\Controllers\MasterPositionController;
 use App\Http\Controllers\MasterUserController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
@@ -72,6 +73,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/history', [ApprovalController::class, 'history'])->name('history');
         Route::patch('/{approval}/approve', [ApprovalController::class, 'approve'])->name('approve');
         Route::patch('/{approval}/reject', [ApprovalController::class, 'reject'])->name('reject');
+    });
+
+    // Routes untuk notifikasi
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
+        Route::get('/latest', [NotificationController::class, 'getLatest'])->name('latest');
     });
 });
 

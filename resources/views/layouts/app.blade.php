@@ -48,12 +48,15 @@
                             </div>
                         </div>
 
-                        <!-- Right section - theme toggle and user menu -->
+                        <!-- Right section - theme toggle, notifications, and user menu -->
                         <div class="flex items-center space-x-3">
                             <!-- Theme Toggle -->
                             <div class="flex items-center">
                                 <x-theme-toggle size="w-5 h-5" />
                             </div>
+
+                            <!-- Notifications -->
+                            <x-notification-dropdown />
 
                             <!-- User Menu -->
                             <x-dropdown align="right" width="48">

@@ -6,6 +6,7 @@ use App\Models\Leave;
 use App\Models\User;
 use App\Models\Approval;
 use App\Models\ApprovalHistory;
+use App\Jobs\SendNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -195,6 +196,16 @@ class LeaveController extends Controller
                     'step'        => $index + 1,
                     'status'      => 'pending',
                 ]);
+
+                // Kirim notifikasi ke approver
+                $approver = User::find($approverId);
+                SendNotification::dispatch(
+                    $approverId,
+                    'leave_request',
+                    'Pengajuan Cuti Baru',
+                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
+                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
+                );
             }
 
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');

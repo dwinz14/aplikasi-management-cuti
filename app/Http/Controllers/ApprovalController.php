@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Approval;
 use App\Models\ApprovalHistory;
+use App\Jobs\SendNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,12 +51,30 @@ class ApprovalController extends Controller
             'catatan'     => $request->input('catatan'),
         ]);
 
+        // Kirim notifikasi ke pemohon cuti
+        SendNotification::dispatch(
+            $approval->leave->user_id,
+            'leave_approved',
+            'Cuti Disetujui',
+            "Pengajuan cuti Anda telah disetujui oleh " . Auth::user()->name,
+            ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
+        );
+
         // jika semua approved → final approve + potong cuti
         $allApproved = $approval->leave->approvals()->where('status', '!=', 'approved')->exists() === false;
         if ($allApproved) {
             $leave = $approval->leave;
             $leave->update(['status_final' => 'approved']);
             $leave->user->decrement('sisa_cuti', $leave->total_hari);
+
+            // Kirim notifikasi final approval
+            SendNotification::dispatch(
+                $leave->user_id,
+                'leave_final_approved',
+                'Cuti Final Disetujui',
+                "Pengajuan cuti Anda telah disetujui secara final dan cuti telah dipotong dari kuota Anda.",
+                ['leave_id' => $leave->id]
+            );
         }
 
         return back()->with('success', 'Approval disetujui.');
@@ -76,6 +95,15 @@ class ApprovalController extends Controller
             'status'      => 'rejected',
             'catatan'     => $request->input('catatan'),
         ]);
+
+        // Kirim notifikasi ke pemohon cuti
+        SendNotification::dispatch(
+            $approval->leave->user_id,
+            'leave_rejected',
+            'Cuti Ditolak',
+            "Pengajuan cuti Anda telah ditolak oleh " . Auth::user()->name,
+            ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
+        );
 
         return back()->with('error', 'Approval ditolak.');
     }
