@@ -171,9 +171,6 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-500">
                                     ${this.timeAgo(notification.created_at)}
                                 </p>
-                                <button onclick="event.stopPropagation(); markAsRead(${notification.id})" class="text-xs text-blue-600 hover:text-blue-500 ${notification.is_read ? 'hidden' : ''}">
-                                    Tandai dibaca
-                                </button>
                             </div>
                         </div>
                     </div>

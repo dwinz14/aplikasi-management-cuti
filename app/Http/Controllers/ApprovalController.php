@@ -60,9 +60,19 @@ class ApprovalController extends Controller
             ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
         );
 
-        // jika semua approved → final approve + potong cuti
-        $allApproved = $approval->leave->approvals()->where('status', '!=', 'approved')->exists() === false;
-        if ($allApproved) {
+        // Cek apakah ada approver berikutnya
+        $nextApproval = $approval->leave->approvals()->where('step', '>', $approval->step)->orderBy('step')->first();
+        if ($nextApproval) {
+            // Kirim notifikasi ke approver berikutnya
+            SendNotification::dispatch(
+                $nextApproval->approver_id,
+                'leave_request',
+                'Pengajuan Cuti Baru',
+                "Pengajuan cuti dari {$approval->leave->user->name} membutuhkan persetujuan Anda.",
+                ['leave_id' => $approval->leave_id, 'requester_id' => $approval->leave->user_id]
+            );
+        } else {
+            // Jika tidak ada approver berikutnya, final approve + potong cuti
             $leave = $approval->leave;
             $leave->update(['status_final' => 'approved']);
             $leave->user->decrement('sisa_cuti', $leave->total_hari);

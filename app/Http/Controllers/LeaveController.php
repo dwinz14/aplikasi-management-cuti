@@ -200,17 +200,17 @@ class LeaveController extends Controller
                     'step'        => $index + 1,
                     'status'      => 'pending',
                 ]);
-
-                // Kirim notifikasi ke approver
-                $approver = User::find($approverId);
-                SendNotification::dispatch(
-                    $approverId,
-                    'leave_request',
-                    'Pengajuan Cuti Baru',
-                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
-                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
-                );
             }
+
+            // Kirim notifikasi hanya ke approver pertama (pengganti jika ada, else atasan)
+            $firstApproverId = $approvers[0];
+            SendNotification::dispatch(
+                $firstApproverId,
+                'leave_request',
+                'Pengajuan Cuti Baru',
+                "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
+                ['leave_id' => $leave->id, 'requester_id' => $user->id]
+            );
 
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');
         });
