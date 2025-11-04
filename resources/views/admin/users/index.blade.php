@@ -186,7 +186,7 @@
                                     {{ $users->firstItem() + $index }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                                    {{ Str::title($user->name) }}</td>
+                                    {{ strtoupper($user->name) }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">

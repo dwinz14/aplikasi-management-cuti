@@ -10,49 +10,18 @@ use App\Jobs\SendNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class LeaveController extends Controller
 {
-
-    // helper private agar controller tetap bersih & konsisten via config
-    // private function getApprovalStepsFor(User $user): array
-    // {
-    //     $map = config('approval_flow');
-    //     return $map[$user->role] ?? [];
-    // }
-
-    // private function resolveApproverId(string $step, User $requester, ?int $replacementIdFromForm): ?int
-    // {
-    //     if ($step === 'pengganti') {
-    //         return $replacementIdFromForm;
-    //     }
-
-    //     if ($step === 'atasan_divisi') {
-    //         $kasie = User::where('division_id', $requester->division_id)->where('role', 'kasie')->first();
-    //         if ($kasie) return $kasie->id;
-    //         $kabag = User::where('division_id', $requester->division_id)->where('role', 'kabag')->first();
-    //         return $kabag?->id;
-    //     }
-
-    //     if ($step === 'kabag') {
-    //         return User::where('division_id', $requester->division_id)->where('role', 'kabag')->value('id');
-    //     }
-
-    //     if ($step === 'direksi') {
-    //         return User::where('role', 'direksi')->value('id'); // asumsi minimal 1
-    //     }
-
-    //     if ($step === 'auto') {
-    //         return null;
-    //     }
-
-    //     return null;
-    // }
-
     public function index()
     {
-        $leaves = Leave::with('approvals.approver')->where('user_id', Auth::id())->latest()->paginate(5);
+        $leaves = Leave::with('approvals.approver')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->paginate(5);
+
         return view('leaves.index', compact('leaves'));
     }
 
@@ -60,17 +29,29 @@ class LeaveController extends Controller
     {
         $user = Auth::user();
         $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag'], true);
+
         $penggantiList = $requiresReplacement
-            ? User::where('office_id', $user->office_id)->where('id', '!=', $user->id)->get()
+            ? Cache::remember("pengganti_{$user->office_id}", 300, fn() =>
+            User::select('id', 'name', 'role')->where('office_id', $user->office_id)->where('id', '!=', $user->id)->get())
             : collect();
 
         $requiresAtasan = !in_array($user->role, ['direksi'], true);
         $atasanList = collect();
+
         if ($requiresAtasan) {
-            $direksi = User::where('role', 'direksi')->where('id', '!=', $user->id)->get();
+            $direksi = Cache::remember('direksi_users', 300, fn() =>
+            User::select('id', 'name', 'role')->where('role', 'direksi')->get());
+
             $atasanList = $atasanList->merge($direksi);
+
             if ($user->role !== 'hrd') {
-                $others = User::where('office_id', $user->office_id)->whereIn('role', ['hrd', 'kasie', 'kabag'])->where('id', '!=', $user->id)->get();
+                $others = Cache::remember("atasan_{$user->office_id}", 300, fn() =>
+                User::select('id', 'name', 'role')
+                    ->where('office_id', $user->office_id)
+                    ->whereIn('role', ['hrd', 'kasie', 'kabag'])
+                    ->where('id', '!=', $user->id)
+                    ->get());
+
                 $atasanList = $atasanList->merge($others);
             }
         }
@@ -85,79 +66,31 @@ class LeaveController extends Controller
         $request->validate([
             'start_date'    => 'required|date|after_or_equal:today',
             'end_date'      => 'required|date|after_or_equal:start_date',
-            'alasan'        => 'required|string',
+            'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
             'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
             'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 
         $totalHari = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
 
-        // cegah minus sisa_cuti (kecuali direksi auto approve; untuk simplicity tetap validasi juga)
         if ($user->sisa_cuti < $totalHari && $user->role !== 'direksi') {
             return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
         }
 
-        //  Validasi masih ada pengajuan aktif
-        $hasActiveLeave = Leave::where('user_id', $user->id)
-            ->whereIn('status_final', ['pending', 'approved'])
-            ->where(function ($q) {
-                $q->where('end_date', '>=', now()->toDateString()); // masih berjalan
-            })
-            ->exists();
-
-        if ($hasActiveLeave) {
-            return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending, tidak bisa ajukan cuti baru.']);
+        if ($this->hasOverlapLeave($user->id, $request->start_date, $request->end_date)) {
+            return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending.']);
         }
 
-        // Validasi pengganti tidak sedang cuti
-        $penggantiOnLeave = Leave::where('user_id', $request->pengganti_id)
-            ->whereIn('status_final', ['approved', 'pending'])
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
-                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('start_date', '<=', $request->start_date)
-                            ->where('end_date', '>=', $request->end_date);
-                    });
-            })
-            ->exists();
-
-        if ($penggantiOnLeave) {
-            return back()->withErrors(['msg' => 'Pengganti yang dipilih sedang cuti pada tanggal tersebut.']);
+        if ($request->pengganti_id && $this->hasOverlapLeave($request->pengganti_id, $request->start_date, $request->end_date)) {
+            return back()->withErrors(['msg' => 'Pengganti yang dipilih sedang cuti di tanggal tersebut.']);
         }
 
-        // Validasi pengganti tidak double approve di rentang waktu sama
-        $penggantiOverlap = Leave::where('pengganti_id', $request->pengganti_id)
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
-                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('start_date', '<=', $request->start_date)
-                            ->where('end_date', '>=', $request->end_date);
-                    });
-            })
-            ->whereNotIn('status_final', ['rejected']) //  semua selain rejected dianggap blocking
-            ->exists();
-
-        if ($penggantiOverlap) {
-            return back()->withErrors(['msg' => 'Pengganti yang dipilih sudah ditugaskan pada cuti lain di tanggal tersebut.']);
+        if ($this->hasOverlapReplacement($request->pengganti_id, $request->start_date, $request->end_date)) {
+            return back()->withErrors(['msg' => 'Pengganti tersebut sudah ditugaskan pada cuti lain.']);
         }
 
-        // Validasi user tidak sedang sebagai pengganti di rentang waktu tersebut
-        $userAsReplacement = Leave::where('pengganti_id', $user->id)
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('start_date', [$request->start_date, $request->end_date])
-                    ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('start_date', '<=', $request->start_date)
-                            ->where('end_date', '>=', $request->end_date);
-                    });
-            })
-            ->whereNotIn('status_final', ['rejected'])
-            ->exists();
-
-        if ($userAsReplacement) {
-            return back()->withErrors(['msg' => 'Anda sedang ditugaskan sebagai pengganti pada tanggal tersebut, tidak bisa ajukan cuti.']);
+        if ($this->hasOverlapReplacement($user->id, $request->start_date, $request->end_date)) {
+            return back()->withErrors(['msg' => 'Anda sedang jadi pengganti di tanggal tersebut.']);
         }
 
         return DB::transaction(function () use ($request, $user, $totalHari) {
@@ -171,7 +104,6 @@ class LeaveController extends Controller
                 'status_final' => 'pending',
             ]);
 
-            // direksi -> auto approve
             if ($user->role === 'direksi') {
                 $leave->update(['status_final' => 'approved']);
                 $leave->user->decrement('sisa_cuti', $leave->total_hari);
@@ -186,12 +118,10 @@ class LeaveController extends Controller
                 return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti disetujui otomatis.');
             }
 
-            // buat approval steps: pengganti dulu jika berbeda, lalu atasan
-            $approvers = [];
-            if ($request->pengganti_id && $request->pengganti_id != $request->atasan_id) {
-                $approvers[] = $request->pengganti_id;
-            }
-            $approvers[] = $request->atasan_id;
+            $approvers = collect([$request->pengganti_id, $request->atasan_id])
+                ->filter()
+                ->unique()
+                ->values();
 
             foreach ($approvers as $index => $approverId) {
                 Approval::create([
@@ -202,10 +132,8 @@ class LeaveController extends Controller
                 ]);
             }
 
-            // Kirim notifikasi hanya ke approver pertama (pengganti jika ada, else atasan)
-            $firstApproverId = $approvers[0];
             SendNotification::dispatch(
-                $firstApproverId,
+                $approvers->first(),
                 'leave_request',
                 'Pengajuan Cuti Baru',
                 "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
@@ -215,52 +143,37 @@ class LeaveController extends Controller
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');
         });
     }
-    // public function edit(Leave $leave)
-    // { // Policy optional
 
-    //     $user = Auth::user();
-    //     $penggantiList = User::where('division_id', $user->division_id)
-    //         ->where('id', '!=', $user->id)
-    //         ->get();
-
-    //     $kabagList = User::where('role', 'kabag')
-    //         ->where('division_id', $user->division_id)
-    //         ->get();
-
-    //     return view('cuti.edit', compact('leave', 'penggantiList', 'kabagList'));
-    // }
-
-    /**
-     * Update cuti.
-     */
-    public function update(Request $request, Leave $leave)
+    private function hasOverlapLeave($userId, $start, $end)
     {
-        // $request->validate([
-        //     'start_date' => 'required|date|after_or_equal:today',
-        //     'end_date' => 'required|date|after_or_equal:start_date',
-        //     'alasan' => 'required|string',
-        //     'pengganti_id' => 'nullable|exists:users,id',
-        //     'kabag_id' => 'nullable|exists:users,id',
-        // ]);
-
-        // $totalHari = (new \Carbon\Carbon($request->start_date))
-        //     ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
-
-        // $leave->update([
-        //     'pengganti_id' => $request->pengganti_id,
-        //     'kabag_id' => $request->kabag_id,
-        //     'start_date' => $request->start_date,
-        //     'end_date' => $request->end_date,
-        //     'total_hari' => $totalHari,
-        //     'alasan' => $request->alasan,
-        // ]);
-
-        // return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil diperbarui.');
+        return Leave::where('user_id', $userId)
+            ->whereIn('status_final', ['pending', 'approved'])
+            ->where(function ($q) use ($start, $end) {
+                $q->whereBetween('start_date', [$start, $end])
+                    ->orWhereBetween('end_date', [$start, $end])
+                    ->orWhere(function ($q2) use ($start, $end) {
+                        $q2->where('start_date', '<=', $start)
+                            ->where('end_date', '>=', $end);
+                    });
+            })
+            ->exists();
     }
 
-    /**
-     * Hapus cuti.
-     */
+    private function hasOverlapReplacement($replacementId, $start, $end)
+    {
+        return Leave::where('pengganti_id', $replacementId)
+            ->whereNotIn('status_final', ['rejected'])
+            ->where(function ($q) use ($start, $end) {
+                $q->whereBetween('start_date', [$start, $end])
+                    ->orWhereBetween('end_date', [$start, $end])
+                    ->orWhere(function ($q2) use ($start, $end) {
+                        $q2->where('start_date', '<=', $start)
+                            ->where('end_date', '>=', $end);
+                    });
+            })
+            ->exists();
+    }
+
     public function destroy(Leave $leave)
     {
         $leave->delete();

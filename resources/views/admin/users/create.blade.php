@@ -57,9 +57,6 @@
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
-                        </div>
-
-                        <div class="space-y-6">
                             <div>
                                 <x-input-label for="role" value="Role" />
                                 <select id="role" name="role"
@@ -77,7 +74,9 @@
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
+                        </div>
 
+                        <div class="space-y-6">
                             <div>
                                 <x-input-label for="division_id" value="Divisi" />
                                 <select id="division_id" name="division_id"
