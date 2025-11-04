@@ -7,9 +7,9 @@
                     {{ __('Dashboard') }}
                 </h2>
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">
+            {{-- <div class="text-sm text-gray-500 dark:text-gray-400">
                 {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
-            </div>
+            </div> --}}
         </div>
     </x-slot>
 
@@ -22,17 +22,20 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <h1 class="text-2xl font-bold mb-2">
-                            Selamat Datang, {{ auth()->user()->name }}! 👋
+                            Selamat Datang, {{ strtoupper(auth()->user()->name) }}! 👋
                         </h1>
                         <p class="text-primary-100 text-base mb-4">
                             Ringkasan aktivitas dan status cuti Anda
                         </p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm font-medium">
-                                {{ auth()->user()->role }}
+                                {{ strtoupper(auth()->user()->role) }}
                             </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
-                                {{ auth()->user()->division->nama_divisi ?? 'Division' }}
+                                {{ strtoupper(auth()->user()->division->nama_divisi ?? 'Division') }}
+                            </span>
+                            <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
+                                {{ strtoupper(auth()->user()->position->nama_jabatan ?? 'Position') }}
                             </span>
                         </div>
                     </div>

@@ -44,6 +44,9 @@
                         <div class="flex items-center space-x-4">
                             <!-- Placeholder for additional menu items -->
                             <div id="header-left-menu" class="flex items-center space-x-2">
+                                <div class="ml-2 text-gray-700 dark:text-gray-300 font-medium hidden sm:block">
+                                    {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
+                                </div>
                                 <!-- Future menu items can be added here -->
                             </div>
                         </div>
