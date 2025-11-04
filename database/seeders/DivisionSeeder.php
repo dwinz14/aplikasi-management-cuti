@@ -14,10 +14,11 @@ class DivisionSeeder extends Seeder
     public function run(): void
     {
         DB::table('divisions')->insert([
-            ['nama_divisi' => 'direksi', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'human resource', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'divisi-coba', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_divisi' => 'marketing', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'operasional', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'skai', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'apuppt', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'hrd', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'umum', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
