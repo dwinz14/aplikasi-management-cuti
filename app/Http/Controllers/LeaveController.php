@@ -61,15 +61,19 @@ class LeaveController extends Controller
         $user = Auth::user();
         $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag'], true);
         $penggantiList = $requiresReplacement
-            ? User::where('division_id', $user->division_id)->where('id', '!=', $user->id)->get()
+            ? User::where('office_id', $user->office_id)->where('id', '!=', $user->id)->get()
             : collect();
 
         $requiresAtasan = !in_array($user->role, ['direksi'], true);
-        $atasanList = $requiresAtasan
-            ? ($user->role === 'hrd'
-                ? User::where('role', 'direksi')->get()
-                : User::where('division_id', $user->division_id)->whereIn('role', ['kasie', 'kabag'])->get())
-            : collect();
+        $atasanList = collect();
+        if ($requiresAtasan) {
+            $direksi = User::where('role', 'direksi')->where('id', '!=', $user->id)->get();
+            $atasanList = $atasanList->merge($direksi);
+            if ($user->role !== 'hrd') {
+                $others = User::where('office_id', $user->office_id)->whereIn('role', ['hrd', 'kasie', 'kabag'])->where('id', '!=', $user->id)->get();
+                $atasanList = $atasanList->merge($others);
+            }
+        }
 
         return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan'));
     }
