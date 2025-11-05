@@ -29,7 +29,8 @@ class User extends Authenticatable
         'office_id',
         'sisa_cuti',
         'last_login_at',
-        'must_change_password'
+        'must_change_password',
+        'gender'
     ];
 
     /**
@@ -67,6 +68,11 @@ class User extends Authenticatable
     public function office()
     {
         return $this->belongsTo(Office::class);
+    }
+
+    public function userLeaveBalances()
+    {
+        return $this->hasMany(UserLeaveBalance::class);
     }
 
     /**

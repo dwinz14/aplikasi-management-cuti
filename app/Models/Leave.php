@@ -11,6 +11,7 @@ class Leave extends Model
 
     protected $fillable = [
         'user_id',
+        'leave_type_id',
         'pengganti_id',
         'kabag_id',
         'start_date',
@@ -27,6 +28,12 @@ class Leave extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function leaveType()
+    {
+        return $this->belongsTo(LeaveType::class);
+    }
+
     public function approvals()
     {
         return $this->hasMany(Approval::class);

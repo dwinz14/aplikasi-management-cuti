@@ -128,14 +128,6 @@
                                 @enderror
                             </div>
 
-                            <div>
-                                <x-input-label for="sisa_cuti" value="Sisa Cuti" />
-                                <x-text-input id="sisa_cuti" name="sisa_cuti" type="number"
-                                    value="{{ old('sisa_cuti', 12) }}" min="0" required />
-                                @error('sisa_cuti')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
-                            </div>
                         </div>
                     </div>
 

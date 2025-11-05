@@ -151,47 +151,44 @@
                     <thead class="bg-gray-50 dark:bg-slate-700/50">
                         <tr>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 #</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Nama</th>
+                            {{-- <th
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Email</th> --}}
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Email</th>
-                            <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Role</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Divisi</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Jabatan</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Kantor</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Sisa Cuti</th>
-                            <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                         @forelse ($users as $index => $user)
                             <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors">
-                                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                <td class="px-4 py-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                                     {{ $users->firstItem() + $index }}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium">
                                     {{ strtoupper($user->name) }}</td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
-                                </td>
-                                <td class="px-4 py-3 text-sm">
+                                {{-- <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
+                                </td> --}}
+                                <td class="px-2 py-2 text-sm">
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                                         @if ($user->role === 'super_admin') bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400
                                         @elseif($user->role === 'hrd') bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400
                                         @elseif($user->role === 'kabag') bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400
@@ -201,18 +198,16 @@
                                         {{ ucfirst(str_replace('_', ' ', $user->role)) }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $user->division?->nama_divisi ? strtoupper($user->division?->nama_divisi) : '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $user->position?->nama_jabatan ? strtoupper($user->position?->nama_jabatan) : '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $user->office?->nama_kantor ? strtoupper($user->office?->nama_kantor) : '-' }}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user->sisa_cuti }}
-                                </td>
-                                <td class="px-4 py-3 text-sm">
+                                <td class="px-4 py-2 text-sm">
                                     <div class="flex items-center space-x-2">
                                         {{-- Edit --}}
                                         <a href="{{ route('admin.users.edit', $user->id) }}"

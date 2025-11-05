@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\MasterOfficeController;
 use App\Http\Controllers\MasterPositionController;
+use App\Http\Controllers\MasterLeaveTypeController;
 use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -107,6 +108,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::resource('divisions', DivisionController::class);
     Route::resource('positions', MasterPositionController::class);
     Route::resource('offices', MasterOfficeController::class);
+    Route::resource('leave-types', MasterLeaveTypeController::class);
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');

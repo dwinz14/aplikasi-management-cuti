@@ -6,6 +6,8 @@ use App\Models\Leave;
 use App\Models\User;
 use App\Models\Approval;
 use App\Models\ApprovalHistory;
+use App\Models\LeaveType;
+use App\Models\UserLeaveBalance;
 use App\Jobs\SendNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,24 @@ class LeaveController extends Controller
             }
         }
 
-        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan'));
+        // Get available leave types for the user
+        $leaveTypes = LeaveType::where('is_active', true)
+            ->when($user->gender, function ($query) use ($user) {
+                return $query->where(function ($q) use ($user) {
+                    $q->whereNull('gender')
+                        ->orWhere('gender', $user->gender);
+                });
+            })
+            ->get();
+
+        // Get user's leave balances for current year
+        $userLeaveBalances = UserLeaveBalance::where('user_id', $user->id)
+            ->where('year', now()->year)
+            ->with('leaveType')
+            ->get()
+            ->keyBy('leave_type_id');
+
+        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances'));
     }
 
     public function store(Request $request)
@@ -64,6 +83,7 @@ class LeaveController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            'leave_type_id' => 'required|exists:leave_types,id',
             'start_date'    => 'required|date|after_or_equal:today',
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
@@ -71,9 +91,28 @@ class LeaveController extends Controller
             'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 
+        // Validate leave type availability for user
+        $leaveType = LeaveType::findOrFail($request->leave_type_id);
+        if ($leaveType->gender && $leaveType->gender !== $user->gender) {
+            return back()->withErrors(['leave_type_id' => 'Jenis cuti ini tidak tersedia untuk Anda.'])->withInput();
+        }
+
         $totalHari = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
 
-        if ($user->sisa_cuti < $totalHari && $user->role !== 'direksi') {
+        // Check quota for non-unlimited leave types
+        if ($leaveType->quota > 0) {
+            $userLeaveBalance = UserLeaveBalance::where('user_id', $user->id)
+                ->where('leave_type_id', $request->leave_type_id)
+                ->where('year', now()->year)
+                ->first();
+
+            if (!$userLeaveBalance || $userLeaveBalance->remaining < $totalHari) {
+                return back()->withErrors(['msg' => 'Kuota cuti tidak mencukupi untuk jenis cuti ini.'])->withInput();
+            }
+        }
+
+        // For backward compatibility, check old sisa_cuti if no specific leave type quota
+        if ($leaveType->quota == 0 && $user->sisa_cuti < $totalHari && $user->role !== 'direksi') {
             return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
         }
 
@@ -93,20 +132,36 @@ class LeaveController extends Controller
             return back()->withErrors(['msg' => 'Anda sedang jadi pengganti di tanggal tersebut.']);
         }
 
-        return DB::transaction(function () use ($request, $user, $totalHari) {
+        return DB::transaction(function () use ($request, $user, $totalHari, $leaveType) {
             $leave = Leave::create([
-                'user_id'     => $user->id,
-                'pengganti_id' => $request->pengganti_id,
-                'start_date'  => $request->start_date,
-                'end_date'    => $request->end_date,
-                'total_hari'  => $totalHari,
-                'alasan'      => $request->alasan,
-                'status_final' => 'pending',
+                'user_id'       => $user->id,
+                'leave_type_id' => $request->leave_type_id,
+                'pengganti_id'   => $request->pengganti_id,
+                'start_date'    => $request->start_date,
+                'end_date'      => $request->end_date,
+                'total_hari'    => $totalHari,
+                'alasan'        => $request->alasan,
+                'status_final'   => 'pending',
             ]);
 
             if ($user->role === 'direksi') {
                 $leave->update(['status_final' => 'approved']);
-                $leave->user->decrement('sisa_cuti', $leave->total_hari);
+
+                // Update leave balance for non-unlimited leave types
+                if ($leaveType->quota > 0) {
+                    $userLeaveBalance = UserLeaveBalance::where('user_id', $user->id)
+                        ->where('leave_type_id', $request->leave_type_id)
+                        ->where('year', now()->year)
+                        ->first();
+
+                    if ($userLeaveBalance) {
+                        $userLeaveBalance->increment('used', $totalHari);
+                        $userLeaveBalance->decrement('remaining', $totalHari);
+                    }
+                } else {
+                    // Backward compatibility for unlimited leave types
+                    $leave->user->decrement('sisa_cuti', $leave->total_hari);
+                }
 
                 ApprovalHistory::create([
                     'leave_id'    => $leave->id,

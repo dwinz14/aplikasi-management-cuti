@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leave_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_jenis_cuti');
-            $table->string('jumlah_hari');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('gender', ['L', 'P'])->nullable()->after('role');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_types');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('gender');
+        });
     }
 };

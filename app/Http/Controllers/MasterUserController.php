@@ -73,7 +73,6 @@ class MasterUserController extends Controller
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
             'office_id'   => ['nullable', 'exists:offices,id'],
-            'sisa_cuti'   => ['required', 'integer', 'min:0'],
 
             // Pesan error kustom (opsional)
             'nik.regex' => 'Format NIK salah.',
@@ -117,7 +116,6 @@ class MasterUserController extends Controller
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
             'office_id'   => ['nullable', 'exists:offices,id'],
-            'sisa_cuti'   => ['required', 'integer', 'min:0'],
 
             // Pesan error kustom (opsional)
             'nik.regex' => 'Format NIK salah.',

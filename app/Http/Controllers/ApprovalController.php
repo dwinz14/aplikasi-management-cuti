@@ -75,7 +75,23 @@ class ApprovalController extends Controller
             // Jika tidak ada approver berikutnya, final approve + potong cuti
             $leave = $approval->leave;
             $leave->update(['status_final' => 'approved']);
-            $leave->user->decrement('sisa_cuti', $leave->total_hari);
+
+            // Potong cuti berdasarkan jenis cuti
+            if ($leave->leaveType->quota > 0) {
+                // Potong dari saldo jenis cuti spesifik
+                $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
+                    ->where('leave_type_id', $leave->leave_type_id)
+                    ->where('year', now()->year)
+                    ->first();
+
+                if ($userLeaveBalance) {
+                    $userLeaveBalance->increment('used', $leave->total_hari);
+                    $userLeaveBalance->decrement('remaining', $leave->total_hari);
+                }
+            } else {
+                // Backward compatibility untuk jenis cuti tanpa batas
+                $leave->user->decrement('sisa_cuti', $leave->total_hari);
+            }
 
             // Kirim notifikasi final approval
             SendNotification::dispatch(

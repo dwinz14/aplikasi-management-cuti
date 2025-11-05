@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\LeaveType;
+use Illuminate\Http\Request;
+
+class MasterLeaveTypeController extends Controller
+{
+    /**
+     * Display a listing of the leave types.
+     */
+    public function index(Request $request)
+    {
+        $leaveTypes = LeaveType::query()
+            ->paginate(10);
+
+        return view('admin.leave-types.index', compact('leaveTypes'));
+    }
+
+    /**
+     * Show the form for creating a new leave type.
+     */
+    public function create()
+    {
+        return view('admin.leave-types.create');
+    }
+
+    /**
+     * Store a newly created leave type in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:leave_types,name',
+            'quota' => 'required|integer|min:0',
+            'gender' => 'nullable|in:L,P',
+            'is_active' => 'boolean',
+        ]);
+
+        LeaveType::create([
+            'name' => $request->name,
+            'quota' => $request->quota,
+            'gender' => $request->gender,
+            'is_active' => $request->has('is_active'),
+        ]);
+
+        return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil ditambahkan.');
+    }
+
+    /**
+     * Display the specified leave type.
+     */
+    public function show(LeaveType $leaveType)
+    {
+        // return view('admin.leave-types.show', compact('leaveType'));
+    }
+
+    /**
+     * Show the form for editing the specified leave type.
+     */
+    public function edit(LeaveType $leaveType)
+    {
+        return view('admin.leave-types.edit', compact('leaveType'));
+    }
+
+    /**
+     * Update the specified leave type in storage.
+     */
+    public function update(Request $request, LeaveType $leaveType)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:leave_types,name,' . $leaveType->id,
+            'quota' => 'required|integer|min:0',
+            'gender' => 'nullable|in:L,P',
+            'is_active' => 'boolean',
+        ]);
+
+        $leaveType->update([
+            'name' => $request->name,
+            'quota' => $request->quota,
+            'gender' => $request->gender,
+            'is_active' => $request->has('is_active'),
+        ]);
+
+        return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified leave type from storage.
+     */
+    public function destroy(LeaveType $leaveType)
+    {
+        // Check if leave type is being used
+        if ($leaveType->leaves()->exists()) {
+            return back()->withErrors(['msg' => 'Jenis cuti tidak dapat dihapus karena masih digunakan dalam pengajuan cuti.']);
+        }
+
+        if ($leaveType->userLeaveBalances()->exists()) {
+            return back()->withErrors(['msg' => 'Jenis cuti tidak dapat dihapus karena masih memiliki saldo cuti pengguna.']);
+        }
+
+        $leaveType->delete();
+
+        return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil dihapus.');
+    }
+}

@@ -75,7 +75,7 @@ class RegisteredUserController extends Controller
             'division_id' => $input['division_id'],
             'position_id' => $input['position_id'],
             'office_id' => $input['office_id'],
-            'sisa_cuti' => 12,
+            // 'sisa_cuti' => 12,
             'status' => 'pending',
         ]);
 
