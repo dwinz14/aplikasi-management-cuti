@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HRDController;
@@ -101,6 +100,7 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
     Route::post('quota/reset', [QuotaController::class, 'resetAll'])->name('quota.reset');
     Route::post('quota/reset-division', [QuotaController::class, 'resetDivision'])->name('quota.resetDivision');
     Route::post('quota/{user}', [QuotaController::class, 'update'])->name('quota.update');
+    Route::post('quota/settings', [QuotaController::class, 'updateSettings'])->name('quota.settings');
 });
 
 // route master for super admin

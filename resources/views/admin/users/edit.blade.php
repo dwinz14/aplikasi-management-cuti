@@ -52,6 +52,23 @@
                             </div>
 
                             <div>
+                                <x-input-label for="gender" value="Jenis Kelamin" />
+                                <select id="gender" name="gender"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="L" {{ old('gender', $user->gender) == 'L' ? 'selected' : '' }}>
+                                        Laki-laki</option>
+                                    <option value="P" {{ old('gender', $user->gender) == 'P' ? 'selected' : '' }}>
+                                        Perempuan</option>
+                                </select>
+                                @error('gender')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
                                 <x-input-label for="role" value="Role" />
                                 <select id="role" name="role"
                                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2"
@@ -68,9 +85,7 @@
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="space-y-6">
                             <div>
                                 <x-input-label for="division_id" value="Divisi" />
                                 <select id="division_id" name="division_id"

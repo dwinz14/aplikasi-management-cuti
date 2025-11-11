@@ -97,13 +97,11 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm">
                                     @if ($leaveType->is_active)
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                             Aktif
                                         </span>
                                     @else
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
                                             Non-Aktif
                                         </span>
                                     @endif
@@ -168,8 +166,7 @@
                     Apakah Anda yakin ingin menghapus jenis cuti <span class="font-bold"
                         x-text="selectedLeaveTypeName"></span>?
                 </p>
-                <form
-                    x-bind:action="'{{ route('admin.leave-types.destroy', ':id') }}'.replace(':id', selectedLeaveType)"
+                <form x-bind:action="'{{ route('admin.leave-types.destroy', ':id') }}'.replace(':id', selectedLeaveType)"
                     method="POST">
                     @csrf
                     @method('DELETE')

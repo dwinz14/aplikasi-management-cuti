@@ -76,21 +76,25 @@ class ApprovalController extends Controller
             $leave = $approval->leave;
             $leave->update(['status_final' => 'approved']);
 
-            // Potong cuti berdasarkan jenis cuti
-            if ($leave->leaveType->quota > 0) {
-                // Potong dari saldo jenis cuti spesifik
-                $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
-                    ->where('leave_type_id', $leave->leave_type_id)
-                    ->where('year', now()->year)
-                    ->first();
+            // Potong cuti berdasarkan jenis cuti dari user_leave_balances
+            $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
+                ->where('leave_type_id', $leave->leave_type_id)
+                ->where('year', now()->year)
+                ->first();
 
-                if ($userLeaveBalance) {
-                    $userLeaveBalance->increment('used', $leave->total_hari);
-                    $userLeaveBalance->decrement('remaining', $leave->total_hari);
-                }
+            if ($userLeaveBalance) {
+                $userLeaveBalance->increment('used', $leave->total_hari);
+                $userLeaveBalance->decrement('remaining', $leave->total_hari);
             } else {
-                // Backward compatibility untuk jenis cuti tanpa batas
-                $leave->user->decrement('sisa_cuti', $leave->total_hari);
+                // Jika tidak ada balance record, buat baru dengan nilai default
+                \App\Models\UserLeaveBalance::create([
+                    'user_id' => $leave->user_id,
+                    'leave_type_id' => $leave->leave_type_id,
+                    'year' => now()->year,
+                    'allocated' => $leave->leaveType->quota ?? 0,
+                    'used' => $leave->total_hari,
+                    'remaining' => ($leave->leaveType->quota ?? 0) - $leave->total_hari,
+                ]);
             }
 
             // Kirim notifikasi final approval

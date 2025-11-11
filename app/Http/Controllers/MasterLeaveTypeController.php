@@ -13,6 +13,9 @@ class MasterLeaveTypeController extends Controller
     public function index(Request $request)
     {
         $leaveTypes = LeaveType::query()
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
             ->paginate(10);
 
         return view('admin.leave-types.index', compact('leaveTypes'));
@@ -53,7 +56,7 @@ class MasterLeaveTypeController extends Controller
      */
     public function show(LeaveType $leaveType)
     {
-        // return view('admin.leave-types.show', compact('leaveType'));
+        return view('admin.leave-types.show', compact('leaveType'));
     }
 
     /**

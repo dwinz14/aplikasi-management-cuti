@@ -37,6 +37,11 @@
                                 <option value="{{ $type->id }}" @selected(old('leave_type_id') == $type->id)
                                     data-quota="{{ $type->quota }}" data-gender="{{ $type->gender }}">
                                     {{ $type->name }}
+                                    @if ($type->quota > 0 && isset($userLeaveBalances[$type->id]))
+                                        (Sisa: {{ $userLeaveBalances[$type->id]->remaining }} hari)
+                                    @elseif ($type->quota > 0)
+                                        (Kuota: {{ $type->quota }} hari)
+                                    @endif
                                 </option>
                             @endforeach
                         </select>

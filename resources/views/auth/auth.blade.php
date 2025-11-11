@@ -128,6 +128,13 @@
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
+                    <!-- Gender -->
+                    <x-select-dropdown name="gender" label="Gender" :options="[
+                        ['id' => 'L', 'name' => 'Laki-laki'],
+                        ['id' => 'P', 'name' => 'Perempuan']
+                    ]" :selected="old('gender')"
+                        placeholder="Pilih Gender" />
+
                     <button type="button" @click="step = 2"
                         class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500 dark:hover:bg-primary-600 text-white font-medium rounded-full transition-all duration-200 shadow-md shadow-primary-500/20 focus:outline-none focus:ring-2 focus:ring-primary-500/30 text-sm">
                         Lanjutkan

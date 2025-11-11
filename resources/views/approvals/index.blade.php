@@ -80,6 +80,7 @@
                                     </p>
                                     <p><span class="font-medium">Total:</span> {{ $approval->leave->total_hari }} hari
                                     </p>
+                                    <p><span class="font-medium">Jenis Cuti:</span> {{ $approval->leave->leaveType->name ?? 'N/A' }}</p>
                                     <p class="italic"><span class="font-medium not-italic">Alasan:</span>
                                         "{{ $approval->leave->alasan }}"</p>
                                 </div>

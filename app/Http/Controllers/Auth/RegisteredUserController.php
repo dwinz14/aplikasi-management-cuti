@@ -33,6 +33,7 @@ class RegisteredUserController extends Controller
         $input['nik'] = trim($input['nik'] ?? '');
         $input['name'] = strtolower(trim($input['name'] ?? ''));
         $input['email'] = strtolower(trim($input['email'] ?? ''));
+        $input['gender'] = trim($input['gender'] ?? '');
         $input['role'] = trim($input['role'] ?? '');
         $input['division_id'] = $input['division_id'] ?? null;
         $input['position_id'] = $input['position_id'] ?? null;
@@ -44,6 +45,7 @@ class RegisteredUserController extends Controller
             'nik' => ['required', 'string', 'size:11', 'regex:/^AP\d{9}$/', 'unique:' . User::class],
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+            'gender' => ['required', 'in:L,P'],
             'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
@@ -70,6 +72,7 @@ class RegisteredUserController extends Controller
             'nik' => $input['nik'],
             'name' => $input['name'],
             'email' => $input['email'],
+            'gender' => $input['gender'],
             'password' => Hash::make($input['password']),
             'role' => $input['role'],
             'division_id' => $input['division_id'],

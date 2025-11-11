@@ -95,7 +95,7 @@
                         @foreach ($approvalHistory as $history)
                             <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors">
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                                    {{ $history->name }}</td>
+                                    {{ Str::title($history->name) }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $history->email }}</td>
                                 <td class="px-4 py-3 text-sm">

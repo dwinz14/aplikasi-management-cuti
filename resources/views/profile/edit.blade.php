@@ -164,7 +164,7 @@
                                         <p class="text-sm font-medium text-blue-100 dark:text-blue-200">
                                             {{ __('Sisa Cuti Tahunan') }}
                                         </p>
-                                        <p class="text-lg font-semibold">{{ $user->sisa_cuti }} days</p>
+                                        <p class="text-lg font-semibold">{{ $user->getAnnualLeaveBalance() }} days</p>
                                     </div>
                                 </div>
                             </div>

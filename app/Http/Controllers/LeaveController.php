@@ -111,10 +111,7 @@ class LeaveController extends Controller
             }
         }
 
-        // For backward compatibility, check old sisa_cuti if no specific leave type quota
-        if ($leaveType->quota == 0 && $user->sisa_cuti < $totalHari && $user->role !== 'direksi') {
-            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
-        }
+
 
         if ($this->hasOverlapLeave($user->id, $request->start_date, $request->end_date)) {
             return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending.']);
@@ -158,9 +155,6 @@ class LeaveController extends Controller
                         $userLeaveBalance->increment('used', $totalHari);
                         $userLeaveBalance->decrement('remaining', $totalHari);
                     }
-                } else {
-                    // Backward compatibility for unlimited leave types
-                    $leave->user->decrement('sisa_cuti', $leave->total_hari);
                 }
 
                 ApprovalHistory::create([
