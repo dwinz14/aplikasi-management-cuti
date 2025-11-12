@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Division;
 use App\Models\QuotaSetting;
 use App\Models\LeaveType;
+use App\Models\Office;
+use App\Models\Position;
 use App\Models\UserLeaveBalance;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,8 @@ class QuotaController extends Controller
 {
     public function index(Request $request)
     {
-        $divisions = Division::all();
+        $positions = Position::all();
+        $offices = Office::all();
         $leaveTypes = LeaveType::where('is_active', true)->get();
 
         // Get selected leave type (default to first active one)
@@ -21,7 +24,8 @@ class QuotaController extends Controller
         $selectedLeaveType = LeaveType::find($leaveTypeId);
 
         $search = $request->get('search');
-        $divisionId = $request->get('division_id');
+        $positionId = $request->get('position_id');
+        $officeId = $request->get('office_id');
         $role = $request->get('role');
 
         // Get user leave balances for selected leave type
@@ -33,8 +37,11 @@ class QuotaController extends Controller
             ->when($search, function ($q) use ($search) {
                 $q->where('users.name', 'like', "%{$search}%");
             })
-            ->when($divisionId, function ($q) use ($divisionId) {
-                $q->where('users.division_id', $divisionId);
+            ->when($positionId, function ($q) use ($positionId) {
+                $q->where('users.position_id', $positionId);
+            })
+            ->when($officeId, function ($q) use ($officeId) {
+                $q->where('users.office_id', $officeId);
             })
             ->when($role, function ($q) use ($role) {
                 $q->where('users.role', $role);
@@ -53,9 +60,11 @@ class QuotaController extends Controller
             'leaveTypes',
             'leaveTypeId',
             'selectedLeaveType',
-            'divisions',
+            'positions',
+            'positionId',
+            'offices',
+            'officeId',
             'search',
-            'divisionId',
             'role',
             'autoGenerate',
             'defaultQuota'
@@ -100,6 +109,28 @@ class QuotaController extends Controller
         }
 
         return back()->with('success', 'Kuota cuti divisi terpilih berhasil direset.');
+    }
+
+    public function resetPosition(Request $request)
+    {
+        $request->validate(['position_id' => 'required|exists:positions,id']);
+        $leaveTypeId = $request->get('leave_type_id');
+        $defaultQuota = $request->get('default_quota', 12);
+
+        if ($leaveTypeId) {
+            UserLeaveBalance::whereHas('user', function ($query) use ($request) {
+                $query->where('position_id', $request->position_id);
+            })
+                ->where('leave_type_id', $leaveTypeId)
+                ->where('year', now()->year)
+                ->update([
+                    'total_quota' => $defaultQuota,
+                    'remaining' => $defaultQuota,
+                    'used' => 0
+                ]);
+        }
+
+        return back()->with('success', 'Kuota cuti jabatan terpilih berhasil direset.');
     }
 
     public function update(Request $request, User $user, LeaveType $leaveType)

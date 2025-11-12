@@ -46,17 +46,33 @@
                                 placeholder="Ketik nama karyawan...">
                         </div>
 
-                        {{-- Division --}}
+                        {{-- Position --}}
                         <div>
-                            <label for="division_id"
-                                class="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">Divisi</label>
-                            <select id="division_id" name="division_id"
+                            <label for="position_id"
+                                class="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">Jabatan</label>
+                            <select id="position_id" name="position_id"
                                 class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-xs">
-                                <option value="">-- Semua Divisi --</option>
-                                @foreach ($divisions as $division)
-                                    <option value="{{ $division->id }}"
-                                        {{ $divisionId == $division->id ? 'selected' : '' }}>
-                                        {{ strtoupper($division->nama_divisi) }}
+                                <option value="">-- Semua Jabatan --</option>
+                                @foreach ($positions as $position)
+                                    <option value="{{ $position->id }}"
+                                        {{ $positionId == $position->id ? 'selected' : '' }}>
+                                        {{ strtoupper($position->nama_jabatan) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Office --}}
+                        <div>
+                            <label for="office_id"
+                                class="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">Kantor</label>
+                            <select id="office_id" name="office_id"
+                                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-xs">
+                                <option value="">-- Semua Kantor --</option>
+                                @foreach ($offices as $office)
+                                    <option value="{{ $office->id }}"
+                                        {{ $officeId == $office->id ? 'selected' : '' }}>
+                                        {{ strtoupper($office->nama_kantor) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -77,7 +93,7 @@
                         </div>
 
                         {{-- Actions --}}
-                        <div class="flex flex-col md:flex-row gap-2 items-stretch justify-end">
+                        <div class="flex flex-col md:flex-row gap-2 items-stretch justify-start">
                             <button type="submit"
                                 class="inline-flex items-center justify-center px-3 py-1.5 bg-primary-600 rounded-md text-white font-medium text-xs hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition">
                                 Terapkan
@@ -98,7 +114,7 @@
                 <div>
                     <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Pengaturan Kuota Cuti</h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Reset kuota cuti untuk semua karyawan atau per
-                        divisi</p>
+                        jabatan</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-amber-600 dark:text-amber-400">
@@ -162,20 +178,20 @@
                     </form>
                 </div>
 
-                {{-- Per Divisi --}}
+                {{-- Per Jabatan --}}
                 <div
                     class="p-3 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20">
-                    <h4 class="text-xs font-medium text-yellow-700 dark:text-yellow-200 mb-1">Reset per Divisi</h4>
-                    <form action="{{ route('hrd.quota.resetDivision') }}" method="POST" x-data
-                        @submit.prevent="if(confirm('Apakah yakin reset kuota divisi ini?')) $el.submit()">
+                    <h4 class="text-xs font-medium text-yellow-700 dark:text-yellow-200 mb-1">Reset per Jabatan</h4>
+                    <form action="{{ route('hrd.quota.resetPosition') }}" method="POST" x-data
+                        @submit.prevent="if(confirm('Apakah yakin reset kuota jabatan ini?')) $el.submit()">
                         @csrf
                         <input type="hidden" name="leave_type_id" value="{{ $leaveTypeId }}">
                         <div class="space-y-2">
-                            <select name="division_id" required
+                            <select name="position_id" required
                                 class="w-full rounded-md border-yellow-300 dark:border-yellow-600 dark:bg-yellow-900/70 dark:text-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-xs">
-                                <option value="">-- Pilih Divisi --</option>
-                                @foreach ($divisions as $division)
-                                    <option value="{{ $division->id }}">{{ strtoupper($division->nama_divisi) }}
+                                <option value="">-- Pilih Jabatan --</option>
+                                @foreach ($positions as $position)
+                                    <option value="{{ $position->id }}">{{ strtoupper($position->nama_jabatan) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -185,7 +201,7 @@
                                     class="flex-1 rounded-md border-yellow-300 dark:border-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-200 text-xs focus:border-yellow-500 focus:ring-yellow-500">
                                 <button type="submit"
                                     class="px-3 py-1.5 bg-yellow-600 text-white text-xs font-medium rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500">
-                                    Reset Divisi
+                                    Reset Jabatan
                                 </button>
                             </div>
                         </div>
@@ -206,76 +222,156 @@
                             @foreach ($leaveTypes as $leaveType)
                                 <option value="{{ $leaveType->id }}"
                                     {{ $leaveTypeId == $leaveType->id ? 'selected' : '' }}>
-                                    {{ $leaveType->name }}
+                                    {{ strtoupper($leaveType->name) }}
                                 </option>
                             @endforeach
                         </select>
                     </form>
                 </div>
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs table-fixed">
-                    <thead class="bg-gray-50 dark:bg-slate-700/50">
-                        <tr class="text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-wider">
-                            <th class="px-4 py-2 text-left w-1/5">Nama</th>
-                            <th class="px-4 py-2 text-left w-1/5">Divisi</th>
-                            <th class="px-4 py-2 text-left w-1/6">Role</th>
-                            <th class="px-4 py-2 text-center w-1/12">Alokasi</th>
-                            <th class="px-4 py-2 text-center w-1/12">Terpakai</th>
-                            <th class="px-4 py-2 text-center w-1/12">Sisa</th>
-                            <th class="px-4 py-2 text-center w-1/6">Aksi</th>
-                        </tr>
-                    </thead>
-
-
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($userLeaveBalances as $balance)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/40 transition duration-150">
-                                <td class="px-4 py-2 font-medium text-gray-900 dark:text-gray-100 break-words">
-                                    {{ Str::title($balance->user->name) }}
-                                </td>
-                                <td class="px-4 py-2 text-gray-500 dark:text-gray-400 break-words">
-                                    {{ strtoupper($balance->user->division->nama_divisi ?? '-') }}
-                                </td>
-                                <td class="px-4 py-2 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-0.5 text-[10px] font-bold rounded-full inline-flex items-center justify-center
-@if ($balance->user->role == 'staff') bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white
-@elseif($balance->user->role == 'kasie') bg-green-100 text-green-700 dark:bg-green-600 dark:text-white
-@elseif($balance->user->role == 'kabag') bg-purple-100 text-purple-700 dark:bg-purple-600 dark:text-white
-@else bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-white @endif">
-                                        {{ ucfirst($balance->user->role) }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-2 text-center font-semibold text-gray-900 dark:text-gray-100">
-                                    {{ $balance->total_quota }} hari</td>
-                                <td class="px-4 py-2 text-center font-semibold text-orange-600 dark:text-orange-400">
-                                    {{ $balance->used }} hari</td>
-                                <td class="px-4 py-2 text-center font-semibold text-green-600 dark:text-green-400">
-                                    {{ $balance->remaining }} hari</td>
-                                <td class="px-3 py-2">
-                                    <form
-                                        action="{{ route('hrd.quota.update', [$balance->user, $balance->leaveType]) }}"
-                                        method="POST" class="flex items-center justify-center gap-2">
-                                        @csrf
-                                        @method('POST')
-                                        <input type="number" name="remaining" value="{{ $balance->remaining }}"
-                                            min="0"
-                                            class="w-16 rounded-md border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 text-xs focus:border-primary-500 focus:ring-primary-500" />
-                                        <button type="submit"
-                                            class="px-3 py-1 bg-primary-600 text-white text-xs rounded-md hover:bg-primary-500 hover:shadow focus:ring-2 focus:ring-primary-500 transition-all">
-                                            Update
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
+                <div class="overflow-x-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead
+                            class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-700/80">
                             <tr>
-                                <td colspan="7" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                                    Tidak ada data karyawan ditemukan.
-                                </td>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Nama Karyawan
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Role
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Jabatan
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Kantor
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-center text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Alokasi
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-center text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Terpakai
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-center text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Sisa
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3.5 text-center text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                                    Aksi
+                                </th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            @forelse($userLeaveBalances as $balance)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                                                <span class="text-white font-semibold text-sm">
+                                                    {{ strtoupper(substr($balance->user->name, 0, 2)) }}
+                                                </span>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ Str::title($balance->user->name) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                            {{ strtoupper($balance->user->role) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                                            {{ strtoupper($balance->user->position->nama_jabatan ?? '-') }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                                            {{ strtoupper($balance->user->office->nama_kantor ?? '-') }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                                {{ $balance->total_quota }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">hari</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-bold text-orange-600 dark:text-orange-400">
+                                                {{ $balance->used }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">hari</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-bold text-green-600 dark:text-green-400">
+                                                {{ $balance->remaining }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">hari</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <form
+                                            action="{{ route('hrd.quota.update', [$balance->user, $balance->leaveType]) }}"
+                                            method="POST" class="flex items-center justify-center gap-2">
+                                            @csrf
+                                            @method('POST')
+                                            <div class="relative">
+                                                <input type="number" name="remaining"
+                                                    value="{{ $balance->remaining }}" min="0"
+                                                    class="w-20 px-3 py-2 text-xs font-medium text-center rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 transition-all"
+                                                    placeholder="0" />
+                                            </div>
+                                            <button type="submit"
+                                                class="inline-flex items-center px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-full shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Update
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <svg class="w-16 h-16 text-gray-400 dark:text-gray-600 mb-4"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                            </svg>
+                                            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+                                                Tidak ada data karyawan ditemukan
+                                            </p>
+                                            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">
+                                                Data akan muncul di sini setelah ditambahkan
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
             @if ($userLeaveBalances->hasPages())
                 <div class="px-4 py-2 border-t border-gray-200 dark:border-gray-700">{{ $userLeaveBalances->links() }}

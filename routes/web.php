@@ -99,7 +99,8 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
     Route::get('quota', [QuotaController::class, 'index'])->name('quota.index');
     Route::post('quota/reset', [QuotaController::class, 'resetAll'])->name('quota.reset');
     Route::post('quota/reset-division', [QuotaController::class, 'resetDivision'])->name('quota.resetDivision');
-    Route::post('quota/{user}', [QuotaController::class, 'update'])->name('quota.update');
+    Route::post('quota/reset-position', [QuotaController::class, 'resetPosition'])->name('quota.resetPosition');
+    Route::post('quota/{user}/{leaveType}', [QuotaController::class, 'update'])->name('quota.update');
     Route::post('quota/settings', [QuotaController::class, 'updateSettings'])->name('quota.settings');
 });
 
@@ -109,6 +110,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::resource('positions', MasterPositionController::class);
     Route::resource('offices', MasterOfficeController::class);
     Route::resource('leave-types', MasterLeaveTypeController::class);
+    Route::patch('leave-types/{leaveType}/toggle', [MasterLeaveTypeController::class, 'toggle'])->name('leave-types.toggle');
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');

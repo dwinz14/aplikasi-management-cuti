@@ -35,22 +35,24 @@
 
                 <div>
                     <x-input-label for="gender" :value="__('Batasan Gender')" />
-                    <select id="gender" name="gender" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                    <select id="gender" name="gender"
+                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                         <option value="">Semua Gender</option>
                         <option value="L" {{ old('gender') === 'L' ? 'selected' : '' }}>Laki-laki</option>
                         <option value="P" {{ old('gender') === 'P' ? 'selected' : '' }}>Perempuan</option>
                     </select>
                     <x-input-error :messages="$errors->get('gender')" class="mt-2" />
-                    <p class="text-sm text-gray-500 mt-1">Pilih gender jika jenis cuti ini khusus untuk laki-laki atau perempuan saja</p>
+                    <p class="text-sm text-gray-500 mt-1">Pilih gender jika jenis cuti ini khusus untuk laki-laki atau
+                        perempuan saja</p>
                 </div>
 
-                <div class="flex items-center">
+                {{-- <div class="flex items-center">
                     <input id="is_active" name="is_active" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" {{ old('is_active') ? 'checked' : '' }}>
                     <label for="is_active" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">
                         {{ __('Aktifkan jenis cuti ini') }}
                     </label>
                     <x-input-error :messages="$errors->get('is_active')" class="mt-2" />
-                </div>
+                </div> --}}
 
                 <div class="flex items-center justify-end space-x-3" x-data="{ previousUrl: '{{ url()->previous() }}' }">
                     <button type="button" @click="window.location = previousUrl"

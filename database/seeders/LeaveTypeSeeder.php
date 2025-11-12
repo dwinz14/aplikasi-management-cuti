@@ -13,23 +13,65 @@ class LeaveTypeSeeder extends Seeder
     public function run(): void
     {
         \App\Models\LeaveType::create([
-            'name' => 'Cuti Tahunan',
+            'name' => 'cuti tahunan',
             'quota' => 12,
             'gender' => null,
             'is_active' => true,
         ]);
 
         \App\Models\LeaveType::create([
-            'name' => 'Cuti Sakit',
+            'name' => 'cuti sakit',
             'quota' => 0, // tanpa batas
             'gender' => null,
             'is_active' => true,
         ]);
 
         \App\Models\LeaveType::create([
-            'name' => 'Cuti Melahirkan',
+            'name' => 'cuti melahirkan',
             'quota' => 90,
             'gender' => 'P', // hanya untuk perempuan
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin pernikahan anak karyawan',
+            'quota' => 2,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin melangsungkan pernikahan',
+            'quota' => 2,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin mengkhitankan/membaptis anak',
+            'quota' => 2,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin persalinan istri',
+            'quota' => 2,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin kematian orang tua/mertua/suami/istri/anak',
+            'quota' => 2,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin kematian keluarga dalam satu rumah',
+            'quota' => 1,
+            'gender' => null,
+            'is_active' => true,
+        ]);
+        \App\Models\LeaveType::create([
+            'name' => 'izin pernikahan saudara kandung',
+            'quota' => 1,
+            'gender' => null,
             'is_active' => true,
         ]);
     }

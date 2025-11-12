@@ -24,17 +24,26 @@ class DashboardController extends Controller
             default => 'Dashboard',
         };
 
-        // Ambil data cuti user
-        $sisaCuti = $user->sisa_cuti;
+        // Ambil data cuti user dari user_leave_balances
+        $currentYear = now()->year;
+        $leaveBalances = $user->userLeaveBalances()
+            ->where('year', $currentYear)
+            ->with('leaveType')
+            ->get();
 
-        $cutiDigunakan = Leave::where('user_id', $user->id)
-            ->where('status_final', 'approved')
-            ->sum('total_hari');
+        // $totalQuota = $leaveBalances->sum('total_quota');
+        $totalUsed = $leaveBalances->sum('used');
+        // $totalRemaining = $leaveBalances->sum('remaining');
 
-        $menungguPersetujuan = Leave::where('user_id', $user->id)
-            ->where('status_final', 'pending')
-            ->count();
+        // Total semua pengajuan cuti (approved + pending + rejected)
+        $totalLeaveApplications = Leave::where('user_id', $user->id)->count();
 
+        // 3 pengajuan cuti terakhir
+        $recentLeaves = Leave::with(['leaveType', 'approvals.approver'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
 
         // Ambil pengajuan cuti pending user dengan approvals
         $pendingLeaves = Leave::with(['approvals.approver'])
@@ -46,9 +55,11 @@ class DashboardController extends Controller
         // Kirimkan variabel ke view
         return view('dashboard', [
             'dashboardTitle' => $dashboardTitle,
-            'sisaCuti' => $sisaCuti,
-            'cutiDigunakan' => $cutiDigunakan,
-            'menungguPersetujuan' => $menungguPersetujuan,
+            // 'totalQuota' => $totalQuota,
+            'totalUsed' => $totalUsed,
+            // 'totalRemaining' => $totalRemaining,
+            'totalLeaveApplications' => $totalLeaveApplications,
+            'recentLeaves' => $recentLeaves,
             'pendingLeaves' => $pendingLeaves,
         ]);
     }

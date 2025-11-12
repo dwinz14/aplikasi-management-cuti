@@ -34,19 +34,15 @@ class MasterLeaveTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255|unique:leave_types,name',
             'quota' => 'required|integer|min:0',
             'gender' => 'nullable|in:L,P',
             'is_active' => 'boolean',
         ]);
+        $validated['name'] = strtolower(strip_tags(trim($validated['name'])));
 
-        LeaveType::create([
-            'name' => $request->name,
-            'quota' => $request->quota,
-            'gender' => $request->gender,
-            'is_active' => $request->has('is_active'),
-        ]);
+        LeaveType::create($validated);
 
         return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil ditambahkan.');
     }
@@ -83,7 +79,6 @@ class MasterLeaveTypeController extends Controller
             'name' => $request->name,
             'quota' => $request->quota,
             'gender' => $request->gender,
-            'is_active' => $request->has('is_active'),
         ]);
 
         return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil diperbarui.');
@@ -106,5 +101,19 @@ class MasterLeaveTypeController extends Controller
         $leaveType->delete();
 
         return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil dihapus.');
+    }
+
+    /**
+     * Toggle the active status of the specified leave type.
+     */
+    public function toggle(LeaveType $leaveType)
+    {
+        $leaveType->update([
+            'is_active' => !$leaveType->is_active,
+        ]);
+
+        $status = $leaveType->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect()->back()->with('success', "Jenis cuti {$leaveType->name} berhasil {$status}.");
     }
 }

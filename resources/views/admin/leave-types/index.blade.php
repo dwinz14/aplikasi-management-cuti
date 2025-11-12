@@ -13,7 +13,7 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4" x-data="{ showFilters: false, confirmDelete: false, selectedLeaveType: null, selectedLeaveTypeName: '' }">
+    <div class="space-y-4" x-data="{ showFilters: false, confirmDelete: false, selectedLeaveType: null, selectedLeaveTypeName: '', confirmToggle: false, selectedAction: '' }">
         @if (session('success'))
             <div
                 class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg flex items-center">
@@ -80,7 +80,7 @@
                                 <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                     {{ $leaveTypes->firstItem() + $index }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                                    {{ $leaveType->name }}</td>
+                                    {{ strtoupper($leaveType->name) }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                                     @if ($leaveType->quota > 0)
                                         {{ $leaveType->quota }} hari
@@ -96,15 +96,16 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    @if ($leaveType->is_active)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                            Non-Aktif
-                                        </span>
-                                    @endif
+                                    <button
+                                        @click="confirmToggle = true; selectedLeaveType = {{ $leaveType->id }}; selectedLeaveTypeName = '{{ $leaveType->name }}'; selectedAction = '{{ $leaveType->is_active ? 'nonaktifkan' : 'aktifkan' }}'"
+                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ $leaveType->is_active ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700' }}">
+                                        <span
+                                            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $leaveType->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                    </button>
+                                    <span
+                                        class="ml-2 text-xs font-medium {{ $leaveType->is_active ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200' }}">
+                                        {{ $leaveType->is_active ? 'Aktif' : 'Non-Aktif' }}
+                                    </span>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
                                     <div class="flex items-center space-x-2">
@@ -166,7 +167,8 @@
                     Apakah Anda yakin ingin menghapus jenis cuti <span class="font-bold"
                         x-text="selectedLeaveTypeName"></span>?
                 </p>
-                <form x-bind:action="'{{ route('admin.leave-types.destroy', ':id') }}'.replace(':id', selectedLeaveType)"
+                <form
+                    x-bind:action="'{{ route('admin.leave-types.destroy', ':id') }}'.replace(':id', selectedLeaveType)"
                     method="POST">
                     @csrf
                     @method('DELETE')
@@ -175,6 +177,33 @@
                             class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition-colors">Batal</button>
                         <button type="submit"
                             class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-md transition-colors">Hapus</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal toggle leave type -->
+        <div x-show="confirmToggle" x-transition x-cloak style="display: none;"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 ease-out"
+                x-show="confirmToggle" x-transition:enter="scale-95 opacity-0"
+                x-transition:enter-end="scale-100 opacity-100" x-transition:leave="scale-100 opacity-100"
+                x-transition:leave-end="scale-95 opacity-0">
+                <h2 class="text-lg font-semibold mb-4">Konfirmasi</h2>
+                <p class="mb-4">
+                    Apakah Anda yakin ingin <span class="font-bold" x-text="selectedAction"></span> jenis cuti <span
+                        class="font-bold" x-text="selectedLeaveTypeName"></span>?
+                </p>
+                <form
+                    x-bind:action="'{{ route('admin.leave-types.toggle', ':id') }}'.replace(':id', selectedLeaveType)"
+                    method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" @click="confirmToggle = false"
+                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition-colors">Batal</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-md transition-colors">Ya</button>
                     </div>
                 </form>
             </div>
