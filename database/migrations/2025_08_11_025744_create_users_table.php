@@ -19,16 +19,33 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kabag', 'kasie', 'staff']);
-            // $table->foreignId('division_id')->nullable()->constrained('divisions')->nullOnDelete();
+            $table->enum('gender', ['L', 'P'])->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->unsignedBigInteger('division_id')->nullable();
-            $table->integer('sisa_cuti')->default(12);
+            $table->unsignedBigInteger('position_id')->nullable();
+            $table->unsignedBigInteger('office_id')->nullable();
+            // $table->integer('sisa_cuti')->default(12);
+            $table->boolean('must_change_password')->default(false);
+            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('division_id')
                 ->references('id')->on('divisions')
-                ->onDelete('set null'); // kalau divisi dihapus, user tidak ikut kehapus, division_id jadi null
+                ->onDelete('set null');
+
+            $table->foreign('position_id')
+                ->references('id')->on('positions')
+                ->onDelete('set null');
+
+            $table->foreign('office_id')
+                ->references('id')->on('offices')
+                ->onDelete('set null');
+
+            $table->index('name');
+            $table->index('role');
+            $table->index('division_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

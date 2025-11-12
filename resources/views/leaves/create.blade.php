@@ -60,7 +60,7 @@
                             <!-- Left Column: Pengganti and Atasan -->
                             <div class="space-y-3">
                                 @if ($requiresReplacement)
-                                    <div class="w-1/2">
+                                    <div class="w-3/4">
                                         <label for="pengganti_id"
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             <svg class="w-4 h-4 inline mr-1 text-primary-600" fill="none"
@@ -82,7 +82,7 @@
                                 @endif
 
                                 @if ($requiresAtasan)
-                                    <div>
+                                    <div class="w-3/4">
                                         <label for="atasan_id"
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             <svg class="w-4 h-4 inline mr-1 text-primary-600" fill="none"
@@ -105,7 +105,7 @@
 
                             <!-- Right Column: Dates -->
                             <div class="space-y-3">
-                                <div>
+                                <div class="w-3/4">
                                     <label for="start_date"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         <svg class="w-4 h-4 inline mr-1 text-primary-600" fill="none"
@@ -124,7 +124,7 @@
                                     @enderror
                                 </div>
 
-                                <div>
+                                <div class="w-3/4">
                                     <label for="end_date"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         <svg class="w-4 h-4 inline mr-1 text-primary-600" fill="none"
@@ -176,20 +176,15 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div
-                            class="bg-gray-50 dark:bg-slate-700/50 px-4 py-3 flex items-center justify-end space-x-3 rounded-lg">
+                        <div class="flex items-center justify-end space-x-3">
                             <a href="{{ route('cuti.index') }}"
-                                class="inline-flex items-center px-4 py-2 bg-white dark:bg-slate-600 border border-gray-300 dark:border-gray-500 rounded-md font-medium text-sm text-gray-700 dark:text-gray-200 uppercase tracking-wide shadow-sm hover:bg-gray-50 dark:hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition duration-200">
+                                class="inline-flex items-center justify-center px-4 py-2 bg-red-400 dark:bg-slate-600 border border-gray-300 dark:border-gray-500 rounded-full font-semibold text-xs text-slate-50 dark:text-gray-200 uppercase tracking-widest shadow-sm hover:bg-rose-300 dark:hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-slate-800 transition ease-in-out duration-150">
                                 Batal
                             </a>
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-medium text-sm text-white uppercase tracking-wide hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition duration-200 shadow-md hover:shadow-lg">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                </svg>
-                                Kirim Pengajuan
-                            </button>
+
+                            <x-primary-button>
+                                {{ __('Simpan') }}
+                            </x-primary-button>
                         </div>
                     </div>
                 </form>

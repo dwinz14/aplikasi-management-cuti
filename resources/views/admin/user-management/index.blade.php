@@ -54,7 +54,7 @@
             @include('admin.user-management.partials.registration-approvals')
         </div>
     </div>
-
+    <x-toast-notification />
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const select = document.getElementById('feature-select');

@@ -10,6 +10,16 @@
                     Kelola Data Jenis Cuti Perusahaan.
                 </p>
             </div>
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+                <a href="{{ route('admin.leave-types.create') }}"
+                    class="inline-flex items-center px-3 py-2 bg-primary-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Tambah Jenis Cuti
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -39,38 +49,29 @@
 
         <div
             class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-            <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
-                <a href="{{ route('admin.leave-types.create') }}"
-                    class="inline-flex items-center px-3 py-2 bg-primary-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Tambah Jenis Cuti
-                </a>
-            </div>
+
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-                    <thead class="bg-gray-50 dark:bg-slate-700/50">
+                    <thead class="bg-blue-100 dark:bg-blue-900 inset-shadow-sm inset-shadow-indigo-500">
                         <tr>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 #</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Nama Jenis Cuti</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Kuota (Hari)</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Gender</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Status</th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Aksi</th>
                         </tr>
                     </thead>
@@ -98,7 +99,7 @@
                                 <td class="px-4 py-3 text-sm">
                                     <button
                                         @click="confirmToggle = true; selectedLeaveType = {{ $leaveType->id }}; selectedLeaveTypeName = '{{ $leaveType->name }}'; selectedAction = '{{ $leaveType->is_active ? 'nonaktifkan' : 'aktifkan' }}'"
-                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ $leaveType->is_active ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700' }}">
+                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ $leaveType->is_active ? 'bg-green-600' : 'bg-stone-500 dark:bg-gray-700' }}">
                                         <span
                                             class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $leaveType->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
                                     </button>

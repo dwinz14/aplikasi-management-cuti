@@ -18,8 +18,8 @@
         <!-- Left Column: Main Content -->
         <div class="space-y-6">
             <!-- Compact Welcome Section -->
-            <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl shadow-lg p-6 text-white">
-                <div class="flex items-center justify-between">
+            <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl shadow-2xl p-6 text-white">
+                <div class="flex items-center justify-between shadow-blue-500/50">
                     <div class="flex-1">
                         <h1 class="text-2xl font-bold mb-2">
                             Selamat Datang, {{ strtoupper(auth()->user()->name) }}! 👋

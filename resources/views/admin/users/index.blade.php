@@ -10,6 +10,16 @@
                     Kelola data akun karyawan.
                 </p>
             </div>
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+                <a href="{{ route('admin.users.create') }}"
+                    class="inline-flex items-center px-3 py-2 bg-primary-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Tambah User
+                </a>
+            </div>
         </div>
     </x-slot>
     {{-- <div class="flex justify-start mb-4">
@@ -49,14 +59,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <a href="{{ route('admin.users.create') }}"
-                    class="inline-flex items-center px-3 py-2 bg-primary-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Tambah User
-                </a>
             </div>
 
             <div x-show="showFilters" x-transition
@@ -148,7 +150,7 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-                    <thead class="bg-gray-50 dark:bg-slate-700/50">
+                    <thead class="bg-blue-100 dark:bg-blue-900 inset-shadow-sm inset-shadow-indigo-500">
                         <tr>
                             <th
                                 class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -156,9 +158,9 @@
                             <th
                                 class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Nama</th>
-                            {{-- <th
+                            <th
                                 class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Email</th> --}}
+                                NIK</th>
                             <th
                                 class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Role</th>
@@ -184,8 +186,8 @@
                                 </td>
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium">
                                     {{ strtoupper($user->name) }}</td>
-                                {{-- <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}
-                                </td> --}}
+                                <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ $user->nik }}
+                                </td>
                                 <td class="px-2 py-2 text-sm">
                                     <span
                                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium

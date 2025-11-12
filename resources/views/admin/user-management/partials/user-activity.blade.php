@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="overflow-x-auto">
+<div class="shadow-xl hover:shadow-2xl overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-        <thead class="bg-gray-50 dark:bg-slate-700/50">
+        <thead class="bg-blue-100 dark:bg-blue-900 inset-shadow-sm inset-shadow-indigo-500">
             <tr>
                 <th
                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -42,7 +42,7 @@
                         {{ $users->firstItem() + $index }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                        {{ Str::title($user->name) }}
+                        {{ strtoupper($user->name) }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                         {{ $user->email }}

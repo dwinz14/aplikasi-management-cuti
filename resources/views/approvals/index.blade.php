@@ -22,7 +22,8 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4">
+    <div
+        class="space-y-4 bg-white dark:bg-slate-800 shadow-xl hover:shadow-xl/30 hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
         @forelse ($approvals as $approval)
             <div x-data="{ open: false }"
                 class="bg-white dark:bg-slate-800 rounded-xl shadow-md transition-all duration-300">
@@ -37,7 +38,8 @@
                         <div>
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
                                 {{ $approval->leave->user->name }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $approval->leave->user->role }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ strtoupper($approval->leave->user->position->nama_jabatan) }}</p>
                         </div>
                         <div class="hidden md:block">
                             <p class="text-sm text-gray-800 dark:text-gray-200 truncate"
@@ -80,7 +82,8 @@
                                     </p>
                                     <p><span class="font-medium">Total:</span> {{ $approval->leave->total_hari }} hari
                                     </p>
-                                    <p><span class="font-medium">Jenis Cuti:</span> {{ $approval->leave->leaveType->name ?? 'N/A' }}</p>
+                                    <p><span class="font-medium">Jenis Cuti:</span>
+                                        {{ $approval->leave->leaveType->name ?? 'N/A' }}</p>
                                     <p class="italic"><span class="font-medium not-italic">Alasan:</span>
                                         "{{ $approval->leave->alasan }}"</p>
                                 </div>
@@ -116,8 +119,7 @@
                             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Inbox Persetujuan Kosong</p>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kerja bagus! Semua pengajuan telah
-                        diproses.</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Semua pengajuan telah diproses.</p>
                 </div>
             </div>
         @endforelse

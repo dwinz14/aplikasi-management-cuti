@@ -22,7 +22,8 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4">
+    <div
+        class="space-y-4 bg-white dark:bg-slate-800 shadow-xl hover:shadow-xl/30 hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
         @forelse ($leaves as $leave)
             @php
                 $now = now();
@@ -61,7 +62,8 @@
                         <div>
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100"> Pengganti Untuk :
                                 {{ Str::title($leave->user->name) }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $leave->user->role }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ $leave->user->position->nama_jabatan }}</p>
                         </div>
                         <div class="hidden sm:block md:hidden">
                             <p class="text-sm text-gray-800 dark:text-gray-200 truncate" title="{{ $leave->alasan }}">
@@ -127,6 +129,8 @@
                                                     class="font-medium">Selesai:</span> {{ $now->diffForHumans($end) }}
                                             </p>
                                         @endif --}}
+                                        <p><span class="font-medium">Jenis Cuti:</span><strong>
+                                                {{ $leave->leaveType->name ?? 'N/A' }}</strong></p>
                                         <p><span class="font-medium">Total:</span> <strong>{{ $leave->total_hari }}
                                                 hari</strong></p>
                                         <p class="italic text-gray-600 dark:text-gray-400"><span
