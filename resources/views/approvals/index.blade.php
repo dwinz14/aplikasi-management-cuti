@@ -37,7 +37,7 @@
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                         <div>
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                {{ $approval->leave->user->name }}</p>
+                                {{ strtoupper($approval->leave->user->name) }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 {{ strtoupper($approval->leave->user->position->nama_jabatan) }}</p>
                         </div>

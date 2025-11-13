@@ -168,7 +168,7 @@
                                     </span>
                                 </td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-400 truncate">
-                                    {{ optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-' }}
+                                    {{ strtoupper(optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-') }}
                                 </td>
                             </tr>
                         @empty

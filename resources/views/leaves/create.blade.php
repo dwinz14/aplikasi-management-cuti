@@ -72,7 +72,10 @@
                                             Pengganti
                                         </label>
                                         <x-select-dropdown name="pengganti_id" label="" :options="$penggantiList->map(function ($u) {
-                                            return ['id' => $u->id, 'name' => $u->name . ' (' . $u->role . ')'];
+                                            return [
+                                                'id' => $u->id,
+                                                'name' => strtoupper($u->name . ' (' . $u->role . ')'),
+                                            ];
                                         })"
                                             :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" />
                                         @error('pengganti_id')
@@ -93,7 +96,10 @@
                                             Atasan Langsung
                                         </label>
                                         <x-select-dropdown name="atasan_id" label="" :options="$atasanList->map(function ($u) {
-                                            return ['id' => $u->id, 'name' => $u->name . ' (' . $u->role . ')'];
+                                            return [
+                                                'id' => $u->id,
+                                                'name' => strtoupper($u->name . ' (' . $u->role . ')'),
+                                            ];
                                         })"
                                             :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" />
                                         @error('atasan_id')

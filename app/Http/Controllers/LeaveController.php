@@ -32,11 +32,34 @@ class LeaveController extends Controller
         $user = Auth::user();
         $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true);
 
-        $penggantiList = $requiresReplacement
-            ? Cache::remember("pengganti_{$user->office_id}", 300, fn() =>
-            User::select('id', 'name', 'role')->where('office_id', $user->office_id)->where('id', '!=', $user->id)->get())
-            : collect();
+        // $penggantiList = $requiresReplacement
+        //     ? Cache::remember("pengganti_{$user->office_id}", 300, fn() =>
+        //     User::select('id', 'name', 'role')->where('office_id', $user->office_id)->where('id', '!=', $user->id)->get())
+        //     : collect();
+        // Default query dasar
+        $query = User::query()->where('id', '!=', $user->id);
 
+        // Case 1: user role kabag-pincab & kantor pusat
+        if ($user->role === 'kabag-pincab' && $user->office_id === 'pusat') {
+            $penggantiList = $query
+                ->where('office_id', $user->office_id)
+                ->orderBy('name')
+                ->get();
+
+            // Case 2: user role kabag-pincab tapi bukan kantor pusat
+        } elseif ($user->role === 'kabag-pincab' && $user->office_id == 'pusat') {
+            $penggantiList = $query
+                ->whereIn('role', ['kabag-pincab', 'hrd'])
+                ->orderBy('name')
+                ->get();
+
+            // Case 3: role lain → tetap filter satu kantor
+        } else {
+            $penggantiList = $requiresReplacement
+                ? Cache::remember("pengganti_{$user->office_id}", 300, fn() =>
+                User::select('id', 'name', 'role')->where('office_id', $user->office_id)->where('id', '!=', $user->id)->get())
+                : collect();
+        }
         $requiresAtasan = !in_array($user->role, ['direksi'], true);
         $atasanList = collect();
 
