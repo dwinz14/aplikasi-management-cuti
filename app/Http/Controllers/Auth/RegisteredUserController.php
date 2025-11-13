@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'gender' => ['required', 'in:L,P'],
-            'role' => ['required', 'in:super_admin,hrd,direksi,kabag,kasie,staff'],
+            'role' => ['required', 'in:super_admin,hrd,direksi,kabag-pincab,kasie,staff'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
             'office_id' => ['nullable', 'exists:offices,id'],

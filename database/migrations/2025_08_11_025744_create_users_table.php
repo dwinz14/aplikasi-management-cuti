@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kabag', 'kasie', 'staff']);
+            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kabag-pincab', 'kasie', 'staff']);
             $table->enum('gender', ['L', 'P'])->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->unsignedBigInteger('division_id')->nullable();

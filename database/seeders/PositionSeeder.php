@@ -14,7 +14,6 @@ class PositionSeeder extends Seeder
     public function run(): void
     {
         DB::table('positions')->insert([
-            ['nama_jabatan' => 'pincab', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jabatan' => 'head cs', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jabatan' => 'customer service', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jabatan' => 'head teller', 'created_at' => now(), 'updated_at' => now()],
@@ -37,6 +36,7 @@ class PositionSeeder extends Seeder
             ['nama_jabatan' => 'staff APUPPT', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jabatan' => 'kabag skai', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jabatan' => 'staf skai', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_jabatan' => 'pincab', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

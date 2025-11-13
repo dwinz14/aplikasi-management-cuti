@@ -87,7 +87,8 @@
                                 <option value="">-- Semua Role --</option>
                                 <option value="staff" {{ $role == 'staff' ? 'selected' : '' }}>Staff</option>
                                 <option value="kasie" {{ $role == 'kasie' ? 'selected' : '' }}>Kasie</option>
-                                <option value="kabag" {{ $role == 'kabag' ? 'selected' : '' }}>kabag</option>
+                                <option value="kabag-pincab" {{ $role == 'kabag-pincab' ? 'selected' : '' }}>
+                                    kabag-pincab</option>
                                 <option value="hrd" {{ $role == 'hrd' ? 'selected' : '' }}>HRD</option>
                             </select>
                         </div>

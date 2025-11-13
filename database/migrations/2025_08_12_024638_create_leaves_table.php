@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('pengganti_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('kabag_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('kabag-pincab_id')->nullable()->constrained('users')->nullOnDelete();
             $table->date('start_date');
             $table->date('end_date');
             $table->unsignedInteger('total_hari')->default(0);
@@ -23,7 +23,7 @@ return new class extends Migration
 
             // Status tiap approval
             $table->enum('status_pengganti', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->enum('status_kabag', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status_kabag-pincab', ['pending', 'approved', 'rejected'])->default('pending');
             $table->enum('status_hrd', ['pending', 'approved', 'rejected'])->default('pending');
 
             // Status final cuti

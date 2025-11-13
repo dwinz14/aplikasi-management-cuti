@@ -49,7 +49,7 @@
                 <option value="">Pilih Role</option>
                 <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                 <option value="kasie" {{ old('role') == 'kasie' ? 'selected' : '' }}>Kasie</option>
-                <option value="kabag" {{ old('role') == 'kabag' ? 'selected' : '' }}>Kabag</option>
+                <option value="kabag-pincab" {{ old('role') == 'kabag-pincab' ? 'selected' : '' }}>kabag-pincab</option>
                 <option value="hrd" {{ old('role') == 'hrd' ? 'selected' : '' }}>HRD</option>
                 <option value="direksi" {{ old('role') == 'direksi' ? 'selected' : '' }}>Direksi</option>
             </select>

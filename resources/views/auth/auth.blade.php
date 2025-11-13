@@ -163,11 +163,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Role -->
                         <x-select-dropdown name="role" label="Role" :options="[
-                            ['id' => 'staff', 'name' => 'Staff'],
-                            ['id' => 'kasie', 'name' => 'Kasie'],
-                            ['id' => 'kabag', 'name' => 'Kabag'],
+                            ['id' => 'staff', 'name' => 'STAFF'],
+                            ['id' => 'kasie', 'name' => 'KASIE'],
+                            ['id' => 'kabag-pincab', 'name' => 'KABAG-PINCAB'],
                             ['id' => 'hrd', 'name' => 'HRD'],
-                            ['id' => 'direksi', 'name' => 'Direksi'],
+                            ['id' => 'direksi', 'name' => 'DIREKSI'],
                         ]" :selected="old('role')"
                             placeholder="Pilih Role" />
 

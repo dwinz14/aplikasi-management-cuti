@@ -32,10 +32,10 @@
                                 {{ strtoupper(auth()->user()->role) }}
                             </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
-                                {{ strtoupper(auth()->user()->division->nama_divisi ?? 'Division') }}
+                                {{ strtoupper(auth()->user()->division->nama_divisi ?? '') }}
                             </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
-                                {{ strtoupper(auth()->user()->position->nama_jabatan ?? 'Position') }}
+                                {{ strtoupper(auth()->user()->position->nama_jabatan ?? '') }}
                             </span>
                         </div>
                     </div>

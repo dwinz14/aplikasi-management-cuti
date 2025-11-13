@@ -30,7 +30,7 @@ class LeaveController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag'], true);
+        $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true);
 
         $penggantiList = $requiresReplacement
             ? Cache::remember("pengganti_{$user->office_id}", 300, fn() =>
@@ -50,7 +50,7 @@ class LeaveController extends Controller
                 $others = Cache::remember("atasan_{$user->office_id}", 300, fn() =>
                 User::select('id', 'name', 'role')
                     ->where('office_id', $user->office_id)
-                    ->whereIn('role', ['hrd', 'kasie', 'kabag'])
+                    ->whereIn('role', ['hrd', 'kasie', 'kabag-pincab'])
                     ->where('id', '!=', $user->id)
                     ->get());
 
@@ -87,7 +87,7 @@ class LeaveController extends Controller
             'start_date'    => 'required|date|after_or_equal:today',
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
-            'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
+            'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
             'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 

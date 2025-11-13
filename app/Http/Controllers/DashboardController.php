@@ -14,15 +14,15 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // Logika untuk menentukan judul dashboard
-        $dashboardTitle = match ($user->role) {
-            'super_admin' => 'Super Admin Dashboard',
-            'direksi' => 'DIreksi Dashboard',
-            'hrd' => 'HRD Dashboard',
-            'kabag' => 'Kepala Divisi Dashboard',
-            'kasie' => 'Kasie Dashboard',
-            'staff' => 'Staff Dashboard',
-            default => 'Dashboard',
-        };
+        // $dashboardTitle = match ($user->role) {
+        //     'super_admin' => 'Super Admin Dashboard',
+        //     'direksi' => 'DIreksi Dashboard',
+        //     'hrd' => 'HRD Dashboard',
+        //     'kabag' => 'Kepala Divisi Dashboard',
+        //     'kasie' => 'Kasie Dashboard',
+        //     'staff' => 'Staff Dashboard',
+        //     default => 'Dashboard',
+        // };
 
         // Ambil data cuti user dari user_leave_balances
         $currentYear = now()->year;
@@ -54,7 +54,7 @@ class DashboardController extends Controller
 
         // Kirimkan variabel ke view
         return view('dashboard', [
-            'dashboardTitle' => $dashboardTitle,
+            // 'dashboardTitle' => $dashboardTitle,
             // 'totalQuota' => $totalQuota,
             'totalUsed' => $totalUsed,
             // 'totalRemaining' => $totalRemaining,
