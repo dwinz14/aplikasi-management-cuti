@@ -26,18 +26,20 @@
         class="space-y-4 bg-white dark:bg-slate-800 shadow-xl hover:shadow-xl/30 hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
         @forelse ($leaves as $leave)
             @php
-                $now = now();
-                if ($now->lt($leave->start_date)) {
+                $today = now()->toDateString();
+                $start = \Carbon\Carbon::parse($leave->start_date)->toDateString();
+                $end = \Carbon\Carbon::parse($leave->end_date)->toDateString();
+                if ($today < $start) {
                     $status = 'dijadwalkan';
                     $badgeClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
                     $statusIcon =
                         '<svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0H21" /></svg>';
-                } elseif ($now->between($leave->start_date, $leave->end_date)) {
+                } elseif ($today >= $start && $today <= $end) {
                     $status = 'berlangsung';
                     $badgeClass = 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
                     $statusIcon =
                         '<svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg>';
-                } elseif ($now->gt($leave->end_date)) {
+                } elseif ($today > $end) {
                     $status = 'selesai';
                     $badgeClass = 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
                     $statusIcon =

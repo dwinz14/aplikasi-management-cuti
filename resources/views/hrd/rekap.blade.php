@@ -118,7 +118,7 @@
         <div
             class="bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all duration-200 rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full table-auto border-collapse">
+                <table class="min-w-full table-fixed border-collapse">
                     <thead
                         class="bg-gray-50 dark:bg-slate-700/60 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
                         <tr>
@@ -126,7 +126,8 @@
                             <th class="px-3 py-3 text-left w-28 whitespace-nowrap">Jabatan</th>
                             <th class="px-3 py-3 text-left w-40 whitespace-nowrap">Tanggal Cuti</th>
                             <th class="px-3 py-3 text-left w-28 whitespace-nowrap">Jenis</th>
-                            <th class="px-3 py-3 text-left w-40">Alasan</th>
+                            <th class="px-3 py-3 text-left w-32">Alasan</th>
+                            <th class="px-3 py-3 text-center w-20 whitespace-nowrap">Bukti</th>
                             <th class="px-2 py-2 text-center w-24 whitespace-nowrap">Status</th>
                             <th class="px-3 py-3 text-left w-40 whitespace-nowrap">Approver Terakhir</th>
                         </tr>
@@ -147,8 +148,30 @@
                                 </td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-400 truncate">
                                     {{ $leave->leaveType->name ?? '-' }}</td>
-                                <td class="px-3 py-3 text-gray-900 dark:text-gray-100 !whitespace-normal leading-snug">
-                                    {{ $leave->alasan }}</td>
+                                <td class="px-3 py-3 max-w-[150px]">
+                                    <div class="text-gray-900 dark:text-gray-100 whitespace-normal break-words">
+                                        {{ $leave->alasan }}
+                                    </div>
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($leave->proof_image)
+                                        <button type="button"
+                                            onclick="window.open('{{ asset('storage/' . $leave->proof_image) }}', '_blank')"
+                                            class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 text-blue-600 dark:text-blue-300 rounded-full transition-colors"
+                                            title="Lihat Bukti">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <span class="text-xs text-gray-400 dark:text-gray-500">Tidak Ada</span>
+                                    @endif
+                                </td>
                                 <td class="px-2 py-2 text-center">
                                     @php
                                         $statusClass =
@@ -167,13 +190,15 @@
                                         {{ ucfirst($leave->status_final) }}
                                     </span>
                                 </td>
-                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400 truncate">
-                                    {{ strtoupper(optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-') }}
+                                <td class="px-3 py-3 max-w-xs">
+                                    <div class="text-gray-600 dark:text-gray-400 whitespace-normal break-words">
+                                        {{ strtoupper(optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-') }}
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-14 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="8" class="px-4 py-14 text-center text-gray-500 dark:text-gray-400">
                                     <div class="flex flex-col items-center justify-center gap-2">
                                         <svg class="w-14 h-14 text-gray-300 dark:text-gray-600"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -182,7 +207,8 @@
                                                 d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5 4.5l-2.25-2.25m0 0l2.25-2.25m-2.25 2.25l2.25 2.25M12 18.75l-2.25-2.25m2.25 2.25l2.25-2.25m-2.25 2.25l-2.25-2.25M6.34 7.5h11.32a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25H6.34a2.25 2.25 0 01-2.25-2.25v-7.5a2.25 2.25 0 012.25-2.25z" />
                                         </svg>
                                         <p class="text-sm font-medium">Tidak ada data cuti</p>
-                                        <p class="text-xs text-gray-400">Data akan muncul ketika ada pengajuan cuti.</p>
+                                        <p class="text-xs text-gray-400">Data akan muncul ketika ada pengajuan cuti.
+                                        </p>
                                     </div>
                                 </td>
                             </tr>

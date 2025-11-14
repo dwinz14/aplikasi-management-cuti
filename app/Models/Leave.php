@@ -18,6 +18,7 @@ class Leave extends Model
         'end_date',
         'total_hari',
         'alasan',
+        'proof_image',
         'status_pengganti',
         'status_kabag-pincab',
         'status_hrd',

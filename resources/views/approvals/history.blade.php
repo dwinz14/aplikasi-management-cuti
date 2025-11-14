@@ -60,8 +60,9 @@
                                     {{ \Carbon\Carbon::parse($history->leave->end_date)->isoFormat('D MMM YYYY') }}
                                     <span class="text-xs">({{ $history->leave->total_hari }} hari)</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                <td class="px-6 py-4 max-w-xs">
+                                    <div
+                                        class="text-sm font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">
                                         {{ $history->leave->alasan }}
                                     </div>
                                 </td>

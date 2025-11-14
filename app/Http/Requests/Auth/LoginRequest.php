@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,11 +42,26 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('nik', 'password'), $this->boolean('remember'))) {
+        $nik = $this->input('nik');
+        $password = $this->input('password');
+
+        // Check if NIK exists
+        $user = User::where('nik', $nik)->first();
+
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'nik' => trans('auth.failed'),
+                'nik' => 'NIK tidak ditemukan.',
+            ]);
+        }
+
+        // Check if password is correct
+        if (!Auth::attempt($this->only('nik', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'password' => 'Password salah.',
             ]);
         }
 

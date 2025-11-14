@@ -48,6 +48,7 @@ class RekapController extends Controller
             'end_date',
             'total_hari',
             'alasan',
+            'proof_image',
             'status_final'
         ])
             ->with([

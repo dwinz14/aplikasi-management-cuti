@@ -17,7 +17,7 @@
         <div class="w-full max-w-5x2">
             <div
                 class="bg-white dark:bg-slate-800 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl p-4 sm:p-6 lg:p-8">
-                <form method="POST" action="{{ route('cuti.store') }}" class="space-y-2">
+                <form method="POST" action="{{ route('cuti.store') }}" enctype="multipart/form-data" class="space-y-2">
                     @csrf
 
                     <!-- Jenis Cuti Selector -->
@@ -54,7 +54,8 @@
                     </div>
 
                     <!-- Form Fields (Hidden initially) -->
-                    <div id="form-fields" class="hidden space-y-4 opacity-0 transition-opacity duration-500">
+                    <div id="form-fields"
+                        class="space-y-4 transition-opacity duration-500 {{ $errors->any() ? '' : 'hidden opacity-0' }}">
                         <!-- Main Grid: Left - Pengganti/Atasan, Right - Dates -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <!-- Left Column: Pengganti and Atasan -->
@@ -142,7 +143,7 @@
                                         Tanggal Selesai
                                     </label>
                                     <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}"
-                                        min="{{ date('Y-m-d') }}"
+                                        min="{{ date('Y-m-d') }}" disabled
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
                                     @error('end_date')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -177,6 +178,27 @@
                             <textarea id="alasan" name="alasan" rows="3" placeholder="Jelaskan alasan cuti Anda secara detail..."
                                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm resize-none">{{ old('alasan') }}</textarea>
                             @error('alasan')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Bukti Gambar (Opsional, kecuali cuti sakit) -->
+                        <div id="proof-image-section" class="hidden">
+                            <label for="proof_image"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <svg class="w-4 h-4 inline mr-1 text-primary-600" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Bukti Gambar <span id="proof-required" class="text-red-500">*</span>
+                            </label>
+                            <input type="file" id="proof_image" name="proof_image" accept="image/*"
+                                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Format: JPG, PNG, GIF. Maksimal
+                                2MB.</p>
+                            @error('proof_image')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -229,13 +251,51 @@
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
 
+            // Date constants
+            const today = new Date().toISOString().split('T')[0];
+            const yesterdayDate = new Date();
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = yesterdayDate.toISOString().split('T')[0];
+
+            let isSickLeave = false;
+
+            // Utility functions
+            function isWeekend(date) {
+                const day = date.getDay();
+                return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+            }
+
+            function countWeekdays(start, end) {
+                let count = 0;
+                const current = new Date(start);
+                while (current <= end) {
+                    if (!isWeekend(current)) {
+                        count++;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                return count;
+            }
+
+            function validateDateInput(input) {
+                const value = input.value;
+                if (value) {
+                    const date = new Date(value);
+                    if (isWeekend(date)) {
+                        alert(
+                        'Tidak dapat memilih hari Sabtu atau Minggu. Silakan pilih hari kerja (Senin-Jumat).');
+                        input.value = '';
+                        return false;
+                    }
+                }
+                return true;
+            }
+
             // Initially hide form fields
             formFields.classList.add('hidden');
 
-            // Set minimum dates
-            const today = new Date().toISOString().split('T')[0];
-            startDateInput.min = today;
-            endDateInput.min = today;
+            // Initially disable end date
+            endDateInput.disabled = true;
 
             // Handle leave type selection
             leaveTypeSelect.addEventListener('change', function() {
@@ -244,37 +304,94 @@
                     setTimeout(() => {
                         formFields.classList.remove('opacity-0');
                     }, 10);
+
+                    // Check if selected leave type is "cuti sakit"
+                    const selectedOption = this.options[this.selectedIndex];
+                    const leaveTypeName = selectedOption.text.toLowerCase();
+                    isSickLeave = leaveTypeName.includes('cuti sakit');
+                    const proofSection = document.getElementById('proof-image-section');
+                    const proofRequired = document.getElementById('proof-required');
+
+                    if (isSickLeave) {
+                        proofSection.classList.remove('hidden');
+                        proofRequired.style.display = 'inline';
+                        // Restrict to past dates for sick leave
+                        startDateInput.min = '';
+                        startDateInput.max = yesterday;
+                        endDateInput.min = today; // Will be overridden when start selected
+                        endDateInput.max = yesterday;
+                    } else {
+                        proofSection.classList.add('hidden');
+                        proofRequired.style.display = 'none';
+                        // Restrict to today or future for other leave types
+                        startDateInput.min = today;
+                        startDateInput.max = '';
+                        endDateInput.min = today;
+                        endDateInput.max = '';
+                    }
+
+                    // Trigger start date change to update end date settings
+                    startDateInput.dispatchEvent(new Event('change'));
                 } else {
                     formFields.classList.add('opacity-0');
                     setTimeout(() => {
                         formFields.classList.add('hidden');
                     }, 500);
+                    isSickLeave = false;
                 }
             });
 
             // Handle date changes
             startDateInput.addEventListener('change', function() {
+                if (!validateDateInput(this)) return;
+
                 const startValue = this.value;
-                endDateInput.min = startValue;
+                if (startValue) {
+                    endDateInput.disabled = false;
+                    endDateInput.min = startValue;
+                    if (isSickLeave) {
+                        endDateInput.max = yesterday;
+                    } else {
+                        endDateInput.max = '';
+                    }
+                } else {
+                    endDateInput.disabled = true;
+                    endDateInput.min = today;
+                    endDateInput.max = '';
+                }
                 calculateDays();
             });
 
-            endDateInput.addEventListener('change', calculateDays);
+            endDateInput.addEventListener('change', function() {
+                if (!validateDateInput(this)) return;
+                calculateDays();
+            });
 
             function calculateDays() {
-                const start = new Date(startDateInput.value);
-                const end = new Date(endDateInput.value);
+                const startValue = startDateInput.value;
+                const endValue = endDateInput.value;
                 const preview = document.getElementById('duration-preview');
                 const totalDays = document.getElementById('total-days');
 
-                if (start && end && end >= start) {
-                    const diffTime = Math.abs(end - start);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    totalDays.textContent = diffDays;
-                    preview.classList.remove('hidden');
+                if (startValue && endValue) {
+                    const start = new Date(startValue);
+                    const end = new Date(endValue);
+
+                    if (end >= start) {
+                        const weekdays = countWeekdays(start, end);
+                        totalDays.textContent = weekdays;
+                        preview.classList.remove('hidden');
+                    } else {
+                        preview.classList.add('hidden');
+                    }
                 } else {
                     preview.classList.add('hidden');
                 }
+            }
+
+            // If there are errors or old input, show the form fields
+            if (leaveTypeSelect.value) {
+                leaveTypeSelect.dispatchEvent(new Event('change'));
             }
         });
     </script>

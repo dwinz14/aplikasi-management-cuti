@@ -47,7 +47,7 @@ class LeaveController extends Controller
                 ->get();
 
             // Case 2: user role kabag-pincab tapi bukan kantor pusat
-        } elseif ($user->role === 'kabag-pincab' && $user->office_id == 'pusat') {
+        } elseif ($user->role === 'kabag-pincab' && $user->office_id !== 'pusat') {
             $penggantiList = $query
                 ->whereIn('role', ['kabag-pincab', 'hrd'])
                 ->orderBy('name')
@@ -105,17 +105,20 @@ class LeaveController extends Controller
     {
         $user = Auth::user();
 
+        $leaveType = LeaveType::findOrFail($request->leave_type_id);
+        $isSickLeave = strtolower($leaveType->name) === 'cuti sakit';
+
         $request->validate([
             'leave_type_id' => 'required|exists:leave_types,id',
-            'start_date'    => 'required|date|after_or_equal:today',
+            'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : 'after_or_equal:today'),
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
+            'proof_image'   => ($isSickLeave ? 'required' : 'nullable') . '|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
             'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);
 
         // Validate leave type availability for user
-        $leaveType = LeaveType::findOrFail($request->leave_type_id);
         if ($leaveType->gender && $leaveType->gender !== $user->gender) {
             return back()->withErrors(['leave_type_id' => 'Jenis cuti ini tidak tersedia untuk Anda.'])->withInput();
         }
@@ -152,7 +155,12 @@ class LeaveController extends Controller
             return back()->withErrors(['msg' => 'Anda sedang jadi pengganti di tanggal tersebut.']);
         }
 
-        return DB::transaction(function () use ($request, $user, $totalHari, $leaveType) {
+        return DB::transaction(function () use ($request, $user, $totalHari, $leaveType, $isSickLeave) {
+            $proofImagePath = null;
+            if ($request->hasFile('proof_image')) {
+                $proofImagePath = $request->file('proof_image')->store('proof_images', 'public');
+            }
+
             $leave = Leave::create([
                 'user_id'       => $user->id,
                 'leave_type_id' => $request->leave_type_id,
@@ -161,6 +169,7 @@ class LeaveController extends Controller
                 'end_date'      => $request->end_date,
                 'total_hari'    => $totalHari,
                 'alasan'        => $request->alasan,
+                'proof_image'   => $proofImagePath,
                 'status_final'   => 'pending',
             ]);
 

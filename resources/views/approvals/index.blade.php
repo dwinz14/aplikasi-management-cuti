@@ -42,9 +42,8 @@
                                 {{ strtoupper($approval->leave->user->position->nama_jabatan) }}</p>
                         </div>
                         <div class="hidden md:block">
-                            <p class="text-sm text-gray-800 dark:text-gray-200 truncate"
-                                title="{{ $approval->leave->alasan }}">
-                                {{ $approval->leave->alasan }}
+                            <p class="text-sm text-gray-800 dark:text-gray-200 truncate">
+                                {{ strtoupper($approval->leave->leaveType->name) }}
                             </p>
                         </div>
                         <div class="hidden md:flex items-center text-sm text-gray-500 dark:text-gray-400">
@@ -86,6 +85,21 @@
                                         {{ $approval->leave->leaveType->name ?? 'N/A' }}</p>
                                     <p class="italic"><span class="font-medium not-italic">Alasan:</span>
                                         "{{ $approval->leave->alasan }}"</p>
+                                    @if ($approval->leave->proof_image)
+                                        <div class="mt-3">
+                                            <p
+                                                class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">
+                                                Bukti Gambar</p>
+                                            <div class="flex justify-center">
+                                                <img src="{{ asset('storage/' . $approval->leave->proof_image) }}"
+                                                    alt="Bukti Cuti"
+                                                    class="max-w-full h-auto max-h-48 rounded-lg shadow-md border border-gray-200 dark:border-gray-600"
+                                                    onclick="window.open(this.src, '_blank')">
+                                            </div>
+                                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 text-center">Klik
+                                                gambar untuk memperbesar</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
