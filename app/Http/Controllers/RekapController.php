@@ -49,7 +49,8 @@ class RekapController extends Controller
             'total_hari',
             'alasan',
             'proof_image',
-            'status_final'
+            'status_final',
+            'created_at'
         ])
             ->with([
                 'user:id,name,position_id,office_id',
@@ -80,7 +81,7 @@ class RekapController extends Controller
         }
 
         $leaves = $query
-            ->orderBy('start_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 

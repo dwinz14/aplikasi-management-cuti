@@ -87,6 +87,7 @@ class MasterUserController extends Controller
         // Gunakan default password dari .env
         $defaultPassword = config('app.default_user_password', 'password123');
         $validated['password'] = Hash::make($defaultPassword);
+        $validated['must_change_password'] = true;
 
         User::create($validated);
 
@@ -141,8 +142,11 @@ class MasterUserController extends Controller
     {
         try {
             $defaultPassword = config('app.default_user_password', 'password123');
-            $user->update(['password' => Hash::make($defaultPassword)]);
-            return back()->with('success', "Password user berhasil direset ke default ({$defaultPassword}).");
+            $user->update([
+                'password' => Hash::make($defaultPassword),
+                'must_change_password' => true
+            ]);
+            return back()->with('success', "Password user berhasil direset ke default. User akan dipaksa mengganti password saat login berikutnya.");
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat mereset password. Silakan coba lagi.');
         }
