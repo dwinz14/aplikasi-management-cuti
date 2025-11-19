@@ -9,6 +9,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\LeavePrintController;
 use App\Http\Controllers\MasterOfficeController;
 use App\Http\Controllers\MasterPositionController;
 use App\Http\Controllers\MasterLeaveTypeController;
@@ -60,6 +61,9 @@ Route::middleware(['auth'])->group(function () {
             ->parameters(['' => 'leave'])
             ->only(['index', 'create', 'store', 'destroy']); // tambah edit/update/destroy kalau perlu
     });
+
+    Route::get('cuti/{leave}/print', [LeavePrintController::class, 'print'])
+        ->name('cuti.print');
 
     Route::get('/replacements', [LeaveController::class, 'replacements'])->name('replacements.index');
 

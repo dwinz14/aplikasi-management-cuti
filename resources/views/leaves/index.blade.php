@@ -86,47 +86,59 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    @if (strtolower($leave->status_final) === 'pending')
-                                        <form action="{{ route('cuti.destroy', $leave) }}" method="POST"
-                                            class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                                                onclick="return confirm('Apakah Anda yakin ingin membatalkan pengajuan cuti ini?');">
-                                                Batalkan
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
-                                    @endif
+
+                                    @switch(strtolower($leave->status_final))
+                                        @case('pending')
+                                            <form action="{{ route('cuti.destroy', $leave) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit"
+                                                    class="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700"
+                                                    onclick="return confirm('Yakin ingin membatalkan pengajuan cuti ini?');">
+                                                    Batalkan
+                                                </button>
+                                            </form>
+                                        @break
+
+                                        @case('approved')
+                                            <a href="{{ route('cuti.print', $leave) }}" target="_blank"
+                                                class="px-3 py-1 text-sm rounded border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                                                title="Cetak Form Cuti">
+                                                <i class="bi bi-printer"></i> Cetak
+                                            </a>
+                                        @break
+
+                                        @default
+                                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                                    @endswitch
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
-                                    <div class="flex flex-col items-center justify-center w-full">
-                                        <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5 4.5l-2.25-2.25m0 0l2.25-2.25m-2.25 2.25l2.25 2.25M12 18.75l-2.25-2.25m2.25 2.25l2.25-2.25m-2.25 2.25l-2.25-2.25M6.34 7.5h11.32a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25H6.34a2.25 2.25 0 01-2.25-2.25v-7.5a2.25 2.25 0 012.25-2.25z" />
-                                        </svg>
-                                        <p class="text-lg font-semibold mb-1 text-gray-800 dark:text-gray-100">Belum ada
-                                            data pengajuan</p>
-                                        <p class="text-sm">Silakan ajukan cuti baru untuk memulai.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50">
-                {{ $leaves->links() }}
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
+                                        <div class="flex flex-col items-center justify-center w-full">
+                                            <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5 4.5l-2.25-2.25m0 0l2.25-2.25m-2.25 2.25l2.25 2.25M12 18.75l-2.25-2.25m2.25 2.25l2.25-2.25m-2.25 2.25l-2.25-2.25M6.34 7.5h11.32a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25H6.34a2.25 2.25 0 01-2.25-2.25v-7.5a2.25 2.25 0 012.25-2.25z" />
+                                            </svg>
+                                            <p class="text-lg font-semibold mb-1 text-gray-800 dark:text-gray-100">Belum ada
+                                                data pengajuan</p>
+                                            <p class="text-sm">Silakan ajukan cuti baru untuk memulai.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50">
+                    {{ $leaves->links() }}
+                </div>
             </div>
         </div>
-    </div>
 
-    <x-toast-notification />
-</x-app-layout>
+        <x-toast-notification />
+    </x-app-layout>

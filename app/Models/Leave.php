@@ -43,6 +43,12 @@ class Leave extends Model
     {
         return $this->hasMany(ApprovalHistory::class);
     }
+
+    public function pengganti()
+    {
+        return $this->belongsTo(User::class, 'pengganti_id');
+    }
+
     /** ambil riwayat terakhir tanpa N+1 saat rekap */
     public function lastHistory()
     {
