@@ -73,7 +73,7 @@ class LeaveController extends Controller
                 $others = Cache::remember("atasan_{$user->office_id}", 300, fn() =>
                 User::select('id', 'name', 'role')
                     ->where('office_id', $user->office_id)
-                    ->whereIn('role', ['hrd', 'kasie', 'kabag-pincab'])
+                    ->whereIn('role', ['hrd', 'kabag-pincab', 'kasie'])
                     ->where('id', '!=', $user->id)
                     ->get());
 
@@ -123,7 +123,7 @@ class LeaveController extends Controller
             return back()->withErrors(['leave_type_id' => 'Jenis cuti ini tidak tersedia untuk Anda.'])->withInput();
         }
 
-        $totalHari = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
+        $totalHari = $this->calculateWorkingDays($request->start_date, $request->end_date);
 
         // Check quota for non-unlimited leave types
         if ($leaveType->quota > 0) {
@@ -265,5 +265,22 @@ class LeaveController extends Controller
     {
         $leaves = Leave::with('user')->where('pengganti_id', Auth::id())->latest()->paginate(10);
         return view('replacements.index', compact('leaves'));
+    }
+
+    private function calculateWorkingDays($startDate, $endDate)
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $workingDays = 0;
+
+        while ($start <= $end) {
+            // Check if it's a weekday (Monday to Friday)
+            if ($start->dayOfWeek !== Carbon::SATURDAY && $start->dayOfWeek !== Carbon::SUNDAY) {
+                $workingDays++;
+            }
+            $start->addDay();
+        }
+
+        return $workingDays;
     }
 }

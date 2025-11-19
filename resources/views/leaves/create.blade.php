@@ -196,6 +196,18 @@
                             </label>
                             <input type="file" id="proof_image" name="proof_image" accept="image/*"
                                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                            <!-- Tombol Preview -->
+                            <button type="button" id="preview-image-btn"
+                                class="mt-2 hidden text-primary-600 hover:text-primary-800 text-sm font-medium flex items-center"
+                                onclick="openImagePreview()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                Lihat Gambar
+                            </button>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Format: JPG, PNG, GIF. Maksimal
                                 2MB.</p>
                             @error('proof_image')
@@ -244,6 +256,16 @@
         </div>
     @endif
 
+    <!-- Modal Preview Gambar -->
+    <div id="imagePreviewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg max-w-lg w-full relative">
+            <button onclick="closeImagePreview()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
+                ✖
+            </button>
+            <img id="imagePreview" src="" alt="Preview" class="w-full rounded-md">
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const leaveTypeSelect = document.getElementById('leave_type_id');
@@ -283,7 +305,8 @@
                     const date = new Date(value);
                     if (isWeekend(date)) {
                         alert(
-                        'Tidak dapat memilih hari Sabtu atau Minggu. Silakan pilih hari kerja (Senin-Jumat).');
+                            'Tidak dapat memilih hari Sabtu atau Minggu. Silakan pilih hari kerja (Senin-Jumat).'
+                            );
                         input.value = '';
                         return false;
                     }
@@ -394,5 +417,28 @@
                 leaveTypeSelect.dispatchEvent(new Event('change'));
             }
         });
+
+        // preview gambar
+        const proofInput = document.getElementById('proof_image');
+        const previewBtn = document.getElementById('preview-image-btn');
+        let previewURL = "";
+
+        proofInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                previewURL = URL.createObjectURL(this.files[0]);
+                previewBtn.classList.remove('hidden');
+            } else {
+                previewBtn.classList.add('hidden');
+            }
+        });
+
+        function openImagePreview() {
+            document.getElementById('imagePreview').src = previewURL;
+            document.getElementById('imagePreviewModal').classList.remove('hidden');
+        }
+
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.add('hidden');
+        }
     </script>
 </x-app-layout>

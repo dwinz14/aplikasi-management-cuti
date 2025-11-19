@@ -9,6 +9,8 @@ use App\Models\Office;
 use App\Models\LeaveType;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
+use App\Exports\RekapCutiExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RekapController extends Controller
 {
@@ -86,5 +88,31 @@ class RekapController extends Controller
             ->withQueryString();
 
         return view('hrd.rekap', compact('leaves', 'positions', 'offices', 'leaveTypes', 'positionId', 'officeId', 'leaveTypeId', 'startDate', 'endDate', 'perPage'));
+    }
+
+    public function export(Request $request)
+    {
+        // Validasi sederhana filter (optional)
+        $request->validate([
+            'position_id' => 'nullable|exists:positions,id',
+            'office_id' => 'nullable|exists:offices,id',
+            'leave_type_id' => 'nullable|exists:leave_types,id',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status_final' => 'nullable|in:pending,approved,rejected',
+        ]);
+
+        $filters = [
+            'position_id' => $request->get('position_id'),
+            'office_id' => $request->get('office_id'),
+            'leave_type_id' => $request->get('leave_type_id'),
+            'start_date' => $request->get('start_date'),
+            'end_date' => $request->get('end_date'),
+            'status_final' => $request->get('status_final'),
+        ];
+
+        $filename = 'rekap_cuti_' . now()->format('Ymd_His') . '.xlsx';
+
+        return Excel::download(new RekapCutiExport($filters), $filename);
     }
 }

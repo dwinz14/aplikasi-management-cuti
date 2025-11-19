@@ -30,12 +30,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-// route rekap cuti
-Route::middleware(['auth', 'role:hrd,super_admin'])
-    ->prefix('hrd')->name('hrd.')
-    ->group(function () {
-        Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
-    });
+
 
 // route dahsboard user
 // Route::middleware(['auth', 'role:super_admin'])->group(function () {
@@ -94,15 +89,6 @@ Route::middleware('auth')->group(function () {
     })->name('password.force-change');
 });
 
-// route set kuota cuti
-Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')->group(function () {
-    Route::get('quota', [QuotaController::class, 'index'])->name('quota.index');
-    Route::post('quota/reset', [QuotaController::class, 'resetAll'])->name('quota.reset');
-    Route::post('quota/reset-division', [QuotaController::class, 'resetDivision'])->name('quota.resetDivision');
-    Route::post('quota/reset-position', [QuotaController::class, 'resetPosition'])->name('quota.resetPosition');
-    Route::post('quota/{user}/{leaveType}', [QuotaController::class, 'update'])->name('quota.update');
-    Route::post('quota/settings', [QuotaController::class, 'updateSettings'])->name('quota.settings');
-});
 
 // route master for super admin
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -116,6 +102,23 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');
     Route::patch('user-activity/{id}/approve', [UserManagementController::class, 'approve'])->name('user-activity.approve');
     Route::patch('user-activity/{id}/reject', [UserManagementController::class, 'reject'])->name('user-activity.reject');
+});
+
+// route rekap cuti
+Route::middleware(['auth', 'role:hrd,super_admin'])
+    ->prefix('hrd')->name('hrd.')
+    ->group(function () {
+        Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
+        Route::get('rekap/export', [\App\Http\Controllers\RekapController::class, 'export'])->name('rekap.export');
+    });
+// route set kuota cuti
+Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')->group(function () {
+    Route::get('quota', [QuotaController::class, 'index'])->name('quota.index');
+    Route::post('quota/reset', [QuotaController::class, 'resetAll'])->name('quota.reset');
+    Route::post('quota/reset-division', [QuotaController::class, 'resetDivision'])->name('quota.resetDivision');
+    Route::post('quota/reset-position', [QuotaController::class, 'resetPosition'])->name('quota.resetPosition');
+    Route::post('quota/{user}/{leaveType}', [QuotaController::class, 'update'])->name('quota.update');
+    Route::post('quota/settings', [QuotaController::class, 'updateSettings'])->name('quota.settings');
 });
 
 require __DIR__ . '/auth.php';
