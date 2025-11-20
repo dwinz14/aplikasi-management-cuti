@@ -126,6 +126,15 @@
                                     <input type="date" id="start_date" name="start_date"
                                         value="{{ old('start_date') }}" min="{{ date('Y-m-d') }}"
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    <p id="date-note" class="mt-1 text-sm text-amber-600 hidden">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                            </path>
+                                        </svg>
+                                        Pengajuan cuti minimal 1 minggu sebelum tanggal cuti.
+                                    </p>
                                     @error('start_date')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
@@ -142,8 +151,8 @@
                                         </svg>
                                         Tanggal Selesai
                                     </label>
-                                    <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}"
-                                        min="{{ date('Y-m-d') }}" disabled
+                                    <input type="date" id="end_date" name="end_date"
+                                        value="{{ old('end_date') }}" min="{{ date('Y-m-d') }}" disabled
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
                                     @error('end_date')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -306,7 +315,7 @@
                     if (isWeekend(date)) {
                         alert(
                             'Tidak dapat memilih hari Sabtu atau Minggu. Silakan pilih hari kerja (Senin-Jumat).'
-                            );
+                        );
                         input.value = '';
                         return false;
                     }
@@ -319,6 +328,9 @@
 
             // Initially disable end date
             endDateInput.disabled = true;
+
+            // Initially hide date note
+            document.getElementById('date-note').classList.add('hidden');
 
             // Handle leave type selection
             leaveTypeSelect.addEventListener('change', function() {
@@ -334,10 +346,12 @@
                     isSickLeave = leaveTypeName.includes('cuti sakit');
                     const proofSection = document.getElementById('proof-image-section');
                     const proofRequired = document.getElementById('proof-required');
+                    const dateNote = document.getElementById('date-note');
 
                     if (isSickLeave) {
                         proofSection.classList.remove('hidden');
                         proofRequired.style.display = 'inline';
+                        dateNote.classList.add('hidden');
                         // Restrict to past dates for sick leave
                         startDateInput.min = '';
                         startDateInput.max = yesterday;
@@ -346,10 +360,14 @@
                     } else {
                         proofSection.classList.add('hidden');
                         proofRequired.style.display = 'none';
-                        // Restrict to today or future for other leave types
-                        startDateInput.min = today;
+                        dateNote.classList.remove('hidden');
+                        // Restrict to 7 days from today for other leave types
+                        const minDate = new Date();
+                        minDate.setDate(minDate.getDate() + 7);
+                        const minDateStr = minDate.toISOString().split('T')[0];
+                        startDateInput.min = minDateStr;
                         startDateInput.max = '';
-                        endDateInput.min = today;
+                        endDateInput.min = minDateStr;
                         endDateInput.max = '';
                     }
 
@@ -361,6 +379,7 @@
                         formFields.classList.add('hidden');
                     }, 500);
                     isSickLeave = false;
+                    document.getElementById('date-note').classList.add('hidden');
                 }
             });
 

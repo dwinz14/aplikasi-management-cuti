@@ -28,7 +28,7 @@
                                 Jenis Cuti</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
-                                Periode Cuti</th>
+                                Tanggal Cuti</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-sm font-medium text-stone-500 dark:text-gray-300 uppercase tracking-wider">
                                 Alasan</th>
@@ -56,11 +56,14 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($history->leave->start_date)->isoFormat('D MMM YYYY') }} -
-                                    {{ \Carbon\Carbon::parse($history->leave->end_date)->isoFormat('D MMM YYYY') }}
+                                    <div>
+                                        {{ \Carbon\Carbon::parse($history->leave->start_date)->isoFormat('D MMM YYYY') }}
+                                        -
+                                        {{ \Carbon\Carbon::parse($history->leave->end_date)->isoFormat('D MMM YYYY') }}
+                                    </div>
                                     <span class="text-xs">({{ $history->leave->total_hari }} hari)</span>
                                 </td>
-                                <td class="px-6 py-4 max-w-xs">
+                                <td class="px-6 py-4 max-w-[150px]">
                                     <div
                                         class="text-sm font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">
                                         {{ $history->leave->alasan }}
