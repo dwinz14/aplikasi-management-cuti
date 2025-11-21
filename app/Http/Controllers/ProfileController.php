@@ -6,6 +6,7 @@ use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Division;
 use App\Models\Position;
 use App\Models\Office;
+use App\Models\LeaveType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,11 +20,23 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $annualType = LeaveType::where('name', 'cuti tahunan')->first();
+        $annualBalance = null;
+
+        if ($annualType) {
+            $annualBalance = $request->user()->userLeaveBalances()
+                ->where('leave_type_id', $annualType->id)
+                ->where('year', now()->year)
+                ->first();
+        }
+
         return view('profile.edit', [
             'user' => $request->user()->load('division', 'position', 'office'),
             'divisions' => Division::all(),
             'positions' => Position::all(),
             'offices' => Office::all(),
+            'annualType' => $annualType,
+            'annualBalance' => $annualBalance,
         ]);
     }
 

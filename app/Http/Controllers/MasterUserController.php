@@ -70,6 +70,7 @@ class MasterUserController extends Controller
             'name'        => ['bail', 'required', 'string', 'max:255', 'regex:/^[a-zA-Z\\s]+$/'],
             'email'       => ['required', 'email', 'unique:users,email'],
             'gender'      => ['nullable', 'in:L,P'],
+            'tanggal_aktif_kerja' => ['nullable', 'date', 'before_or_equal:today'],
             'role'        => ['required', 'in:super_admin,hrd,kabag-pincab,kasie,staff,direksi'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
@@ -77,6 +78,7 @@ class MasterUserController extends Controller
 
             // Pesan error kustom (opsional)
             'nik.regex' => 'Format NIK salah.',
+            'tanggal_aktif_kerja.before_or_equal' => 'Tanggal aktif kerja tidak boleh lebih dari hari ini.',
         ]);
 
 
@@ -115,6 +117,7 @@ class MasterUserController extends Controller
             'name'        => ['bail', 'required', 'string', 'max:255', 'regex:/^[a-zA-Z\\s]+$/'],
             'email'       => ['required', 'email', 'unique:users,email,' . $user->id],
             'gender'      => ['nullable', 'in:L,P'],
+            'tanggal_aktif_kerja' => ['nullable', 'date', 'before_or_equal:today'],
             'role'        => ['required', 'in:super_admin,hrd,kabag-pincab,kasie,staff,direksi'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
@@ -122,6 +125,7 @@ class MasterUserController extends Controller
 
             // Pesan error kustom (opsional)
             'nik.regex' => 'Format NIK salah.',
+            'tanggal_aktif_kerja.before_or_equal' => 'Tanggal aktif kerja tidak boleh lebih dari hari ini.',
         ]);
 
         $validated['name'] = strtolower(strip_tags(trim($validated['name'])));

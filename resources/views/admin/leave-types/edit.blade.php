@@ -13,9 +13,9 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
-            <form method="POST" action="{{ route('admin.leave-types.update', $leaveType->id) }}" class="space-y-6">
+    <div class="space-y-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+            <form method="POST" action="{{ route('admin.leave-types.update', $leaveType->id) }}" class="space-y-4">
                 @csrf
                 @method('PUT')
 
@@ -49,7 +49,18 @@
                         perempuan saja</p>
                 </div>
 
+                <div>
+                    <x-input-label for="min_years" :value="__('Minimal Masa Kerja (Tahun)')" />
 
+                    <x-text-input id="min_years" name="min_years" type="number" min="0"
+                        class="mt-1 block w-full" :value="old('min_years', $leaveType->min_years ?? 0)" placeholder="Masukkan minimal masa kerja..." />
+
+                    <x-input-error :messages="$errors->get('min_years')" class="mt-2" />
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Isi 0 jika tidak ada minimal masa kerja.
+                    </p>
+                </div>
 
                 <div class="flex items-center justify-end space-x-3">
                     <a href="{{ route('admin.leave-types.index') }}"

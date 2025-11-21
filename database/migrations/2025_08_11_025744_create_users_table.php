@@ -24,6 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('division_id')->nullable();
             $table->unsignedBigInteger('position_id')->nullable();
             $table->unsignedBigInteger('office_id')->nullable();
+            $table->date('tanggal_aktif_kerja')->nullable();
             // $table->integer('sisa_cuti')->default(12);
             $table->boolean('must_change_password')->default(false);
             $table->timestamp('last_login_at')->nullable();

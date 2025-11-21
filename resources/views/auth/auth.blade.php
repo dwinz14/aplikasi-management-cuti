@@ -190,6 +190,28 @@
                             placeholder="Pilih Kantor" />
                     </div>
 
+                    {{-- masa kerja --}}
+                    <div>
+                        <x-input-label for="tanggal_aktif_kerja" value="Tanggal Aktif Kerja"
+                            class="mb-2 text-gray-800 dark:text-gray-200 font-medium" />
+
+                        <div class="relative">
+                            <div
+                                class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400 dark:text-gray-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+
+                            <x-text-input id="tanggal_aktif_kerja" type="date" name="tanggal_aktif_kerja"
+                                :value="old('tanggal_aktif_kerja')" required
+                                class="block w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200 cursor-pointer" />
+                        </div>
+
+                        <x-input-error :messages="$errors->get('tanggal_aktif_kerja')" class="mt-2" />
+                    </div>
 
                     <!-- Password -->
                     <div>

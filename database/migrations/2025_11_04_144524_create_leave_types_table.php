@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('quota')->default(0);
             $table->enum('gender', ['L', 'P'])->nullable();
+            $table->unsignedInteger('min_years')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

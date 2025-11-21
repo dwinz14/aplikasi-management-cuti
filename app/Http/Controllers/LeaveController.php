@@ -89,6 +89,12 @@ class LeaveController extends Controller
                         ->orWhere('gender', $user->gender);
                 });
             })
+            ->where(function ($q) use ($user) {
+                $masaKerja = $user->masaKerjaTahun();
+
+                $q->where('min_years', 0)
+                    ->orWhere('min_years', '<=', $masaKerja);
+            })
             ->get();
 
         // Get user's leave balances for current year
@@ -106,7 +112,29 @@ class LeaveController extends Controller
         $user = Auth::user();
 
         $leaveType = LeaveType::findOrFail($request->leave_type_id);
-        $isSickLeave = strtolower($leaveType->name) === 'cuti sakit';
+        // Validasi masa kerja minimal untuk jenis cuti
+        if ($leaveType->min_years > 0) {
+
+            if (!$user->tanggal_aktif_kerja) {
+                return back()->withErrors([
+                    'leave_type_id' => 'Tanggal aktif kerja belum diatur. Hubungi Admin.'
+                ])->withInput();
+            }
+
+            $masaKerjaTahun = $user->masaKerjaTahun();
+
+            if ($masaKerjaTahun < $leaveType->min_years) {
+                return back()->withErrors([
+                    'leave_type_id' => "Jenis cuti ini hanya untuk karyawan dengan masa kerja minimal {$leaveType->min_years} tahun."
+                ])->withInput();
+            }
+        }
+
+        $types = [
+            'izin sakit dengan surat dokter',
+            'izin sakit tanpa surat dokter'
+        ];
+        $isSickLeave = in_array(strtolower($leaveType->name), $types);
 
         $request->validate([
             'leave_type_id' => 'required|exists:leave_types,id',

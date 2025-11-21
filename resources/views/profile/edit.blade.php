@@ -60,19 +60,22 @@
                                     <div>
                                         <h3 class="text-2xl md:text-3xl font-bold">{{ strtoupper($user->name) }}</h3>
                                         <p class="text-lg font-medium text-blue-100 dark:text-blue-200">
-                                            {{ strtoupper($user->position->nama_jabatan ?? $user->role) }}
+                                            {{ strtoupper($user->position->nama_jabatan ?? 'N/A') }}
                                         </p>
+                                        <div class="text-sm font-medium text-blue-100 dark:text-blue-200">
+                                            Masa Kerja : {{ $user->masaKerjaTahunBulan() }}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="text-right flex-shrink-0 ml-4"> {{-- ml-4 ditambah agar tidak menempel di layar kecil --}}
-                                    <p class="text-sm font-medium text-blue-100 dark:text-blue-200">Sisa Cuti Tahunan
-                                    </p>
-                                    <p class="text-4xl font-bold">{{ $user->getAnnualLeaveBalance() }}
-                                        <span class="text-2xl font-medium">Hari</span>
-                                    </p>
+                                    @if ($annualType && $user->masaKerjaTahun() >= $annualType->min_years)
+                                        <span class="badge bg-success">Sisa Cuti Tahunan:
+                                            {{ $annualBalance->remaining ?? 0 }} Hari</span>
+                                    @else
+                                        <span class="badge bg-danger">Cuti Tahunan: Belum Tersedia</span>
+                                    @endif
                                 </div>
-
                             </div>
 
                             <div class="border-t border-white/20 pt-6">

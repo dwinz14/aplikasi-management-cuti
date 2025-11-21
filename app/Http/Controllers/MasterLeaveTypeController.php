@@ -38,6 +38,7 @@ class MasterLeaveTypeController extends Controller
             'name' => 'required|string|max:255|unique:leave_types,name',
             'quota' => 'required|integer|min:0',
             'gender' => 'nullable|in:L,P',
+            'min_years' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ]);
         $validated['name'] = strtolower(strip_tags(trim($validated['name'])));
@@ -72,6 +73,7 @@ class MasterLeaveTypeController extends Controller
             'name' => 'required|string|max:255|unique:leave_types,name,' . $leaveType->id,
             'quota' => 'required|integer|min:0',
             'gender' => 'nullable|in:L,P',
+            'min_years' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
@@ -79,6 +81,7 @@ class MasterLeaveTypeController extends Controller
             'name' => $request->name,
             'quota' => $request->quota,
             'gender' => $request->gender,
+            'min_years' => $request->min_years,
         ]);
 
         return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil diperbarui.');

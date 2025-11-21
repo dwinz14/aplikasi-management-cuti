@@ -334,54 +334,69 @@
 
             // Handle leave type selection
             leaveTypeSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const leaveTypeName = (selectedOption?.text || '').toLowerCase();
+
+                const proofSection = document.getElementById('proof-image-section');
+                const proofRequired = document.getElementById('proof-required');
+                const dateNote = document.getElementById('date-note');
+
+                const isSickWithLetter = leaveTypeName.includes('izin sakit dengan surat dokter');
+                const isSickWithoutLetter = leaveTypeName.includes('izin sakit tanpa surat dokter');
+                const isSickLeave = isSickWithLetter || isSickWithoutLetter;
+
+                // Show form fields smoothly
                 if (this.value) {
                     formFields.classList.remove('hidden');
-                    setTimeout(() => {
-                        formFields.classList.remove('opacity-0');
-                    }, 10);
-
-                    // Check if selected leave type is "cuti sakit"
-                    const selectedOption = this.options[this.selectedIndex];
-                    const leaveTypeName = selectedOption.text.toLowerCase();
-                    isSickLeave = leaveTypeName.includes('cuti sakit');
-                    const proofSection = document.getElementById('proof-image-section');
-                    const proofRequired = document.getElementById('proof-required');
-                    const dateNote = document.getElementById('date-note');
-
-                    if (isSickLeave) {
-                        proofSection.classList.remove('hidden');
-                        proofRequired.style.display = 'inline';
-                        dateNote.classList.add('hidden');
-                        // Restrict to past dates for sick leave
-                        startDateInput.min = '';
-                        startDateInput.max = yesterday;
-                        endDateInput.min = today; // Will be overridden when start selected
-                        endDateInput.max = yesterday;
-                    } else {
-                        proofSection.classList.add('hidden');
-                        proofRequired.style.display = 'none';
-                        dateNote.classList.remove('hidden');
-                        // Restrict to 7 days from today for other leave types
-                        const minDate = new Date();
-                        minDate.setDate(minDate.getDate() + 7);
-                        const minDateStr = minDate.toISOString().split('T')[0];
-                        startDateInput.min = minDateStr;
-                        startDateInput.max = '';
-                        endDateInput.min = minDateStr;
-                        endDateInput.max = '';
-                    }
-
-                    // Trigger start date change to update end date settings
-                    startDateInput.dispatchEvent(new Event('change'));
+                    setTimeout(() => formFields.classList.remove('opacity-0'), 10);
                 } else {
                     formFields.classList.add('opacity-0');
-                    setTimeout(() => {
-                        formFields.classList.add('hidden');
-                    }, 500);
-                    isSickLeave = false;
-                    document.getElementById('date-note').classList.add('hidden');
+                    setTimeout(() => formFields.classList.add('hidden'), 500);
+                    return;
                 }
+
+                // RULE: Sick with doctor letter → proof required
+                if (isSickWithLetter) {
+                    proofSection.classList.remove('hidden');
+                    proofRequired.style.display = 'inline';
+                    dateNote.classList.add('hidden');
+                } else {
+                    proofSection.classList.add('hidden');
+                    proofRequired.style.display = 'none';
+                    dateNote.classList.toggle('hidden', isSickLeave);
+                }
+
+                // Apply date rules
+                applyDateRules(isSickLeave);
+
+                // Refresh dependent fields
+                startDateInput.dispatchEvent(new Event('change'));
             });
+
+            /**
+             * Apply min/max rules for sick leave or normal leave
+             */
+            function applyDateRules(isSickLeave) {
+                if (isSickLeave) {
+                    // Sick → past dates allowed
+                    startDateInput.min = '';
+                    startDateInput.max = yesterday;
+                    endDateInput.min = today; // start date will override this
+                    endDateInput.max = yesterday;
+                } else {
+                    // Normal leave → min 7 days from today
+                    const minDate = new Date();
+                    minDate.setDate(minDate.getDate() + 7);
+
+                    const minDateStr = minDate.toISOString().split('T')[0];
+
+                    startDateInput.min = minDateStr;
+                    startDateInput.max = '';
+                    endDateInput.min = minDateStr;
+                    endDateInput.max = '';
+                }
+            }
+
 
             // Handle date changes
             startDateInput.addEventListener('change', function() {

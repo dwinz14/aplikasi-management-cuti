@@ -13,6 +13,7 @@ class LeaveType extends Model
         'name',
         'quota',
         'gender',
+        'min_years',
         'is_active',
     ];
 

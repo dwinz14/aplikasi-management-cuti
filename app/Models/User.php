@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
+use App\Models\LeaveType;
 
 class User extends Authenticatable
 {
@@ -27,7 +29,8 @@ class User extends Authenticatable
         'division_id',
         'position_id',
         'office_id',
-        'sisa_cuti',
+        'tanggal_aktif_kerja',
+        // 'sisa_cuti',
         'last_login_at',
         'must_change_password',
         'gender'
@@ -74,6 +77,46 @@ class User extends Authenticatable
     public function userLeaveBalances()
     {
         return $this->hasMany(UserLeaveBalance::class);
+    }
+
+    public function masaKerjaTahun()
+    {
+        if (!$this->tanggal_aktif_kerja) return 0;
+
+        return Carbon::parse($this->tanggal_aktif_kerja)->diffInYears(now());
+    }
+
+    public function masaKerjaTahunBulan()
+    {
+        if (!$this->tanggal_aktif_kerja) return 'Belum ditentukan';
+
+        $startDate = Carbon::parse($this->tanggal_aktif_kerja);
+        $now = now();
+
+        $years = (int) $startDate->diffInYears($now);
+        $months = (int) $startDate->diffInMonths($now) % 12;
+
+        if ($years == 0 && $months == 0) {
+            return 'Kurang dari 1 bulan';
+        }
+
+        $result = [];
+        if ($years > 0) {
+            $result[] = $years . ' tahun';
+        }
+        if ($months > 0) {
+            $result[] = $months . ' bulan';
+        }
+
+        return implode(' ', $result);
+    }
+
+    public function eligibleForAnnualLeave()
+    {
+        $cutiTahunan = LeaveType::where('name', 'cuti tahunan')->first();
+        if (!$cutiTahunan) return false;
+
+        return $this->masaKerjaTahun() >= $cutiTahunan->min_years;
     }
 
     /**

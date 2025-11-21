@@ -50,6 +50,7 @@ class RegisteredUserController extends Controller
             'division_id' => ['nullable', 'exists:divisions,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
             'office_id' => ['nullable', 'exists:offices,id'],
+            'tanggal_aktif_kerja' => ['required', 'date', 'before_or_equal:today'],
             'password' => [
                 'required',
                 'confirmed',
@@ -62,6 +63,7 @@ class RegisteredUserController extends Controller
             'name.regex' => 'Nama hanya boleh berisi huruf dan spasi.',
             'password.regex' => 'Kata sandi harus dimulai dengan huruf besar, mengandung setidaknya satu digit dan satu karakter khusus.',
             'nik.regex' => 'Format NIK tidak valid. Harus diawali dengan "AP" diikuti 9 digit.',
+            'tanggal_aktif_kerja.before_or_equal' => 'Tanggal aktif kerja tidak boleh lebih dari hari ini.',
         ]);
 
         if ($validator->fails()) {
@@ -78,6 +80,7 @@ class RegisteredUserController extends Controller
             'division_id' => $input['division_id'],
             'position_id' => $input['position_id'],
             'office_id' => $input['office_id'],
+            'tanggal_aktif_kerja' => $input['tanggal_aktif_kerja'],
             // 'sisa_cuti' => 12,
             'status' => 'pending',
         ]);
