@@ -130,18 +130,15 @@ class LeaveController extends Controller
             }
         }
 
-        $types = [
-            'izin sakit dengan surat dokter',
-            'izin sakit tanpa surat dokter'
-        ];
-        $isSickLeave = in_array(strtolower($leaveType->name), $types);
+        $isSickLeave = in_array(strtolower($leaveType->name), ['izin sakit dengan surat dokter', 'izin sakit tanpa surat dokter']);
+        $requiresProof = strtolower($leaveType->name) === 'izin sakit dengan surat dokter';
 
         $request->validate([
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : 'after_or_equal:today'),
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
-            'proof_image'   => ($isSickLeave ? 'required' : 'nullable') . '|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
             'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
         ]);

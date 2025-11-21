@@ -80,7 +80,8 @@
                                         })"
                                             :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" />
                                         @error('pengganti_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400"> Anda harus memilih
+                                                pengganti</p>
                                         @enderror
                                     </div>
                                 @endif
@@ -104,7 +105,8 @@
                                         })"
                                             :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" />
                                         @error('atasan_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih atasan
+                                                langsung</p>
                                         @enderror
                                     </div>
                                 @endif
@@ -136,7 +138,8 @@
                                         Pengajuan cuti minimal 1 minggu sebelum tanggal cuti.
                                     </p>
                                     @error('start_date')
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih tanggal
+                                            mulai cuti</p>
                                     @enderror
                                 </div>
 
@@ -155,7 +158,8 @@
                                         value="{{ old('end_date') }}" min="{{ date('Y-m-d') }}" disabled
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
                                     @error('end_date')
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih tanggal
+                                            selesai cuti</p>
                                     @enderror
                                 </div>
 
@@ -187,7 +191,7 @@
                             <textarea id="alasan" name="alasan" rows="3" placeholder="Jelaskan alasan cuti Anda secara detail..."
                                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm resize-none">{{ old('alasan') }}</textarea>
                             @error('alasan')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus mengisi alasan cuti</p>
                             @enderror
                         </div>
 
@@ -201,7 +205,7 @@
                                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                     </path>
                                 </svg>
-                                Bukti Gambar <span id="proof-required" class="text-red-500">*</span>
+                                Bukti Gambar <span id="proof-required" class="text-red-500 hidden">*</span>
                             </label>
                             <input type="file" id="proof_image" name="proof_image" accept="image/*"
                                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
@@ -220,7 +224,8 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Format: JPG, PNG, GIF. Maksimal
                                 2MB.</p>
                             @error('proof_image')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus menyertakan bukti surat
+                                    dokter</p>
                             @enderror
                         </div>
 
@@ -343,7 +348,7 @@
 
                 const isSickWithLetter = leaveTypeName.includes('izin sakit dengan surat dokter');
                 const isSickWithoutLetter = leaveTypeName.includes('izin sakit tanpa surat dokter');
-                const isSickLeave = isSickWithLetter || isSickWithoutLetter;
+                isSickLeave = isSickWithLetter || isSickWithoutLetter; // Update global variable
 
                 // Show form fields smoothly
                 if (this.value) {
@@ -355,15 +360,19 @@
                     return;
                 }
 
-                // RULE: Sick with doctor letter → proof required
+                // RULE: Sick with doctor letter → proof required, without letter → no proof needed
                 if (isSickWithLetter) {
                     proofSection.classList.remove('hidden');
-                    proofRequired.style.display = 'inline';
+                    proofRequired.classList.remove('hidden');
+                    dateNote.classList.add('hidden');
+                } else if (isSickWithoutLetter) {
+                    proofSection.classList.add('hidden');
+                    proofRequired.classList.add('hidden');
                     dateNote.classList.add('hidden');
                 } else {
                     proofSection.classList.add('hidden');
-                    proofRequired.style.display = 'none';
-                    dateNote.classList.toggle('hidden', isSickLeave);
+                    proofRequired.classList.add('hidden');
+                    dateNote.classList.remove('hidden');
                 }
 
                 // Apply date rules
@@ -378,10 +387,10 @@
              */
             function applyDateRules(isSickLeave) {
                 if (isSickLeave) {
-                    // Sick → past dates allowed
+                    // Sick → past dates allowed for start, end max is yesterday
                     startDateInput.min = '';
                     startDateInput.max = yesterday;
-                    endDateInput.min = today; // start date will override this
+                    endDateInput.min = ''; // allow past dates, overridden by start date
                     endDateInput.max = yesterday;
                 } else {
                     // Normal leave → min 7 days from today
@@ -402,6 +411,11 @@
             startDateInput.addEventListener('change', function() {
                 if (!validateDateInput(this)) return;
 
+                if (isSickLeave && this.value > yesterday) {
+                    alert('Tanggal mulai untuk jenis cuti sakit tidak boleh hari ini atau di masa depan.');
+                    this.value = yesterday;
+                }
+
                 const startValue = this.value;
                 if (startValue) {
                     endDateInput.disabled = false;
@@ -421,6 +435,13 @@
 
             endDateInput.addEventListener('change', function() {
                 if (!validateDateInput(this)) return;
+
+                if (isSickLeave && this.value > yesterday) {
+                    alert(
+                        'Tanggal selesai untuk jenis cuti sakit tidak boleh hari ini atau di masa depan.'
+                    );
+                    this.value = yesterday;
+                }
                 calculateDays();
             });
 
