@@ -141,7 +141,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full table-fixed border-collapse">
                     <thead
-                        class="bg-gray-50 dark:bg-slate-700/60 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
+                        class="bg-blue-100 dark:bg-blue-900 inset-shadow-sm inset-shadow-indigo-500 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
                         <tr>
                             <th class="px-3 py-3 text-left w-32 whitespace-nowrap">Nama</th>
                             <th class="px-3 py-3 text-left w-28 whitespace-nowrap">Jabatan</th>
@@ -153,7 +153,7 @@
                             <th class="px-3 py-3 text-left w-40 whitespace-nowrap">Approver Terakhir</th>
                         </tr>
                     </thead>
-                    <tbody class="text-sm divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="text-xs divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($leaves as $leave)
                             <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/40 transition cursor-pointer">
                                 <td class="px-3 py-3 font-medium text-gray-900 dark:text-gray-100 truncate">
@@ -167,10 +167,10 @@
                                     </div>
                                     <span class="text-xs text-gray-400 block">({{ $leave->total_hari }} hari)</span>
                                 </td>
-                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400 truncate">
-                                    {{ $leave->leaveType->name ?? '-' }}</td>
+                                <td class="px-3 py-3 text-gray-600 dark:text-gray-400 whitespace-normal break-words">
+                                    {{ Str::title($leave->leaveType->name ?? '-') }}</td>
                                 <td class="px-3 py-3 max-w-[150px]">
-                                    <div class="text-gray-900 dark:text-gray-100 whitespace-normal break-words">
+                                    <div class="text-gray-900 dark:text-gray-100 truncate">
                                         {{ $leave->alasan }}
                                     </div>
                                 </td>

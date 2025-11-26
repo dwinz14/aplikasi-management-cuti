@@ -18,7 +18,7 @@
 
 <body class="font-sans antialiased">
     <div x-data="{ sidebarOpen: false }"
-        class="min-h-screen bg-slate-100 dark:bg-slate-900 dark:text-gray-300 transition-colors duration-300">
+        class="min-h-screen bg-slate-200 dark:bg-slate-900 dark:text-gray-300 transition-colors duration-300">
         @include('layouts.navigation')
 
         <div class="flex flex-col flex-1">

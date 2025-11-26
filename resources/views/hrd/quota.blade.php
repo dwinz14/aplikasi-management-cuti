@@ -231,8 +231,7 @@
                 </div>
                 <div class="overflow-x-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead
-                            class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-700/80">
+                        <thead class="bg-blue-100 dark:bg-blue-900 inset-shadow-sm inset-shadow-indigo-500">
                             <tr>
                                 <th scope="col"
                                     class="px-6 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
