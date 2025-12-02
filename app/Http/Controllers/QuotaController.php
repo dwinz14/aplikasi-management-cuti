@@ -10,6 +10,8 @@ use App\Models\Office;
 use App\Models\Position;
 use App\Models\UserLeaveBalance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class QuotaController extends Controller
 {
@@ -48,7 +50,7 @@ class QuotaController extends Controller
             })
             ->orderBy('users.name')
             ->select('user_leave_balances.*')
-            ->paginate(4)
+            ->paginate(8)
             ->withQueryString();
 
         // Get current settings
@@ -182,5 +184,64 @@ class QuotaController extends Controller
         }
 
         return back()->with('success', 'Pengaturan kuota berhasil diperbarui.');
+    }
+
+    public function generateAnnualBalances(Request $request)
+    {
+        $request->validate([
+            'year' => 'nullable|integer|min:2020|max:' . (now()->year + 1),
+        ]);
+
+        $year = $request->year ?: now()->year;
+
+        DB::transaction(function () use ($year) {
+            $users = User::where('role', '!=', 'super_admin')->get();
+            $leaveTypes = LeaveType::where('is_active', true)->get();
+
+            $created = 0;
+            $skipped = 0;
+
+            foreach ($users as $user) {
+                foreach ($leaveTypes as $leaveType) {
+                    // Skip jika jenis cuti khusus gender dan user tidak sesuai
+                    if ($leaveType->gender && $leaveType->gender !== $user->gender) {
+                        continue;
+                    }
+
+                    // Hitung masa kerja dalam tahun
+                    $masaKerjaTahun = $user->masaKerjaTahun();
+
+                    // Skip jika masa kerja kurang dari min_years
+                    if ($masaKerjaTahun < $leaveType->min_years) {
+                        continue;
+                    }
+
+                    // Gunakan updateOrCreate untuk menghindari duplikat
+                    $balance = UserLeaveBalance::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'leave_type_id' => $leaveType->id,
+                            'year' => $year,
+                        ],
+                        [
+                            'total_quota' => $leaveType->quota,
+                            'remaining' => $leaveType->quota,
+                            'used' => 0,
+                        ]
+                    );
+
+                    if ($balance->wasRecentlyCreated) {
+                        $created++;
+                    } else {
+                        $skipped++;
+                    }
+                }
+            }
+
+            // Log aktivitas
+            Log::info("Generate kuota cuti tahunan {$year}: {$created} dibuat, {$skipped} dilewati.");
+        });
+
+        return back()->with('success', "Generate kuota cuti tahunan untuk tahun {$year} berhasil. Silakan refresh halaman untuk melihat hasil.");
     }
 }

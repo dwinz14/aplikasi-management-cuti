@@ -123,6 +123,7 @@ Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')
     Route::post('quota/reset-position', [QuotaController::class, 'resetPosition'])->name('quota.resetPosition');
     Route::post('quota/{user}/{leaveType}', [QuotaController::class, 'update'])->name('quota.update');
     Route::post('quota/settings', [QuotaController::class, 'updateSettings'])->name('quota.settings');
+    Route::post('quota/generate-annual', [QuotaController::class, 'generateAnnualBalances'])->name('quota.generateAnnual');
 });
 
 require __DIR__ . '/auth.php';

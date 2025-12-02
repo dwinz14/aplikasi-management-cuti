@@ -13,7 +13,7 @@
         </div>
     </x-slot>
 
-    <div class="space-y-4" x-data="{ showFilter: false, showReset: false }">
+    <div class="space-y-4" x-data="{ showFilter: false, showReset: false, showGenerate: false }">
         {{-- Filter & Search --}}
         <div class="bg-white dark:bg-slate-800 shadow-lg rounded-xl p-4 transition-all">
             <div class="flex items-center justify-between mb-3">
@@ -109,6 +109,68 @@
             </div>
         </div>
 
+        {{-- Generate Kuota Tahunan --}}
+        <div class="bg-white dark:bg-slate-800 shadow-lg rounded-xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Generate Kuota Cuti Tahunan
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Buat kuota cuti tahunan untuk semua karyawan
+                        berdasarkan masa kerja</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-green-600 dark:text-green-400">
+                        Untuk Generate Kuota Tahunan
+                    </span>
+                    <button @click="showGenerate = !showGenerate"
+                        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-4 h-4 ml-2 transition-transform" :class="showGenerate ? 'rotate-180' : ''"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4" x-show="showGenerate" x-collapse">
+                <div
+                    class="p-4 rounded-lg border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20">
+                    <h4 class="text-sm font-medium text-green-700 dark:text-green-200 mb-3">Generate Kuota Cuti Tahunan
+                    </h4>
+                    <form action="{{ route('hrd.quota.generateAnnual') }}" method="POST"
+                        @submit.prevent="if(confirm('Apakah yakin generate kuota cuti tahunan? Proses ini akan memakan waktu.')) $el.submit()">
+                        @csrf
+                        <div class="space-y-3">
+                            <div>
+                                <label for="year"
+                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Tahun
+                                </label>
+                                <input type="number" id="year" name="year" value="{{ now()->year }}"
+                                    min="2020" max="{{ now()->year + 1 }}"
+                                    class="w-full rounded-md border-green-300 dark:border-green-600 dark:bg-green-900/50 dark:text-green-200 text-sm focus:border-green-500 focus:ring-green-500">
+                                <p class="text-xs text-gray-500 mt-1">Default: tahun sekarang</p>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+                                <h5 class="text-xs font-medium text-blue-700 dark:text-blue-200 mb-2">Generate kuota
+                                    cuti untuk semua karyawan
+                                </h5>
+                            </div>
+                            <button type="submit"
+                                class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generate Kuota Tahunan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         {{-- Reset Kuota --}}
         <div class="bg-white dark:bg-slate-800 shadow-lg rounded-xl p-4">
             <div class="flex items-center justify-between mb-4">
@@ -125,7 +187,8 @@
                         class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         <svg class="w-4 h-4 ml-2 transition-transform" :class="showReset ? 'rotate-180' : ''"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
                 </div>
@@ -148,7 +211,8 @@
                                 </label>
                             </div>
                             <div>
-                                <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1">Kuota default</label>
+                                <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1">Kuota
+                                    default</label>
                                 <input type="number" name="default_annual_leave_quota" value="{{ $defaultQuota }}"
                                     min="0"
                                     class="w-full rounded-md border-blue-300 dark:border-blue-600 dark:bg-blue-900/50 dark:text-blue-200 text-xs focus:border-blue-500 focus:ring-blue-500">
