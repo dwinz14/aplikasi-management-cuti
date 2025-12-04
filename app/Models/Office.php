@@ -10,6 +10,8 @@ class Office extends Model
 {
     use HasFactory;
 
+    const PUSAT = 1;
+
     protected $fillable = ['nama_kantor'];
 
     public function users()

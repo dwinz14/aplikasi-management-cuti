@@ -9,6 +9,7 @@ use App\Models\ApprovalHistory;
 use App\Models\LeaveType;
 use App\Models\UserLeaveBalance;
 use App\Jobs\SendNotification;
+use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -40,14 +41,14 @@ class LeaveController extends Controller
         $query = User::query()->where('id', '!=', $user->id);
 
         // Case 1: user role kabag-pincab & kantor pusat
-        if ($user->role === 'kabag-pincab' && $user->office_id === 'pusat') {
+        if ($user->role === 'kabag-pincab' && $user->office_id == Office::PUSAT) {
             $penggantiList = $query
-                ->where('office_id', $user->office_id)
+                ->where('office_id', Office::PUSAT)
                 ->orderBy('name')
                 ->get();
 
             // Case 2: user role kabag-pincab tapi bukan kantor pusat
-        } elseif ($user->role === 'kabag-pincab' && $user->office_id !== 'pusat') {
+        } elseif ($user->role === 'kabag-pincab' && $user->office_id != Office::PUSAT) {
             $penggantiList = $query
                 ->whereIn('role', ['kabag-pincab', 'hrd'])
                 ->orderBy('name')
