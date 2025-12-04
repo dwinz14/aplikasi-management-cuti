@@ -34,12 +34,16 @@
                             </div>
 
                             <div class="text-sm text-stone-600 dark:text-gray-400 space-y-1">
-                                <p><span class="font-medium">Role:</span> {{ strtoupper(ucfirst($user->role)) }}</p>
+                                <p><span class="font-medium">Role:</span> {{ strtoupper($user->role) }}
+                                </p>
                                 <p><span class="font-medium">Divisi:</span>
                                     {{ $user->division?->nama_divisi ? Strtoupper($user->division?->nama_divisi) : '-' }}
                                 </p>
                                 <p><span class="font-medium">Jabatan:</span>
                                     {{ $user->position?->nama_jabatan ? Strtoupper($user->position?->nama_jabatan) : '-' }}
+                                </p>
+                                <p><span class="font-medium">Kantor:</span>
+                                    {{ $user->office?->nama_kantor ? Strtoupper($user->office?->nama_kantor) : '-' }}
                                 </p>
                                 <p><span class="font-medium">Terdaftar:</span>
                                     {{ \Carbon\Carbon::parse($user->created_at)->format('d/m/Y H:i') }}
