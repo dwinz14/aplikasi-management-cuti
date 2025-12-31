@@ -103,6 +103,9 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::patch('leave-types/{leaveType}/toggle', [MasterLeaveTypeController::class, 'toggle'])->name('leave-types.toggle');
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
+    Route::post('/users/reset-passwords', [MasterUserController::class, 'resetAllPasswords'])
+        ->name('users.resetAllPasswords');
+    Route::delete('/destroy-all', [MasterUserController::class, 'destroyAll'])->name('users.destroyAll');
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');
     Route::patch('user-activity/{id}/approve', [UserManagementController::class, 'approve'])->name('user-activity.approve');
     Route::patch('user-activity/{id}/reject', [UserManagementController::class, 'reject'])->name('user-activity.reject');

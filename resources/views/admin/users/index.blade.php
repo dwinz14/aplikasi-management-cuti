@@ -10,15 +10,46 @@
                     Kelola data akun karyawan.
                 </p>
             </div>
-            <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+            <div
+                class="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <a href="{{ route('admin.users.create') }}"
-                    class="inline-flex items-center px-3 py-2 bg-primary-600 border border-transparent rounded-full font-medium text-xs text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                    class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm w-full sm:w-auto">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Tambah User
                 </a>
+
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form action="{{ route('admin.users.resetAllPasswords') }}" method="POST"
+                        onsubmit="return confirm('Yakin ingin reset semua password user?');" class="w-full sm:w-auto">
+                        @csrf
+                        <button type="submit"
+                            class="inline-flex items-center justify-center w-full px-4 py-2 bg-amber-500 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset Password
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.users.destroyAll') }}" method="POST"
+                        onsubmit="return confirm('⚠️ PERINGATAN! Yakin ingin menghapus SEMUA user?');"
+                        class="w-full sm:w-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Hapus Semua
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </x-slot>

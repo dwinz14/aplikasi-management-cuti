@@ -10,6 +10,7 @@ use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MasterUserController extends Controller
@@ -153,6 +154,42 @@ class MasterUserController extends Controller
             return back()->with('success', "Password user berhasil direset ke default. User akan dipaksa mengganti password saat login berikutnya.");
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat mereset password. Silakan coba lagi.');
+        }
+    }
+
+    public function resetAllPasswords(Request $request)
+    {
+        try {
+            $defaultPassword = config('app.default_user_password', 'password123');
+            $updatedCount = User::whereNotIn('role', ['super_admin'])
+                ->update([
+                    'password' => Hash::make($defaultPassword),
+                    'must_change_password' => true
+                ]);
+
+
+            return redirect()->route('admin.users.index')->with('success', "Berhasil mereset password {$updatedCount} user ke default. Semua user akan dipaksa mengganti password saat login berikutnya.");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.users.index')->with('error', 'Terjadi kesalahan saat mereset semua password. Silakan coba lagi.');
+        }
+    }
+    public function destroyAll(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $deletedCount = User::whereNotIn('role', ['super_admin'])->delete();
+
+            DB::commit();
+
+            if ($deletedCount > 0) {
+                return redirect()->route('admin.users.index')->with('success', "Berhasil menghapus {$deletedCount} user. Super admin tetap aman.");
+            } else {
+                return redirect()->route('admin.users.index')->with('info', 'Tidak ada user yang dihapus. Hanya super admin yang tersisa.');
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.users.index')->with('error', 'Terjadi kesalahan saat menghapus user. Silakan coba lagi.');
         }
     }
 }
