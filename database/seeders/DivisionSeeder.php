@@ -22,6 +22,7 @@ class DivisionSeeder extends Seeder
             ['nama_divisi' => 'marketing', 'created_at' => now(), 'updated_at' => now()],
             ['nama_divisi' => 'general', 'created_at' => now(), 'updated_at' => now()],
             ['nama_divisi' => 'collection', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_divisi' => 'direksi', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

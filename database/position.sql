@@ -13,7 +13,7 @@ INSERT INTO positions (nama_jabatan, created_at, updated_at) VALUES
 ('kasie operasional', NOW(), NOW()),
 ('kepala bagian hrd', NOW(), NOW()),
 ('kepala bagian kepatuhan & manrisk', NOW(), NOW()),
-('kepala bagian operation', NOW(), NOW()),
+('kepala bagian operasional', NOW(), NOW()),
 ('kepala bagian skai', NOW(), NOW()),
 ('kepala kantor kas', NOW(), NOW()),
 ('kepatuhan & manrisk staff', NOW(), NOW()),
@@ -25,4 +25,5 @@ INSERT INTO positions (nama_jabatan, created_at, updated_at) VALUES
 ('staff skai', NOW(), NOW()),
 ('tabungan deposito', NOW(), NOW()),
 ('teller', NOW(), NOW()),
-('umum', NOW(), NOW());
+('umum', NOW(), NOW()),
+('direksi', NOW(), NOW());

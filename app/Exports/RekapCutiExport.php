@@ -91,7 +91,7 @@ class RekapCutiExport implements FromQuery, WithMapping, WithHeadings, ShouldAut
             $leave->end_date,
             $leave->total_hari,
             strtoupper($leave->status_final ?? 'pending'),
-            ucwords($lastApproval ? ($lastApproval->approver->name ?? '-') : '-'),
+            ucwords(optional($leave->approvals()->where('step', 2)->first()?->approver)->name ?? '-'),
             $lastApproval ? $lastApproval->created_at->format('Y-m-d H:i:s') : '-',
             $leave->alasan ?? '-',
         ];

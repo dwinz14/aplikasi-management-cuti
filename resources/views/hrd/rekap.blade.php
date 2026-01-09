@@ -213,7 +213,7 @@
                                 </td>
                                 <td class="px-3 py-3 max-w-xs">
                                     <div class="text-gray-600 dark:text-gray-400 whitespace-normal break-words">
-                                        {{ strtoupper(optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-') }}
+                                        {{ Str::title(optional($leave->approvals()->where('step', 2)->first()?->approver)->name ?? '-') }}
                                     </div>
                                 </td>
                             </tr>

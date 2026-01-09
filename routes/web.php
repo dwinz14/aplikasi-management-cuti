@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('', LeaveController::class)
             ->parameters(['' => 'leave'])
             ->only(['index', 'create', 'store', 'destroy']); // tambah edit/update/destroy kalau perlu
+        Route::patch('/{leave}/accept-revision', [LeaveController::class, 'acceptRevision'])->name('accept-revision');
+        Route::patch('/{leave}/reject-revision', [LeaveController::class, 'rejectRevision'])->name('reject-revision');
     });
 
     Route::get('cuti/{leave}/print', [LeavePrintController::class, 'print'])
@@ -72,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/history', [ApprovalController::class, 'history'])->name('history');
         Route::patch('/{approval}/approve', [ApprovalController::class, 'approve'])->name('approve');
         Route::patch('/{approval}/reject', [ApprovalController::class, 'reject'])->name('reject');
+        Route::patch('/{approval}/request-revision', [ApprovalController::class, 'requestRevision'])->name('request-revision');
     });
 
     // Routes untuk notifikasi

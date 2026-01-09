@@ -187,7 +187,7 @@
             <tr>
                 <td class="tbl-key">Atasan Langsung</td>
                 <td class="tbl-val">
-                    {{ strtoupper(optional($leave->approvalHistories()->latest()->first()?->approver)->name ?? '-') }}
+                    {{ strtoupper(optional($leave->approvals->where('step', 2)->first()->approver)->name ?? '-') }}
                 </td>
             </tr>
         </table>

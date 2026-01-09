@@ -335,7 +335,7 @@
                         <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse($userLeaveBalances as $balance)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-normal break-word">
                                         <div class="flex items-center">
                                             <div
                                                 class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">

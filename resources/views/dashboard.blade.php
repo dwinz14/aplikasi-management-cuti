@@ -32,10 +32,10 @@
                                 {{ strtoupper(auth()->user()->role) }}
                             </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
-                                {{ strtoupper(auth()->user()->division->nama_divisi ?? '') }}
+                                {{ strtoupper(auth()->user()->position->nama_jabatan ?? '') }}
                             </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
-                                {{ strtoupper(auth()->user()->position->nama_jabatan ?? '') }}
+                                {{ strtoupper(auth()->user()->office->nama_kantor ?? '') }}
                             </span>
                         </div>
                     </div>
@@ -205,7 +205,7 @@
                                             <div class="flex-1">
                                                 <div class="flex items-center space-x-2">
                                                     <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $leave->leaveType->name ?? 'Cuti' }}
+                                                        {{ Str::title($leave->leaveType->name ?? 'Cuti') }}
                                                     </span>
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
