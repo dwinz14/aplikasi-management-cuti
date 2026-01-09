@@ -70,15 +70,22 @@ class LeaveController extends Controller
 
             $atasanList = $atasanList->merge($direksi);
 
+            $hrd = Cache::remember('hrd_users', 300, fn() =>
+            User::select('id', 'name', 'role')->where('role', 'hrd')->get());
+
+            $atasanList = $atasanList->merge($hrd);
+
             if ($user->role !== 'hrd') {
                 $others = Cache::remember("atasan_{$user->office_id}", 300, fn() =>
                 User::select('id', 'name', 'role')
                     ->where('office_id', $user->office_id)
-                    ->whereIn('role', ['hrd', 'kabag-pincab', 'kasie'])
+                    ->whereIn('role', ['kabag-pincab', 'kasie'])
                     ->where('id', '!=', $user->id)
                     ->get());
 
                 $atasanList = $atasanList->merge($others);
+
+                $atasanList = $atasanList->unique('id')->values();
             }
         }
 
@@ -335,6 +342,12 @@ class LeaveController extends Controller
             'status' => 'approved',
         ]);
 
+        // Update history status for the approver
+        ApprovalHistory::where('leave_id', $leave->id)
+            ->where('approved_by', $approval->approver_id)
+            ->where('status', 'revision_requested')
+            ->update(['status' => 'revision_accepted']);
+
         ApprovalHistory::create([
             'leave_id'    => $leave->id,
             'approved_by' => Auth::id(),
@@ -389,6 +402,12 @@ class LeaveController extends Controller
         $approval->update([
             'status' => 'rejected',
         ]);
+
+        // Update history status for the approver
+        ApprovalHistory::where('leave_id', $leave->id)
+            ->where('approved_by', $approval->approver_id)
+            ->where('status', 'revision_requested')
+            ->update(['status' => 'revision_rejected']);
 
         ApprovalHistory::create([
             'leave_id'    => $leave->id,
