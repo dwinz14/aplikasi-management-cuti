@@ -28,9 +28,6 @@
                             Ringkasan aktivitas dan status cuti Anda
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm font-medium">
-                                {{ strtoupper(auth()->user()->role) }}
-                            </span>
                             <span class="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-sm">
                                 {{ strtoupper(auth()->user()->position->nama_jabatan ?? '') }}
                             </span>
