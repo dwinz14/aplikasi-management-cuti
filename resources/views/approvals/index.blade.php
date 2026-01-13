@@ -37,9 +37,7 @@
                 <div @click="open = !open"
                     class="flex items-center p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl">
                     <div class="flex-shrink-0 mr-4">
-                        <img class="h-10 w-10 rounded-full"
-                            src="https://ui-avatars.com/api/?name={{ urlencode($approval->leave->user->name) }}&background=random"
-                            alt="">
+                        <img class="h-10 w-10 rounded-full" src="{{ asset('img/user.png') }}" alt="">
                     </div>
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                         <div>

@@ -68,8 +68,7 @@
                                         class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 p-1 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors duration-200">
                                         <span class="sr-only">Open user menu</span>
                                         <img class="h-8 w-8 rounded-full ring-2 ring-gray-200 dark:ring-gray-600"
-                                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random"
-                                            alt="">
+                                            src="{{ asset('img/user.png') }}" alt="">
                                         <span class="ml-2 text-gray-700 dark:text-gray-300 font-medium hidden sm:block">
                                             {{ Auth::user()->name }}
                                         </span>

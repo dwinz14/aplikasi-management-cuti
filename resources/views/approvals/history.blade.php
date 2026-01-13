@@ -32,8 +32,7 @@
                     <div class="flex-shrink-0 mr-4">
                         <div class="relative">
                             <img class="h-12 w-12 rounded-full border-2 border-gray-200 dark:border-gray-600"
-                                src="https://ui-avatars.com/api/?name={{ urlencode($history->leave->user->name) }}&background=random&size=128"
-                                alt="{{ $history->leave->user->name }}">
+                                src="{{ asset('img/user.png') }}" alt="{{ $history->leave->user->name }}">
                             {{-- Role Badge Icon --}}
                             <div
                                 class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full {{ $history->role_badge_color }} flex items-center justify-center border-2 border-white dark:border-slate-800">
