@@ -112,7 +112,7 @@ class LeaveController extends Controller
             ->get()
             ->keyBy('leave_type_id');
 
-        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances'));
+        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances', 'user'));
     }
 
     public function store(Request $request)

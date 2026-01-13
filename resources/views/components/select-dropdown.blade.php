@@ -1,9 +1,18 @@
-@props(['name', 'label', 'options' => [], 'selected' => null, 'placeholder' => 'Pilih...', 'disabled' => false])
+@props([
+    'name',
+    'label',
+    'options' => [],
+    'selected' => null,
+    'placeholder' => 'Pilih...',
+    'disabled' => false,
+    'searchable' => false,
+])
 
 <div x-data="dropdownSelect({
     options: @js($options),
     selected: @js($selected),
-    placeholder: @js($placeholder)
+    placeholder: @js($placeholder),
+    searchable: @js($searchable),
 })" @click.away="open = false" x-cloak class="relative w-full">
 
     <x-input-label :for="$name" :value="$label" class="mb-2 font-medium text-gray-800 dark:text-gray-200" />
@@ -27,8 +36,15 @@
     <div x-show="open" x-transition.opacity.scale.95
         class="absolute z-50 mt-2 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-56 overflow-auto ring-1 ring-black/5 dark:ring-white/10">
 
+        <!-- Search input (only show if searchable) -->
+        <div x-show="searchable" class="p-2 border-b border-gray-200 dark:border-slate-700">
+            <input type="text" x-model="searchTerm" placeholder="Cari..."
+                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                @keydown.stop>
+        </div>
+
         <ul class="py-1 text-sm">
-            <template x-for="option in options" :key="option.id">
+            <template x-for="option in filteredOptions" :key="option.id">
                 <li @click="select(option)"
                     class="px-3 py-2 cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors duration-100"
                     :class="{
@@ -37,6 +53,13 @@
                         'text-gray-800 dark:text-gray-200': selectedValue != option.id
                     }"
                     x-text="option.name">
+                </li>
+            </template>
+
+            <!-- No results message -->
+            <template x-if="searchable && filteredOptions.length === 0 && searchTerm">
+                <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 italic">
+                    Tidak ada hasil untuk "<span x-text="searchTerm"></span>"
                 </li>
             </template>
         </ul>
@@ -50,20 +73,37 @@
     function dropdownSelect({
         options,
         selected,
-        placeholder
+        placeholder,
+        searchable
     }) {
         return {
             open: false,
             options: options,
             selectedValue: selected,
             selectedLabel: placeholder,
+            searchable: searchable,
+            searchTerm: '',
+            get filteredOptions() {
+                if (!this.searchable || !this.searchTerm) {
+                    return this.options;
+                }
+                return this.options.filter(option =>
+                    option.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+                );
+            },
             toggle() {
-                this.open = !this.open
+                this.open = !this.open;
+                if (this.open && this.searchable) {
+                    this.$nextTick(() => {
+                        this.$refs.searchInput?.focus();
+                    });
+                }
             },
             select(option) {
                 this.selectedValue = option.id;
                 this.selectedLabel = option.name;
                 this.open = false;
+                this.searchTerm = '';
             },
             init() {
                 const option = this.options.find(o => o.id == this.selectedValue);

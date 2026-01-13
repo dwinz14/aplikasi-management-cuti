@@ -149,28 +149,29 @@
                                     Pengajuan</h4>
                                 <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                                     <div class="flex items-start">
-                                        <span class="font-medium w-32 flex-shrink-0">Approval sebagai:</span>
-                                        <span class="flex-1">{{ $isAtasan ? 'Atasan' : 'Pengganti' }}</span>
+                                        <span class="font-medium w-32 flex-shrink-0">Approval sebagai</span>
+                                        <span class="flex-1">: {{ $isAtasan ? 'Atasan' : 'Pengganti' }}</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="font-medium w-32 flex-shrink-0">Tanggal:</span>
-                                        <span class="flex-1">
+                                        <span class="font-medium w-32 flex-shrink-0">Tanggal</span>
+                                        <span class="flex-1">:
                                             {{ \Carbon\Carbon::parse($approval->leave->start_date)->isoFormat('dddd, D MMMM YYYY') }}
                                             <span class="text-gray-400 dark:text-gray-500">s/d</span>
                                             {{ \Carbon\Carbon::parse($approval->leave->end_date)->isoFormat('dddd, D MMMM YYYY') }}
                                         </span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="font-medium w-32 flex-shrink-0">Total:</span>
-                                        <span class="flex-1">{{ $approval->leave->total_hari }} hari kerja</span>
+                                        <span class="font-medium w-32 flex-shrink-0">Total</span>
+                                        <span class="flex-1">: {{ $approval->leave->total_hari }} hari kerja</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="font-medium w-32 flex-shrink-0">Jenis Cuti:</span>
-                                        <span class="flex-1">{{ $approval->leave->leaveType->name ?? 'N/A' }}</span>
+                                        <span class="font-medium w-32 flex-shrink-0">Jenis Cuti</span>
+                                        <span class="flex-1">:
+                                            {{ strtoupper($approval->leave->leaveType->name) ?? 'N/A' }}</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="font-medium w-32 flex-shrink-0">Alasan:</span>
-                                        <span class="flex-1 italic">"{{ $approval->leave->alasan }}"</span>
+                                        <span class="font-medium w-32 flex-shrink-0">Alasan</span>
+                                        <span class="flex-1">: "{{ $approval->leave->alasan }}"</span>
                                     </div>
                                 </div>
 

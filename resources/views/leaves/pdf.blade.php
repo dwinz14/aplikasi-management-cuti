@@ -198,7 +198,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Role / Nama</th>
+                        <th>Nama</th>
                         <th>Status</th>
                         <th>Waktu</th>
                     </tr>
@@ -208,7 +208,7 @@
                     @foreach ($histories as $h)
                         <tr>
                             <td style="text-align:center;">{{ $i++ }}</td>
-                            <td>{{ strtoupper($h->role) }} / {{ ucwords(optional($h->approver)->name ?? '—') }}</td>
+                            <td>{{ ucwords(optional($h->approver)->name ?? '—') }}</td>
                             <td style="text-align:center;">{{ strtoupper($h->status) }}</td>
                             <td style="text-align:center;">{{ $h->created_at->format('d M Y H:i') }}</td>
                         </tr>
