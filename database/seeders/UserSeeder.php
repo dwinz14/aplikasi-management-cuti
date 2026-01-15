@@ -16,10 +16,10 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert([
             [
-                'nik' => '1',
+                'nik' => 'AP111111111',
                 'name' => 'super admin',
                 'email' => 'admin@cutiapp.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Superuser123!'),
                 'role' => 'super_admin',
                 'gender' => null,
                 'status' => 'approved',
