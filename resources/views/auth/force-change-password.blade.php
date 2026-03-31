@@ -163,8 +163,8 @@
             validationDiv.style.display = 'block';
             const rules = [{
                     id: 'password-rule-1',
-                    regex: /^[A-Z]/,
-                    message: 'Karakter pertama harus huruf besar'
+                    regex: /[A-Z]/,
+                    message: 'Harus mengandung minimal 1 huruf besar'
                 },
                 {
                     id: 'password-rule-2',

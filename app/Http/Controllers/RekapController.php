@@ -49,6 +49,7 @@ class RekapController extends Controller
             'start_date',
             'end_date',
             'total_hari',
+            'alasan',
             'proof_image',
             'status_final',
             'created_at'

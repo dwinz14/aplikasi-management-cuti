@@ -194,6 +194,17 @@
 
         <div class="section-title">Riwayat Persetujuan</div>
         <div class="approvals">
+            @php
+                $statusLabels = [
+                    'approved' => 'Disetujui',
+                    'rejected' => 'Ditolak',
+                    'revision_requested' => 'Revisi Diminta',
+                    'revision_accepted' => 'Revisi Disetujui',
+                    'revision_rejected' => 'Revisi Ditolak',
+                ];
+                $i = 1;
+            @endphp
+
             <table>
                 <thead>
                     <tr>
@@ -204,20 +215,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $i = 1; @endphp
-                    @foreach ($histories as $h)
+                    @forelse ($histories as $h)
                         <tr>
                             <td style="text-align:center;">{{ $i++ }}</td>
                             <td>{{ ucwords(optional($h->approver)->name ?? '—') }}</td>
-                            <td style="text-align:center;">{{ strtoupper($h->status) }}</td>
-                            <td style="text-align:center;">{{ $h->created_at->format('d M Y H:i') }}</td>
+                            <td style="text-align:center;">
+                                {{ $statusLabels[$h->status] ?? strtoupper($h->status) }}
+                            </td>
+                            <td style="text-align:center;">
+                                {{ $h->created_at->format('d M Y H:i') }}
+                            </td>
                         </tr>
-                    @endforeach
-                    @if ($histories->isEmpty())
+                    @empty
                         <tr>
-                            <td colspan="5" style="text-align:center;">Belum ada riwayat persetujuan</td>
+                            <td colspan="4" style="text-align:center;">
+                                Belum ada riwayat persetujuan
+                            </td>
                         </tr>
-                    @endif
+                    @endforelse
                 </tbody>
             </table>
         </div>
