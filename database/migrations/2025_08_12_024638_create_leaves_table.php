@@ -27,7 +27,7 @@ return new class extends Migration
             $table->enum('status_hrd', ['pending', 'approved', 'rejected'])->default('pending');
 
             // Status final cuti
-            $table->enum('status_final', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status_final', ['pending', 'approved', 'rejected', 'revision_requested', 'revision_accepted', 'revision_rejected'])->default('pending');
 
             $table->timestamps();
         });

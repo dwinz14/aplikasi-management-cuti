@@ -56,9 +56,7 @@
             <a href="{{ route('profile.edit') }}" class="flex-shrink-0 w-full group block">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <img class="inline-block h-9 w-9 rounded-full"
-                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random"
-                            alt="">
+                        <img class="inline-block h-9 w-9 rounded-full" src="{{ asset('img/user.png') }}" alt="">
                         <div class="ml-3">
                             <p class="text-sm font-medium text-white group-hover:text-gray-200">{{ Auth::user()->name }}
                             </p>

@@ -23,6 +23,12 @@ class Leave extends Model
         'status_kabag-pincab',
         'status_hrd',
         'status_final',
+        'is_revision_pending',
+        'revision_by_approval_id',
+    ];
+
+    protected $casts = [
+        'is_revision_pending' => 'boolean',
     ];
 
     public function user()
@@ -53,5 +59,10 @@ class Leave extends Model
     public function lastHistory()
     {
         return $this->hasOne(ApprovalHistory::class)->latestOfMany();
+    }
+
+    public function revisionApproval()
+    {
+        return $this->belongsTo(Approval::class, 'revision_by_approval_id');
     }
 }

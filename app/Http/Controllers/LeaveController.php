@@ -70,15 +70,22 @@ class LeaveController extends Controller
 
             $atasanList = $atasanList->merge($direksi);
 
+            $hrd = Cache::remember('hrd_users', 300, fn() =>
+            User::select('id', 'name', 'role')->where('role', 'hrd')->get());
+
+            $atasanList = $atasanList->merge($hrd);
+
             if ($user->role !== 'hrd') {
                 $others = Cache::remember("atasan_{$user->office_id}", 300, fn() =>
                 User::select('id', 'name', 'role')
                     ->where('office_id', $user->office_id)
-                    ->whereIn('role', ['hrd', 'kabag-pincab', 'kasie'])
+                    ->whereIn('role', ['kabag-pincab', 'kasie'])
                     ->where('id', '!=', $user->id)
                     ->get());
 
                 $atasanList = $atasanList->merge($others);
+
+                $atasanList = $atasanList->unique('id')->values();
             }
         }
 
@@ -105,7 +112,7 @@ class LeaveController extends Controller
             ->get()
             ->keyBy('leave_type_id');
 
-        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances'));
+        return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances', 'user'));
     }
 
     public function store(Request $request)
@@ -308,5 +315,154 @@ class LeaveController extends Controller
         }
 
         return $workingDays;
+    }
+
+    public function acceptRevision(Leave $leave)
+    {
+        abort_unless($leave->user_id === Auth::id(), 403);
+        abort_unless($leave->is_revision_pending, 400);
+
+        $approval = $leave->revisionApproval;
+
+        if (!$approval || !$approval->revised_start_date) {
+            return back()->withErrors(['msg' => 'Data revisi tidak ditemukan.']);
+        }
+
+        // Update tanggal leave dengan tanggal revisi
+        $leave->update([
+            'start_date' => $approval->revised_start_date,
+            'end_date' => $approval->revised_end_date,
+            'total_hari' => $approval->revised_total_hari,
+            'is_revision_pending' => false,
+            'revision_by_approval_id' => null,
+        ]);
+
+        // Approve approval yang meminta revisi
+        $approval->update([
+            'status' => 'approved',
+        ]);
+
+        // Update history status for the approver
+        ApprovalHistory::where('leave_id', $leave->id)
+            ->where('approved_by', $approval->approver_id)
+            ->where('status', 'revision_requested')
+            ->update(['status' => 'revision_accepted']);
+
+        ApprovalHistory::create([
+            'leave_id'    => $leave->id,
+            'approved_by' => Auth::id(),
+            'role'        => Auth::user()->role,
+            'status'      => 'revision_accepted',
+            'catatan'     => "Pemohon menyetujui revisi tanggal: {$approval->revised_start_date} s/d {$approval->revised_end_date}",
+        ]);
+
+        // Kirim notifikasi ke approver
+        SendNotification::dispatch(
+            $approval->approver_id,
+            'revision_accepted',
+            'Revisi Diterima',
+            Auth::user()->name . " menyetujui revisi tanggal cuti yang Anda ajukan.",
+            ['leave_id' => $leave->id]
+        );
+
+        // Cek apakah ada approver berikutnya
+        $nextApproval = $leave->approvals()->where('step', '>', $approval->step)->orderBy('step')->first();
+
+        if ($nextApproval) {
+            // Kirim notifikasi ke approver berikutnya
+            SendNotification::dispatch(
+                $nextApproval->approver_id,
+                'leave_request',
+                'Pengajuan Cuti Baru',
+                "Pengajuan cuti dari {$leave->user->name} membutuhkan persetujuan Anda.",
+                ['leave_id' => $leave->id, 'requester_id' => $leave->user_id]
+            );
+        } else {
+            // Final approve
+            $this->finalApproveLeave($leave);
+        }
+
+        return redirect()->route('cuti.index')->with('success', 'Revisi tanggal telah diterima dan cuti disetujui.');
+    }
+
+    public function rejectRevision(Leave $leave)
+    {
+        abort_unless($leave->user_id === Auth::id(), 403);
+        abort_unless($leave->is_revision_pending, 400);
+
+        $approval = $leave->revisionApproval;
+
+        // Update status
+        $leave->update([
+            'status_final' => 'rejected',
+            'is_revision_pending' => false,
+            'revision_by_approval_id' => null,
+        ]);
+
+        $approval->update([
+            'status' => 'rejected',
+        ]);
+
+        // Update history status for the approver
+        ApprovalHistory::where('leave_id', $leave->id)
+            ->where('approved_by', $approval->approver_id)
+            ->where('status', 'revision_requested')
+            ->update(['status' => 'revision_rejected']);
+
+        ApprovalHistory::create([
+            'leave_id'    => $leave->id,
+            'approved_by' => Auth::id(),
+            'role'        => Auth::user()->role,
+            'status'      => 'revision_rejected',
+            'catatan'     => "Pemohon menolak revisi tanggal dari " . $approval->approver->name,
+        ]);
+
+        // Kirim notifikasi ke approver
+        SendNotification::dispatch(
+            $approval->approver_id,
+            'revision_rejected',
+            'Revisi Ditolak',
+            Auth::user()->name . " menolak revisi tanggal cuti yang Anda ajukan. Pengajuan cuti dibatalkan.",
+            ['leave_id' => $leave->id]
+        );
+
+        return redirect()->route('cuti.index')->with('error', 'Revisi tanggal ditolak. Pengajuan cuti dibatalkan.');
+    }
+
+    private function finalApproveLeave($leave)
+    {
+        $leave->update(['status_final' => 'approved']);
+
+        $leaveType = $leave->leaveType;
+
+        // Potong cuti jika ada quota
+        if ($leaveType->quota > 0) {
+            $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
+                ->where('leave_type_id', $leave->leave_type_id)
+                ->where('year', now()->year)
+                ->first();
+
+            if ($userLeaveBalance) {
+                $userLeaveBalance->increment('used', $leave->total_hari);
+                $userLeaveBalance->decrement('remaining', $leave->total_hari);
+            } else {
+                \App\Models\UserLeaveBalance::create([
+                    'user_id' => $leave->user_id,
+                    'leave_type_id' => $leave->leave_type_id,
+                    'year' => now()->year,
+                    'allocated' => $leaveType->quota ?? 0,
+                    'used' => $leave->total_hari,
+                    'remaining' => ($leaveType->quota ?? 0) - $leave->total_hari,
+                ]);
+            }
+        }
+
+        SendNotification::dispatch(
+            $leave->user_id,
+            'leave_final_approved',
+            'Cuti Final Disetujui',
+            "Pengajuan cuti Anda telah disetujui secara final dan cuti telah dipotong dari kuota Anda.",
+            ['leave_id' => $leave->id]
+        );
     }
 }

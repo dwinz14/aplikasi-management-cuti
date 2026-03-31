@@ -56,9 +56,7 @@
                 <div @click="open = !open"
                     class="flex items-center p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl {{ $badgeClass }} {{ $status === 'dijadwalkan' ? 'bg-blue-50 dark:bg-blue-900/20' : ($status === 'berlangsung' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-900/20') }}">
                     <div class="flex-shrink-0 mr-4">
-                        <img class="h-10 w-10 rounded-full"
-                            src="https://ui-avatars.com/api/?name={{ urlencode($leave->user->name) }}&background=random"
-                            alt="">
+                        <img class="h-10 w-10 rounded-full" src="{{ asset('img/user.png') }}" alt="">
                     </div>
                     <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
                         <div>

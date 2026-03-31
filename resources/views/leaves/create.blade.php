@@ -78,7 +78,7 @@
                                                 'name' => strtoupper($u->name . ' (' . $u->role . ')'),
                                             ];
                                         })"
-                                            :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" />
+                                            :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" searchable="true" />
                                         @error('pengganti_id')
                                             <p class="mt-1 text-sm text-red-600 dark:text-red-400"> Anda harus memilih
                                                 pengganti</p>
@@ -103,7 +103,7 @@
                                                 'name' => strtoupper($u->name . ' (' . $u->role . ')'),
                                             ];
                                         })"
-                                            :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" />
+                                            :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" searchable="true" />
                                         @error('atasan_id')
                                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih atasan
                                                 langsung</p>
@@ -135,7 +135,8 @@
                                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
                                             </path>
                                         </svg>
-                                        Pengajuan cuti minimal 1 minggu sebelum tanggal cuti.
+                                        <span id="date-note-text">Pengajuan cuti minimal 1 minggu sebelum tanggal
+                                            cuti.</span>
                                     </p>
                                     @error('start_date')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih tanggal
@@ -293,6 +294,9 @@
             yesterdayDate.setDate(yesterdayDate.getDate() - 1);
             const yesterday = yesterdayDate.toISOString().split('T')[0];
 
+            // User role
+            const userRole = '{{ $user->role }}';
+
             let isSickLeave = false;
 
             // Utility functions
@@ -372,7 +376,12 @@
                 } else {
                     proofSection.classList.add('hidden');
                     proofRequired.classList.add('hidden');
-                    dateNote.classList.remove('hidden');
+                    // Hide date note for privileged roles (kabag-pincab and hrd)
+                    if (userRole === 'kabag-pincab' || userRole === 'hrd') {
+                        dateNote.classList.add('hidden');
+                    } else {
+                        dateNote.classList.remove('hidden');
+                    }
                 }
 
                 // Apply date rules
@@ -393,9 +402,10 @@
                     endDateInput.min = ''; // allow past dates, overridden by start date
                     endDateInput.max = yesterday;
                 } else {
-                    // Normal leave → min 7 days from today
+                    // Normal leave → min based on user role
+                    const minDays = (userRole === 'kabag-pincab' || userRole === 'hrd') ? 1 : 7;
                     const minDate = new Date();
-                    minDate.setDate(minDate.getDate() + 7);
+                    minDate.setDate(minDate.getDate() + minDays);
 
                     const minDateStr = minDate.toISOString().split('T')[0];
 

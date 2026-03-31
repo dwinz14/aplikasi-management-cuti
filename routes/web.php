@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('', LeaveController::class)
             ->parameters(['' => 'leave'])
             ->only(['index', 'create', 'store', 'destroy']); // tambah edit/update/destroy kalau perlu
+        Route::patch('/{leave}/accept-revision', [LeaveController::class, 'acceptRevision'])->name('accept-revision');
+        Route::patch('/{leave}/reject-revision', [LeaveController::class, 'rejectRevision'])->name('reject-revision');
     });
 
     Route::get('cuti/{leave}/print', [LeavePrintController::class, 'print'])
@@ -72,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/history', [ApprovalController::class, 'history'])->name('history');
         Route::patch('/{approval}/approve', [ApprovalController::class, 'approve'])->name('approve');
         Route::patch('/{approval}/reject', [ApprovalController::class, 'reject'])->name('reject');
+        Route::patch('/{approval}/request-revision', [ApprovalController::class, 'requestRevision'])->name('request-revision');
     });
 
     // Routes untuk notifikasi
@@ -103,6 +106,9 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
     Route::patch('leave-types/{leaveType}/toggle', [MasterLeaveTypeController::class, 'toggle'])->name('leave-types.toggle');
     Route::resource('users', MasterUserController::class);
     Route::post('users/{user}/reset-password', [MasterUserController::class, 'resetPassword'])->name('users.resetPassword');
+    Route::post('/users/reset-passwords', [MasterUserController::class, 'resetAllPasswords'])
+        ->name('users.resetAllPasswords');
+    Route::delete('/destroy-all', [MasterUserController::class, 'destroyAll'])->name('users.destroyAll');
     Route::get('user-activity', [UserManagementController::class, 'index'])->name('user-activity.index');
     Route::patch('user-activity/{id}/approve', [UserManagementController::class, 'approve'])->name('user-activity.approve');
     Route::patch('user-activity/{id}/reject', [UserManagementController::class, 'reject'])->name('user-activity.reject');

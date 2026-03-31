@@ -68,7 +68,7 @@
                             <div>
                                 <x-input-label for="tanggal_aktif_kerja" value="Tanggal Aktif Kerja" />
                                 <x-text-input id="tanggal_aktif_kerja" name="tanggal_aktif_kerja" type="date"
-                                    value="{{ old('tanggal_aktif_kerja') }}"
+                                    value="{{ old('tanggal_aktif_kerja', $user->tanggal_aktif_kerja) }}"
                                     placeholder="Pilih tanggal aktif kerja..." />
                                 @error('tanggal_aktif_kerja')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

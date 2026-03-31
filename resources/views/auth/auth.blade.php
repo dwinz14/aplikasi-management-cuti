@@ -44,9 +44,9 @@
                     <x-input-label for="nik" :value="__('NIK')"
                         class="mb-2 text-gray-800 dark:text-gray-200 font-medium" />
                     <x-text-input id="nik"
-                        class="block w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200"
+                        class="block w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200 uppercase"
                         type="text" name="nik" :value="old('nik')" required autofocus autocomplete="nik"
-                        placeholder="Masukkan NIK..." />
+                        placeholder="Masukkan NIK..." maxlength="11" />
                     <x-input-error :messages="$errors->get('nik')" class="mt-2" />
                 </div>
 
@@ -59,8 +59,8 @@
                             class="block w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-400/20 rounded-xl transition-all duration-200"
                             type="password" name="password" required autocomplete="current-password"
                             placeholder="Masukkan password..." />
-                        <button type="button" onclick="togglePassword()"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+                        <button type="button" id="togglePasswordBtn"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors select-none">
                             <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -384,21 +384,118 @@
             }
         });
 
-        // unhide password
-        function togglePassword() {
-            const input = document.getElementById('password');
+        // Auto uppercase untuk NIK input
+        (function() {
+            const nikInput = document.getElementById('nik');
+
+            if (nikInput) {
+                // Konversi ke uppercase saat user mengetik
+                nikInput.addEventListener('input', function(e) {
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+
+                    this.value = this.value.toUpperCase();
+
+                    // Maintain cursor position setelah uppercase
+                    this.setSelectionRange(start, end);
+                });
+
+                // Konversi ke uppercase saat paste
+                nikInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const upperText = pastedText.toUpperCase();
+
+                    // Insert uppercase text di cursor position
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const currentValue = this.value;
+
+                    this.value = currentValue.substring(0, start) + upperText + currentValue.substring(end);
+
+                    // Set cursor position setelah pasted text
+                    const newPosition = start + upperText.length;
+                    this.setSelectionRange(newPosition, newPosition);
+
+                    // Trigger input event untuk validasi lainnya jika ada
+                    this.dispatchEvent(new Event('input', {
+                        bubbles: true
+                    }));
+                });
+
+                // Validasi format NIK (2 huruf + 9 angka)
+                nikInput.addEventListener('blur', function() {
+                    const nikPattern = /^[A-Z]{2}[0-9]{9}$/;
+                    const value = this.value.trim();
+
+                    if (value && !nikPattern.test(value)) {
+                        // Bisa ditambahkan custom validation message
+                        this.setCustomValidity(
+                            'Format NIK harus AP diikuti 9 angka (Contoh: AP123456789)');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+
+                // Clear custom validity saat user mulai mengetik lagi
+                nikInput.addEventListener('input', function() {
+                    this.setCustomValidity('');
+                });
+            }
+        })();
+
+        // Click & Hold untuk unhide password
+        (function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('togglePasswordBtn');
             const eyeOpen = document.getElementById('eye-open');
             const eyeClosed = document.getElementById('eye-closed');
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeOpen.classList.add('hidden');
-                eyeClosed.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                eyeOpen.classList.remove('hidden');
-                eyeClosed.classList.add('hidden');
+            let isShowing = false;
+
+            // Fungsi untuk show password
+            function showPassword() {
+                if (!isShowing) {
+                    passwordInput.type = 'text';
+                    eyeOpen.classList.add('hidden');
+                    eyeClosed.classList.remove('hidden');
+                    isShowing = true;
+                }
             }
-        }
+
+            // Fungsi untuk hide password
+            function hidePassword() {
+                if (isShowing) {
+                    passwordInput.type = 'password';
+                    eyeOpen.classList.remove('hidden');
+                    eyeClosed.classList.add('hidden');
+                    isShowing = false;
+                }
+            }
+
+            // Event listeners untuk mouse
+            toggleBtn.addEventListener('mousedown', function(e) {
+                e.preventDefault(); // Mencegah focus hilang dari input
+                showPassword();
+            });
+
+            toggleBtn.addEventListener('mouseup', hidePassword);
+            toggleBtn.addEventListener('mouseleave', hidePassword);
+
+            // Event listeners untuk touch (mobile)
+            toggleBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                showPassword();
+            });
+
+            toggleBtn.addEventListener('touchend', hidePassword);
+            toggleBtn.addEventListener('touchcancel', hidePassword);
+
+            // Mencegah context menu saat long press di mobile
+            toggleBtn.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+        })();
     </script>
 </x-guest-layout>
