@@ -22,12 +22,14 @@ return new class extends Migration
             $table->text('alasan');
 
             // Status tiap approval
-            $table->enum('status_pengganti', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->enum('status_kabag-pincab', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->enum('status_hrd', ['pending', 'approved', 'rejected'])->default('pending');
+            // $table->enum('status_pengganti', ['pending', 'approved', 'rejected'])->default('pending');
+            // $table->enum('status_kabag-pincab', ['pending', 'approved', 'rejected'])->default('pending');
+            // $table->enum('status_hrd', ['pending', 'approved', 'rejected'])->default('pending');
 
             // Status final cuti
             $table->enum('status_final', ['pending', 'approved', 'rejected', 'revision_requested', 'revision_accepted', 'revision_rejected'])->default('pending');
+            // tambahan status izin mendadak
+            $table->boolean('is_mendadak')->default(false);
 
             $table->timestamps();
         });

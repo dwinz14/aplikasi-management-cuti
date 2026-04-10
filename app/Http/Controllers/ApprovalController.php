@@ -92,7 +92,7 @@ class ApprovalController extends Controller
         $this->authorizeApproval($approval);
 
         $request->validate([
-            'revised_start_date' => 'required|date|after_or_equal:today',
+            'revised_start_date' => 'required|date',
             'revised_end_date' => 'required|date|after_or_equal:revised_start_date',
         ]);
 

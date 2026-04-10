@@ -25,10 +25,12 @@ class Leave extends Model
         'status_final',
         'is_revision_pending',
         'revision_by_approval_id',
+        'is_mendadak',
     ];
 
     protected $casts = [
         'is_revision_pending' => 'boolean',
+        'is_mendadak'         => 'boolean',
     ];
 
     public function user()

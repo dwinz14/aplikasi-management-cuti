@@ -141,15 +141,37 @@ class LeaveController extends Controller
         $isSickLeave = in_array(strtolower($leaveType->name), ['izin sakit dengan surat dokter', 'izin sakit tanpa surat dokter']);
         $requiresProof = strtolower($leaveType->name) === 'izin sakit dengan surat dokter';
 
-        $request->validate([
+        $rules = [
             'leave_type_id' => 'required|exists:leave_types,id',
-            'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : 'after_or_equal:today'),
+            'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : ''),
             'end_date'      => 'required|date|after_or_equal:start_date',
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
-            'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'pengganti_id'  => (in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
-            'atasan_id'     => (!in_array($user->role, ['direksi'], true) ? 'required' : 'nullable') . '|nullable|exists:users,id',
-        ]);
+
+            'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            'pengganti_id' => in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true)
+                ? 'required|exists:users,id'
+                : 'nullable|exists:users,id',
+
+            'atasan_id' => !in_array($user->role, ['direksi'], true)
+                ? 'required|exists:users,id'
+                : 'nullable|exists:users,id',
+        ];
+
+        $messages = [
+            'leave_type_i.required' => 'Anda harus memilih jenis cuti',
+            'start_date.required' => 'Anda harus memilih tanggal mulai cuti',
+            'end_date.required' => 'Anda harus memilih tanggal selesai cuti',
+            'alasan.required' => 'Anda harus mengisi alasan cuti',
+            'proof_image.required' => 'Anda harus menyertakan bukti surat dokter',
+            'pengganti_id.required' => 'Anda harus memilih pengganti',
+            'pengganti_id.exists'   => 'Pengganti tidak valid',
+
+            'atasan_id.required' => 'Anda harus memilih atasan',
+            'atasan_id.exists'   => 'Atasan tidak valid',
+        ];
+
+        $request->validate($rules, $messages);
 
         // Validate leave type availability for user
         if ($leaveType->gender && $leaveType->gender !== $user->gender) {
@@ -204,6 +226,7 @@ class LeaveController extends Controller
                 'alasan'        => $request->alasan,
                 'proof_image'   => $proofImagePath,
                 'status_final'   => 'pending',
+                'is_mendadak' => !$isSickLeave && \Carbon\Carbon::parse($request->start_date)->lt(\Carbon\Carbon::today()->addWeek()),
             ]);
 
             if ($user->role === 'direksi') {

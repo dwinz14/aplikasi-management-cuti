@@ -49,6 +49,12 @@
                         <div class="hidden md:block">
                             <p class="text-sm text-gray-800 dark:text-gray-200 truncate">
                                 {{ strtoupper($approval->leave->leaveType->name) }}
+                                @if ($approval->leave->is_mendadak)
+                                    <span
+                                        class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                        ⚡ Mendadak
+                                    </span>
+                                @endif
                             </p>
                         </div>
                         <div class="hidden md:flex items-center justify-between">

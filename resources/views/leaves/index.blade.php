@@ -151,12 +151,12 @@
                                     actionType: '', // 'accept' or 'reject'
                                     modalTitle: '',
                                     modalMessage: '',
-
+                                
                                     confirmAction(type, url) {
                                         this.actionType = type;
                                         this.actionUrl = url;
                                         this.modalOpen = true;
-
+                                
                                         if (type === 'accept') {
                                             this.modalTitle = 'Terima Revisi & Setujui Cuti?';
                                             this.modalMessage = 'Apakah Anda yakin menerima revisi tanggal ini? Cuti akan langsung disetujui.';
@@ -322,7 +322,14 @@
                                 class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition duration-150 {{ $leave->is_revision_pending ? 'bg-yellow-50 dark:bg-yellow-900/10' : '' }}">
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                                    {{ strtoupper($leave->leaveType->name) }}</td>
+                                    {{ strtoupper($leave->leaveType->name) }}
+                                    @if ($leave->is_mendadak)
+                                        <span
+                                            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                            ⚡ Mendadak
+                                        </span>
+                                    @endif
+                                </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-100">
                                     {{ \Carbon\Carbon::parse($leave->start_date)->isoFormat('D MMM YYYY') }} -

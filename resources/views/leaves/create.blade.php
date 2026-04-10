@@ -79,10 +79,6 @@
                                             ];
                                         })"
                                             :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" searchable="true" />
-                                        @error('pengganti_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400"> Anda harus memilih
-                                                pengganti</p>
-                                        @enderror
                                     </div>
                                 @endif
 
@@ -104,10 +100,6 @@
                                             ];
                                         })"
                                             :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" searchable="true" />
-                                        @error('atasan_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih atasan
-                                                langsung</p>
-                                        @enderror
                                     </div>
                                 @endif
                             </div>
@@ -125,22 +117,30 @@
                                         </svg>
                                         Tanggal Mulai
                                     </label>
+
+                                    {{-- PERUBAHAN: hapus min="{{ date('Y-m-d') }}" → mendukung tanggal mendadak --}}
                                     <input type="date" id="start_date" name="start_date"
-                                        value="{{ old('start_date') }}" min="{{ date('Y-m-d') }}"
+                                        value="{{ old('start_date') }}"
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
-                                    <p id="date-note" class="mt-1 text-sm text-amber-600 hidden">
-                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+
+                                    {{-- PERUBAHAN: ganti date-note lama dengan badge mendadak --}}
+                                    {{-- Badge ini muncul/hilang via JS, bukan dihapus dari DOM --}}
+                                    <div id="mendadak-badge"
+                                        class="hidden mt-2 flex items-start gap-2 px-3 py-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-600">
+                                        <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-orange-500" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                                            </path>
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                         </svg>
-                                        <span id="date-note-text">Pengajuan cuti minimal 1 minggu sebelum tanggal
-                                            cuti.</span>
-                                    </p>
+                                        <span class="text-xs text-orange-700 dark:text-orange-300">
+                                            <span class="font-bold">⚡ Pengajuan Mendadak</span>
+                                            — Tanggal cuti sudah lewat atau hari ini. Pengajuan ini akan dicatat sebagai
+                                            <span class="font-semibold">cuti/izin mendadak</span>.
+                                        </span>
+                                    </div>
+
                                     @error('start_date')
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih tanggal
-                                            mulai cuti</p>
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -155,12 +155,13 @@
                                         </svg>
                                         Tanggal Selesai
                                     </label>
+
+                                    {{-- PERUBAHAN: hapus min="{{ date('Y-m-d') }}" — dikelola penuh oleh JS --}}
                                     <input type="date" id="end_date" name="end_date"
-                                        value="{{ old('end_date') }}" min="{{ date('Y-m-d') }}" disabled
+                                        value="{{ old('end_date') }}" disabled
                                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
                                     @error('end_date')
-                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih tanggal
-                                            selesai cuti</p>
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -192,7 +193,7 @@
                             <textarea id="alasan" name="alasan" rows="3" placeholder="Jelaskan alasan cuti Anda secara detail..."
                                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-slate-700 dark:text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm resize-none">{{ old('alasan') }}</textarea>
                             @error('alasan')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus mengisi alasan cuti</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -225,8 +226,7 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Format: JPG, PNG, GIF. Maksimal
                                 2MB.</p>
                             @error('proof_image')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus menyertakan bukti surat
-                                    dokter</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -287,6 +287,7 @@
             const formFields = document.getElementById('form-fields');
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
+            const mendadakBadge = document.getElementById('mendadak-badge');
 
             // Date constants
             const today = new Date().toISOString().split('T')[0];
@@ -299,19 +300,17 @@
 
             let isSickLeave = false;
 
-            // Utility functions
+            // ─── Utility functions ──────────────────────────────────────────
             function isWeekend(date) {
                 const day = date.getDay();
-                return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+                return day === 0 || day === 6;
             }
 
             function countWeekdays(start, end) {
                 let count = 0;
                 const current = new Date(start);
                 while (current <= end) {
-                    if (!isWeekend(current)) {
-                        count++;
-                    }
+                    if (!isWeekend(current)) count++;
                     current.setDate(current.getDate() + 1);
                 }
                 return count;
@@ -332,29 +331,43 @@
                 return true;
             }
 
-            // Initially hide form fields
+            // ─── Deteksi mendadak: muncul jika bukan izin sakit & start_date <= hari ini ──
+            function checkMendadak() {
+                const val = startDateInput.value;
+                if (!isSickLeave && val) {
+                    const selectedDate = new Date(val);
+                    const todayDate = new Date();
+                    const nextWeek = new Date();
+                    nextWeek.setDate(todayDate.getDate() + 6);
+
+                    if (selectedDate < nextWeek) {
+                        mendadakBadge.classList.remove('hidden');
+                    } else {
+                        mendadakBadge.classList.add('hidden');
+                    }
+                } else {
+                    mendadakBadge.classList.add('hidden');
+                }
+            }
+
+            // ─── Initial state ───────────────────────────────────────────────
             formFields.classList.add('hidden');
-
-            // Initially disable end date
             endDateInput.disabled = true;
+            mendadakBadge.classList.add('hidden');
 
-            // Initially hide date note
-            document.getElementById('date-note').classList.add('hidden');
-
-            // Handle leave type selection
+            // ─── Handle leave type selection ─────────────────────────────────
             leaveTypeSelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 const leaveTypeName = (selectedOption?.text || '').toLowerCase();
 
                 const proofSection = document.getElementById('proof-image-section');
                 const proofRequired = document.getElementById('proof-required');
-                const dateNote = document.getElementById('date-note');
 
                 const isSickWithLetter = leaveTypeName.includes('izin sakit dengan surat dokter');
                 const isSickWithoutLetter = leaveTypeName.includes('izin sakit tanpa surat dokter');
-                isSickLeave = isSickWithLetter || isSickWithoutLetter; // Update global variable
+                isSickLeave = isSickWithLetter || isSickWithoutLetter;
 
-                // Show form fields smoothly
+                // Tampilkan/sembunyikan form fields
                 if (this.value) {
                     formFields.classList.remove('hidden');
                     setTimeout(() => formFields.classList.remove('opacity-0'), 10);
@@ -364,60 +377,47 @@
                     return;
                 }
 
-                // RULE: Sick with doctor letter → proof required, without letter → no proof needed
+                // Atur tampilan bukti & badge mendadak sesuai jenis cuti
                 if (isSickWithLetter) {
                     proofSection.classList.remove('hidden');
                     proofRequired.classList.remove('hidden');
-                    dateNote.classList.add('hidden');
+                    mendadakBadge.classList.add('hidden');
                 } else if (isSickWithoutLetter) {
                     proofSection.classList.add('hidden');
                     proofRequired.classList.add('hidden');
-                    dateNote.classList.add('hidden');
+                    mendadakBadge.classList.add('hidden');
                 } else {
                     proofSection.classList.add('hidden');
                     proofRequired.classList.add('hidden');
-                    // Hide date note for privileged roles (kabag-pincab and hrd)
-                    if (userRole === 'kabag-pincab' || userRole === 'hrd') {
-                        dateNote.classList.add('hidden');
-                    } else {
-                        dateNote.classList.remove('hidden');
-                    }
+                    // Badge mendadak dikontrol checkMendadak() saat tanggal dipilih
                 }
 
-                // Apply date rules
+                // Terapkan aturan tanggal
                 applyDateRules(isSickLeave);
 
-                // Refresh dependent fields
+                // Refresh: cek ulang nilai tanggal yang sudah terisi
                 startDateInput.dispatchEvent(new Event('change'));
             });
 
-            /**
-             * Apply min/max rules for sick leave or normal leave
-             */
+            // ─── Aturan min/max tanggal ──────────────────────────────────────
+            // PERUBAHAN: cuti biasa tidak ada batasan min → mendukung pengajuan mendadak
             function applyDateRules(isSickLeave) {
                 if (isSickLeave) {
-                    // Sick → past dates allowed for start, end max is yesterday
+                    // Izin sakit → hanya tanggal lampau (sebelum/sama dengan kemarin)
                     startDateInput.min = '';
                     startDateInput.max = yesterday;
-                    endDateInput.min = ''; // allow past dates, overridden by start date
+                    endDateInput.min = '';
                     endDateInput.max = yesterday;
                 } else {
-                    // Normal leave → min based on user role
-                    const minDays = (userRole === 'kabag-pincab' || userRole === 'hrd') ? 1 : 7;
-                    const minDate = new Date();
-                    minDate.setDate(minDate.getDate() + minDays);
-
-                    const minDateStr = minDate.toISOString().split('T')[0];
-
-                    startDateInput.min = minDateStr;
+                    // Cuti/izin biasa → bebas, termasuk mendadak
+                    startDateInput.min = '';
                     startDateInput.max = '';
-                    endDateInput.min = minDateStr;
+                    endDateInput.min = '';
                     endDateInput.max = '';
                 }
             }
 
-
-            // Handle date changes
+            // ─── Event: pilih tanggal mulai ──────────────────────────────────
             startDateInput.addEventListener('change', function() {
                 if (!validateDateInput(this)) return;
 
@@ -430,19 +430,19 @@
                 if (startValue) {
                     endDateInput.disabled = false;
                     endDateInput.min = startValue;
-                    if (isSickLeave) {
-                        endDateInput.max = yesterday;
-                    } else {
-                        endDateInput.max = '';
-                    }
+                    endDateInput.max = isSickLeave ? yesterday : '';
                 } else {
                     endDateInput.disabled = true;
-                    endDateInput.min = today;
+                    endDateInput.min = '';
                     endDateInput.max = '';
                 }
+
+                // Cek & tampilkan badge mendadak
+                checkMendadak();
                 calculateDays();
             });
 
+            // ─── Event: pilih tanggal selesai ────────────────────────────────
             endDateInput.addEventListener('change', function() {
                 if (!validateDateInput(this)) return;
 
@@ -455,6 +455,7 @@
                 calculateDays();
             });
 
+            // ─── Hitung durasi (hari kerja) ──────────────────────────────────
             function calculateDays() {
                 const startValue = startDateInput.value;
                 const endValue = endDateInput.value;
@@ -466,8 +467,7 @@
                     const end = new Date(endValue);
 
                     if (end >= start) {
-                        const weekdays = countWeekdays(start, end);
-                        totalDays.textContent = weekdays;
+                        totalDays.textContent = countWeekdays(start, end);
                         preview.classList.remove('hidden');
                     } else {
                         preview.classList.add('hidden');
@@ -477,13 +477,13 @@
                 }
             }
 
-            // If there are errors or old input, show the form fields
+            // Jika ada old input / error, langsung tampilkan form
             if (leaveTypeSelect.value) {
                 leaveTypeSelect.dispatchEvent(new Event('change'));
             }
         });
 
-        // preview gambar
+        // ─── Preview gambar bukti ────────────────────────────────────────────
         const proofInput = document.getElementById('proof_image');
         const previewBtn = document.getElementById('preview-image-btn');
         let previewURL = "";

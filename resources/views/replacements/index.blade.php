@@ -63,7 +63,14 @@
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100"> Pengganti Untuk :
                                 {{ Str::title($leave->user->name) }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ $leave->user->position->nama_jabatan }}</p>
+                                {{ Strtoupper($leave->user->position->nama_jabatan) }}
+                                @if ($leave->is_mendadak)
+                                    <span
+                                        class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                        ⚡ Mendadak
+                                    </span>
+                                @endif
+                            </p>
                         </div>
                         <div class="hidden sm:block md:hidden">
                             <p class="text-sm text-gray-800 dark:text-gray-200 truncate" title="{{ $leave->alasan }}">
@@ -130,7 +137,7 @@
                                             </p>
                                         @endif --}}
                                         <p><span class="font-medium">Jenis Cuti:</span><strong>
-                                                {{ $leave->leaveType->name ?? 'N/A' }}</strong></p>
+                                                {{ Str::title($leave->leaveType->name) ?? 'N/A' }}</strong></p>
                                         <p><span class="font-medium">Total:</span> <strong>{{ $leave->total_hari }}
                                                 hari</strong></p>
                                         <p class="italic text-gray-600 dark:text-gray-400"><span

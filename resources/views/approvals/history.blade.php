@@ -67,6 +67,12 @@
                             <p
                                 class="text-sm font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">
                                 {{ Str::title($history->leave->leaveType->name) ?? 'N/A' }}
+                                @if ($history->leave->is_mendadak)
+                                    <span
+                                        class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                        ⚡ Mendadak
+                                    </span>
+                                @endif
                             </p>
                         </div>
 
