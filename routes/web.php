@@ -1,10 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\HRDController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\kabagController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
@@ -30,28 +26,6 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-
-
-
-// route dahsboard user
-// Route::middleware(['auth', 'role:super_admin'])->group(function () {
-//     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
-// });
-
-// Route::middleware(['auth', 'role:hrd'])->group(function () {
-//     Route::get('/hrd/dashboard', [DashboardController::class, 'hrd'])->name('hrd.dashboard');
-// });
-
-// Route::middleware(['auth', 'role:kabag'])->group(function () {
-//     Route::get('/kabag/dashboard', [DashboardController::class, 'kabag'])->name('kabag.dashboard');
-// });
-// Route::middleware(['auth', 'role:kasie'])->group(function () {
-//     Route::get('/kasie/dashboard', [DashboardController::class, 'kasie'])->name('kasie.dashboard');
-// });
-
-// Route::middleware(['auth', 'role:staff'])->group(function () {
-//     Route::get('/staff/dashboard', [DashboardController::class, 'staff'])->name('staff.dashboard');
-// });
 
 //route cuti & approve
 Route::middleware(['auth'])->group(function () {

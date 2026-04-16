@@ -160,7 +160,7 @@ class ApprovalController extends Controller
             ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
         );
 
-        return back()->with('error', 'Approval ditolak.');
+        return back()->with('success', 'Approval ditolak.');
     }
 
     // proteksi supaya hanya approver terkait yang bisa bertindak & tidak lompat step
