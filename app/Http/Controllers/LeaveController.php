@@ -145,7 +145,7 @@ class LeaveController extends Controller
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : ''),
             'end_date'      => 'required|date|after_or_equal:start_date',
-            'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()-]+$/'],
+            'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()\/-]+$/'],
 
             'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|image|mimes:jpeg,png,jpg,gif|max:2048',
 
@@ -255,10 +255,10 @@ class LeaveController extends Controller
                 return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti disetujui otomatis.');
             }
 
-            $approvers = collect([$request->pengganti_id, $request->atasan_id])
-                ->filter()
-                ->unique()
-                ->values();
+            $penggantiId = $request->pengganti_id;
+            $atasanId    = $request->atasan_id;
+
+            $approvers = collect([$penggantiId, $atasanId])->filter()->values();
 
             foreach ($approvers as $index => $approverId) {
                 Approval::create([
@@ -269,13 +269,39 @@ class LeaveController extends Controller
                 ]);
             }
 
-            SendNotification::dispatch(
-                $approvers->first(),
-                'leave_request',
-                'Pengajuan Cuti Baru',
-                "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
-                ['leave_id' => $leave->id, 'requester_id' => $user->id]
-            );
+            // Jika pengganti dan atasan adalah orang yang sama:
+            // Step 1 (pengganti) di-auto-approve langsung saat pengajuan,
+            // sehingga approver menerima notifikasi untuk step 2 (atasan)
+            if ($penggantiId && $atasanId && $penggantiId === $atasanId) {
+                $step1 = $leave->approvals()->where('step', 1)->first();
+                $step1->update(['status' => 'approved']);
+
+                ApprovalHistory::create([
+                    'leave_id'    => $leave->id,
+                    'approved_by' => $atasanId,
+                    'role'        => \App\Models\User::find($atasanId)->role,
+                    'status'      => 'approved',
+                    'catatan'     => 'Auto-approved: pengganti dan atasan adalah orang yang sama.',
+                ]);
+
+                // Notifikasi langsung ke step 2 (atasan)
+                SendNotification::dispatch(
+                    $atasanId,
+                    'leave_request',
+                    'Pengajuan Cuti Baru',
+                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda sebagai atasan.",
+                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
+                );
+            } else {
+                // Normal: notifikasi ke step 1 (pengganti atau atasan pertama)
+                SendNotification::dispatch(
+                    $approvers->first(),
+                    'leave_request',
+                    'Pengajuan Cuti Baru',
+                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
+                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
+                );
+            }
 
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');
         });
@@ -319,7 +345,12 @@ class LeaveController extends Controller
 
     public function replacements()
     {
-        $leaves = Leave::with('user')->where('pengganti_id', Auth::id())->latest()->paginate(10);
+        $leaves = Leave::with('user')
+            ->where('pengganti_id', Auth::id())
+            ->where('status_final', 'approved')  // ← tambah ini
+            ->latest()
+            ->paginate(10);
+
         return view('replacements.index', compact('leaves'));
     }
 

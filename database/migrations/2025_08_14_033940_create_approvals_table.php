@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('step'); // urutan approval
             $table->enum('status', ['pending', 'approved', 'rejected', 'revision_requested', 'revision_accepted', 'revision_rejected'])->default('pending');
             $table->timestamps();
-            $table->unique(['leave_id', 'approver_id']); // cegah duplikasi approver
+            $table->unique(['leave_id', 'step'], 'approvals_leave_id_step_unique');
         });
     }
 

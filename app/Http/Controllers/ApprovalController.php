@@ -59,7 +59,6 @@ class ApprovalController extends Controller
             'catatan'     => $request->input('catatan'),
         ]);
 
-        // Kirim notifikasi ke pemohon cuti
         SendNotification::dispatch(
             $approval->leave->user_id,
             'leave_approved',
@@ -68,10 +67,12 @@ class ApprovalController extends Controller
             ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
         );
 
-        // Cek apakah ada approver berikutnya
-        $nextApproval = $approval->leave->approvals()->where('step', '>', $approval->step)->orderBy('step')->first();
+        $nextApproval = $approval->leave->approvals()
+            ->where('step', '>', $approval->step)
+            ->orderBy('step')
+            ->first();
+
         if ($nextApproval) {
-            // Kirim notifikasi ke approver berikutnya
             SendNotification::dispatch(
                 $nextApproval->approver_id,
                 'leave_request',
@@ -80,7 +81,6 @@ class ApprovalController extends Controller
                 ['leave_id' => $approval->leave_id, 'requester_id' => $approval->leave->user_id]
             );
         } else {
-            // Jika tidak ada approver berikutnya, final approve + potong cuti
             $this->finalApprove($approval->leave);
         }
 

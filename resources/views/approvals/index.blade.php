@@ -27,7 +27,7 @@
         @forelse ($approvals as $approval)
             @php
                 $hasRevision = $approval->revised_at !== null;
-                $isAtasan = $approval->approver_id != $approval->leave->pengganti_id;
+                $isAtasan = $approval->step === 2;
             @endphp
 
             <div x-data="{ open: false }"
