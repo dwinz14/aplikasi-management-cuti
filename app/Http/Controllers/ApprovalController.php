@@ -177,23 +177,26 @@ class ApprovalController extends Controller
     {
         $leave->update(['status_final' => 'approved']);
 
-        // Potong cuti berdasarkan jenis cuti dari user_leave_balances
         $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
             ->where('leave_type_id', $leave->leave_type_id)
             ->where('year', now()->year)
             ->first();
 
         if ($userLeaveBalance) {
-            $userLeaveBalance->increment('used', $leave->total_hari);
-            $userLeaveBalance->decrement('remaining', $leave->total_hari);
+            // Atomic update: pakai raw query atau increment/decrement sekaligus
+            $userLeaveBalance->update([
+                'used' => \DB::raw("used + {$leave->total_hari}"),
+                'remaining' => \DB::raw("remaining - {$leave->total_hari}"),
+            ]);
         } else {
+            $leaveType = $leave->leaveType;
             \App\Models\UserLeaveBalance::create([
                 'user_id' => $leave->user_id,
                 'leave_type_id' => $leave->leave_type_id,
                 'year' => now()->year,
-                'allocated' => $leave->leaveType->quota ?? 0,
+                'total_quota' => $leaveType->quota ?? 0,
                 'used' => $leave->total_hari,
-                'remaining' => ($leave->leaveType->quota ?? 0) - $leave->total_hari,
+                'remaining' => ($leaveType->quota ?? 0) - $leave->total_hari,
             ]);
         }
 

@@ -104,8 +104,6 @@
                                         )"
                                             :selected="old('pengganti_id')" placeholder="-- Pilih Pengganti --" searchable="true" />
                                         @error('pengganti_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih
-                                                pengganti</p>
                                         @enderror
                                     </div>
                                 @endif
@@ -128,8 +126,6 @@
                                         )"
                                             :selected="old('atasan_id')" placeholder="-- Pilih Atasan --" searchable="true" />
                                         @error('atasan_id')
-                                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Anda harus memilih atasan
-                                                langsung</p>
                                         @enderror
                                     </div>
                                 @endif
@@ -516,8 +512,8 @@
                 isSickLeave: false,
                 showProof: false,
 
-                startDate: '{{ old('start_date', '') }}',
-                endDate: '{{ old('end_date', '') }}',
+                startDate: @json(old('start_date', '')),
+                endDate: @json(old('end_date', '')),
 
                 startOpen: false,
                 endOpen: false,

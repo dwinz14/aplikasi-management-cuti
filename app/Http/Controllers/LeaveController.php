@@ -31,6 +31,16 @@ class LeaveController extends Controller
     public function create()
     {
         $user = Auth::user();
+
+        $activePending = Leave::where('user_id', $user->id)
+            ->where('status_final', 'pending')
+            ->exists();
+
+        if ($activePending) {
+            return redirect()->route('cuti.index')
+                ->with('error', 'Anda masih memiliki pengajuan cuti yang sedang diproses. Silakan tunggu hingga selesai.');
+        }
+
         $requiresReplacement = in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true);
 
         // $penggantiList = $requiresReplacement
@@ -144,7 +154,7 @@ class LeaveController extends Controller
         $rules = [
             'leave_type_id' => 'required|exists:leave_types,id',
             'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : ''),
-            'end_date'      => 'required|date|after_or_equal:start_date',
+            'end_date'      => 'required|date|after_or_equal:start_date' . ($isSickLeave ? '|before_or_equal:today' : ''),
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()\/-]+$/'],
 
             'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -194,8 +204,12 @@ class LeaveController extends Controller
 
 
 
+        if ($this->hasActivePending($user->id)) {
+            return back()->withErrors(['msg' => 'Anda masih memiliki pengajuan cuti yang sedang diproses. Selesaikan terlebih dahulu sebelum mengajukan yang baru.']);
+        }
+
         if ($this->hasOverlapLeave($user->id, $request->start_date, $request->end_date)) {
-            return back()->withErrors(['msg' => 'Masih ada cuti aktif atau pending.']);
+            return back()->withErrors(['msg' => 'Tanggal yang dipilih bertabrakan dengan cuti yang sudah disetujui.']);
         }
 
         if ($request->pengganti_id && $this->hasOverlapLeave($request->pengganti_id, $request->start_date, $request->end_date)) {
@@ -307,10 +321,20 @@ class LeaveController extends Controller
         });
     }
 
-    private function hasOverlapLeave($userId, $start, $end)
+    /**
+     * Cek apakah user memiliki pengajuan dengan status_final pending.
+     */
+    private function hasActivePending(int $userId): bool
     {
         return Leave::where('user_id', $userId)
-            ->whereIn('status_final', ['pending', 'approved'])
+            ->where('status_final', 'pending')
+            ->exists();
+    }
+
+    private function hasOverlapLeave(int $userId, string $start, string $end): bool
+    {
+        return Leave::where('user_id', $userId)
+            ->where('status_final', 'approved')
             ->where(function ($q) use ($start, $end) {
                 $q->whereBetween('start_date', [$start, $end])
                     ->orWhereBetween('end_date', [$start, $end])
