@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LeaveHelper;
 use App\Models\Leave;
 use App\Models\User;
 use App\Models\Approval;
@@ -10,6 +11,7 @@ use App\Models\LeaveType;
 use App\Models\UserLeaveBalance;
 use App\Jobs\SendNotification;
 use App\Models\Office;
+use App\Services\LeaveApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -188,7 +190,7 @@ class LeaveController extends Controller
             return back()->withErrors(['leave_type_id' => 'Jenis cuti ini tidak tersedia untuk Anda.'])->withInput();
         }
 
-        $totalHari = $this->calculateWorkingDays($request->start_date, $request->end_date);
+        $totalHari = LeaveHelper::calculateWorkingDays($request->start_date, $request->end_date);
 
         // Check quota for non-unlimited leave types
         if ($leaveType->quota > 0) {
@@ -509,38 +511,6 @@ class LeaveController extends Controller
 
     private function finalApproveLeave($leave)
     {
-        $leave->update(['status_final' => 'approved']);
-
-        $leaveType = $leave->leaveType;
-
-        // Potong cuti jika ada quota
-        if ($leaveType->quota > 0) {
-            $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
-                ->where('leave_type_id', $leave->leave_type_id)
-                ->where('year', now()->year)
-                ->first();
-
-            if ($userLeaveBalance) {
-                $userLeaveBalance->increment('used', $leave->total_hari);
-                $userLeaveBalance->decrement('remaining', $leave->total_hari);
-            } else {
-                \App\Models\UserLeaveBalance::create([
-                    'user_id' => $leave->user_id,
-                    'leave_type_id' => $leave->leave_type_id,
-                    'year' => now()->year,
-                    'allocated' => $leaveType->quota ?? 0,
-                    'used' => $leave->total_hari,
-                    'remaining' => ($leaveType->quota ?? 0) - $leave->total_hari,
-                ]);
-            }
-        }
-
-        SendNotification::dispatch(
-            $leave->user_id,
-            'leave_final_approved',
-            'Cuti Final Disetujui',
-            "Pengajuan cuti Anda telah disetujui secara final dan cuti telah dipotong dari kuota Anda.",
-            ['leave_id' => $leave->id]
-        );
+        app(LeaveApprovalService::class)->finalApprove($leave);
     }
 }

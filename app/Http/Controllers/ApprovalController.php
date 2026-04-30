@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LeaveHelper;
 use App\Models\Approval;
 use App\Models\ApprovalHistory;
 use App\Jobs\SendNotification;
+use App\Services\LeaveApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -15,15 +17,18 @@ class ApprovalController extends Controller
     {
         $userId = Auth::id();
 
+        // Subquery untuk mengecek apakah semua approval step sebelumnya sudah approved
         $approvals = Approval::with(['leave.user', 'approver'])
             ->where('approver_id', $userId)
             ->where('status', 'pending')
-            ->get()
-            ->filter(function (Approval $a) {
-                $prev = $a->leave->approvals->where('step', '<', $a->step);
-                return $prev->every(fn($x) => $x->status === 'approved');
+            ->whereNotExists(function ($query) {
+                $query->select(\DB::raw(1))
+                    ->from('approvals as a2')
+                    ->whereColumn('a2.leave_id', 'approvals.leave_id')
+                    ->whereColumn('a2.step', '<', 'approvals.step')
+                    ->where('a2.status', '!=', 'approved');
             })
-            ->values();
+            ->get();
 
         return view('approvals.index', compact('approvals'));
     }
@@ -96,7 +101,7 @@ class ApprovalController extends Controller
             'revised_end_date' => 'required|date|after_or_equal:revised_start_date',
         ]);
 
-        $revisedTotalHari = $this->calculateWorkingDays(
+        $revisedTotalHari = LeaveHelper::calculateWorkingDays(
             $request->revised_start_date,
             $request->revised_end_date
         );
@@ -175,39 +180,7 @@ class ApprovalController extends Controller
 
     private function finalApprove($leave)
     {
-        $leave->update(['status_final' => 'approved']);
-
-        $userLeaveBalance = \App\Models\UserLeaveBalance::where('user_id', $leave->user_id)
-            ->where('leave_type_id', $leave->leave_type_id)
-            ->where('year', now()->year)
-            ->first();
-
-        if ($userLeaveBalance) {
-            // Atomic update: pakai raw query atau increment/decrement sekaligus
-            $userLeaveBalance->update([
-                'used' => \DB::raw("used + {$leave->total_hari}"),
-                'remaining' => \DB::raw("remaining - {$leave->total_hari}"),
-            ]);
-        } else {
-            $leaveType = $leave->leaveType;
-            \App\Models\UserLeaveBalance::create([
-                'user_id' => $leave->user_id,
-                'leave_type_id' => $leave->leave_type_id,
-                'year' => now()->year,
-                'total_quota' => $leaveType->quota ?? 0,
-                'used' => $leave->total_hari,
-                'remaining' => ($leaveType->quota ?? 0) - $leave->total_hari,
-            ]);
-        }
-
-        // Kirim notifikasi final approval
-        SendNotification::dispatch(
-            $leave->user_id,
-            'leave_final_approved',
-            'Cuti Final Disetujui',
-            "Pengajuan cuti Anda telah disetujui secara final dan cuti telah dipotong dari kuota Anda.",
-            ['leave_id' => $leave->id]
-        );
+        app(LeaveApprovalService::class)->finalApprove($leave);
     }
 
     private function calculateWorkingDays($startDate, $endDate)

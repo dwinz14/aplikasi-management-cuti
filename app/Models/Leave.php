@@ -38,6 +38,11 @@ class Leave extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
     public function leaveType()
     {
         return $this->belongsTo(LeaveType::class);
