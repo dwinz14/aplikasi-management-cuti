@@ -60,6 +60,7 @@ class ApprovalController extends Controller
             'leave_id'    => $approval->leave_id,
             'approved_by' => Auth::id(),
             'role'        => Auth::user()->role,
+            'step'        => $approval->step,
             'status'      => 'approved',
             'catatan'     => $request->input('catatan'),
         ]);
@@ -124,6 +125,7 @@ class ApprovalController extends Controller
             'leave_id'    => $approval->leave_id,
             'approved_by' => Auth::id(),
             'role'        => Auth::user()->role,
+            'step'        => $approval->step,
             'status'      => 'revision_requested',
             'catatan'     => "Revisi tanggal: {$request->revised_start_date} s/d {$request->revised_end_date} ({$revisedTotalHari} hari)",
         ]);
@@ -152,6 +154,7 @@ class ApprovalController extends Controller
             'leave_id'    => $approval->leave_id,
             'approved_by' => Auth::id(),
             'role'        => Auth::user()->role,
+            'step'        => $approval->step,
             'status'      => 'rejected',
             'catatan'     => $request->input('catatan'),
         ]);

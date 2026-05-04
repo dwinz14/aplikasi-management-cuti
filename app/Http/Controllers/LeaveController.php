@@ -265,6 +265,7 @@ class LeaveController extends Controller
                     'leave_id'    => $leave->id,
                     'approved_by' => $user->id,
                     'role'        => $user->role,
+                    'step'        => null,
                     'status'      => 'approved',
                 ]);
 
@@ -296,6 +297,7 @@ class LeaveController extends Controller
                     'leave_id'    => $leave->id,
                     'approved_by' => $atasanId,
                     'role'        => \App\Models\User::find($atasanId)->role,
+                    'step'        => 1,   // ← tambah ini
                     'status'      => 'approved',
                     'catatan'     => 'Auto-approved: pengganti dan atasan adalah orang yang sama.',
                 ]);
@@ -432,6 +434,7 @@ class LeaveController extends Controller
             'leave_id'    => $leave->id,
             'approved_by' => Auth::id(),
             'role'        => Auth::user()->role,
+            'step'        => null,
             'status'      => 'revision_accepted',
             'catatan'     => "Pemohon menyetujui revisi tanggal: {$approval->revised_start_date} s/d {$approval->revised_end_date}",
         ]);
@@ -493,6 +496,7 @@ class LeaveController extends Controller
             'leave_id'    => $leave->id,
             'approved_by' => Auth::id(),
             'role'        => Auth::user()->role,
+            'step'        => null,
             'status'      => 'revision_rejected',
             'catatan'     => "Pemohon menolak revisi tanggal dari " . $approval->approver->name,
         ]);

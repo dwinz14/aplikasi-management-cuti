@@ -52,6 +52,7 @@ class RekapController extends Controller
             'alasan',
             'proof_image',
             'status_final',
+            'is_mendadak',
             'created_at'
         ])
             ->with([

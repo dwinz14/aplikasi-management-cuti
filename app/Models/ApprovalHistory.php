@@ -10,7 +10,9 @@ class ApprovalHistory extends Model
         'leave_id',
         'approved_by',
         'role',
+        'step',
         'status',
+        'catatan',
     ];
 
     public function leave()
@@ -39,18 +41,11 @@ class ApprovalHistory extends Model
     // Helper untuk mendapatkan context role
     public function getRoleContextAttribute()
     {
-        // Cek apakah user adalah pemohon
-        if ($this->approved_by === $this->leave->user_id) {
+        if (is_null($this->step)) {
             return 'Sebagai Pemohon Cuti';
         }
 
-        // Cek apakah user adalah pengganti
-        if ($this->approved_by === $this->leave->pengganti_id) {
-            return 'Sebagai Pengganti';
-        }
-
-        // Selain itu adalah atasan
-        return 'Sebagai Atasan';
+        return $this->step === 1 ? 'Sebagai Pengganti' : 'Sebagai Atasan';
     }
 
     // Helper untuk icon context

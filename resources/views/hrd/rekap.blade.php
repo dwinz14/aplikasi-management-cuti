@@ -168,7 +168,14 @@
                                     <span class="text-xs text-gray-400 block">({{ $leave->total_hari }} hari)</span>
                                 </td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-400 whitespace-normal break-words">
-                                    {{ Str::title($leave->leaveType->name ?? '-') }}</td>
+                                    {{ Str::title($leave->leaveType->name ?? '-') }}
+                                    @if ($leave->is_mendadak)
+                                        <span
+                                            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                            ⚡ Mendadak
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-3 py-3 max-w-[150px]">
                                     <div class="text-gray-900 dark:text-gray-100 truncate">
                                         {{ $leave->alasan }}
