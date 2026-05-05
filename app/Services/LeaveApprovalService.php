@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Leave;
 use App\Models\UserLeaveBalance;
 use App\Jobs\SendNotification;
+use App\Notifications\LeaveFinalApproved;
 use Illuminate\Support\Facades\DB;
 
 class LeaveApprovalService
@@ -37,12 +38,6 @@ class LeaveApprovalService
             }
         }
 
-        SendNotification::dispatch(
-            $leave->user_id,
-            'leave_final_approved',
-            'Cuti Final Disetujui',
-            "Pengajuan cuti Anda telah disetujui secara final.",
-            ['leave_id' => $leave->id]
-        );
+        $leave->user->notify(new LeaveFinalApproved($leave->id));
     }
 }

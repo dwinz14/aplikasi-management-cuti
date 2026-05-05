@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Helpers\LeaveHelper;
 use App\Models\Approval;
+use App\Notifications\LeaveRequestApproved;
+use App\Notifications\LeaveRequestSubmitted;
+use App\Notifications\LeaveFinalApproved;
 use App\Models\ApprovalHistory;
-use App\Jobs\SendNotification;
+use App\Models\User;
+use App\Notifications\LeaveRequestRejected;
+use App\Notifications\LeaveRequestRevisionRequested;
 use App\Services\LeaveApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,13 +70,9 @@ class ApprovalController extends Controller
             'catatan'     => $request->input('catatan'),
         ]);
 
-        SendNotification::dispatch(
-            $approval->leave->user_id,
-            'leave_approved',
-            'Cuti Disetujui',
-            "Pengajuan cuti Anda telah disetujui oleh " . Auth::user()->name,
-            ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
-        );
+        $leave = $approval->leave;
+        $employee = $leave->user;
+        $employee->notify(new LeaveRequestApproved($leave->id, Auth::user()->name));
 
         $nextApproval = $approval->leave->approvals()
             ->where('step', '>', $approval->step)
@@ -79,13 +80,13 @@ class ApprovalController extends Controller
             ->first();
 
         if ($nextApproval) {
-            SendNotification::dispatch(
-                $nextApproval->approver_id,
-                'leave_request',
-                'Pengajuan Cuti Baru',
-                "Pengajuan cuti dari {$approval->leave->user->name} membutuhkan persetujuan Anda.",
-                ['leave_id' => $approval->leave_id, 'requester_id' => $approval->leave->user_id]
-            );
+            if ($nextApproval) {
+                $nextApprover = User::find($nextApproval->approver_id);
+                $nextApprover->notify(new LeaveRequestSubmitted($leave->id, $leave->user->name));
+            } else {
+                // final approve, notifikasi ke pemohon
+                $employee->notify(new LeaveFinalApproved($leave->id));
+            }
         } else {
             $this->finalApprove($approval->leave);
         }
@@ -131,13 +132,7 @@ class ApprovalController extends Controller
         ]);
 
         // Kirim notifikasi ke pemohon
-        SendNotification::dispatch(
-            $approval->leave->user_id,
-            'leave_revision_requested',
-            'Revisi Tanggal Cuti',
-            Auth::user()->name . " meminta revisi tanggal cuti Anda. Silakan tinjau dan berikan tanggapan.",
-            ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
-        );
+        $approval->leave->user->notify(new LeaveRequestRevisionRequested($approval->leave_id, Auth::user()->name));
 
         return back()->with('success', 'Permintaan revisi tanggal telah dikirim ke pemohon.');
     }
@@ -160,13 +155,7 @@ class ApprovalController extends Controller
         ]);
 
         // Kirim notifikasi ke pemohon cuti
-        SendNotification::dispatch(
-            $approval->leave->user_id,
-            'leave_rejected',
-            'Cuti Ditolak',
-            "Pengajuan cuti Anda telah ditolak oleh " . Auth::user()->name,
-            ['leave_id' => $approval->leave_id, 'approver_id' => Auth::id()]
-        );
+        $approval->leave->user->notify(new LeaveRequestRejected($approval->leave_id, Auth::user()->name));
 
         return back()->with('success', 'Approval ditolak.');
     }

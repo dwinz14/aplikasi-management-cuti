@@ -33,114 +33,64 @@
             <!-- Notifications List -->
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden">
                 @forelse($notifications as $notification)
+                    @php
+                        $data = $notification->data;
+                        $title = $data['title'] ?? 'Notifikasi';
+                        $message = $data['message'] ?? '';
+                        $isRead = !is_null($notification->read_at);
+                    @endphp
                     <div
-                        class="notification-item border-b border-gray-200 dark:border-gray-700 last:border-b-0 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ !$notification->is_read ? 'bg-blue-50/30 dark:bg-blue-900/10' : '' }}">
-                        <div class="p-6">
-                            <div class="flex items-start space-x-4">
-                                <!-- Icon -->
-                                <div class="flex-shrink-0">
-                                    <div
-                                        class="w-12 h-12 rounded-full flex items-center justify-center {{ !$notification->is_read ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gray-300 dark:bg-gray-600' }}">
-                                        @if (!$notification->is_read)
-                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                            </svg>
-                                        @else
-                                            <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        @endif
-                                    </div>
+                        class="border-b border-gray-200 dark:border-gray-700 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4
+                                    class="text-lg font-semibold text-gray-900 dark:text-gray-100 {{ $isRead ? 'opacity-75' : '' }}">
+                                    {{ $title }}
+                                </h4>
+                                <p class="text-gray-600 dark:text-gray-400 mt-1 {{ $isRead ? 'opacity-75' : '' }}">
+                                    {{ $message }}
+                                </p>
+                                <div class="flex items-center mt-3 space-x-4">
+                                    <small class="text-gray-500 dark:text-gray-500">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </small>
+                                    @if (!$isRead)
+                                        <span class="flex h-2 w-2">
+                                            <span
+                                                class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                        </span>
+                                    @endif
                                 </div>
-
-                                <!-- Content -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex-1 pr-4">
-                                            <div class="flex items-center space-x-2 mb-1">
-                                                <h4
-                                                    class="text-base font-semibold text-gray-900 dark:text-gray-100 {{ $notification->is_read ? 'opacity-75' : '' }}">
-                                                    {{ $notification->title }}
-                                                </h4>
-                                                @if (!$notification->is_read)
-                                                    <span class="flex h-2 w-2">
-                                                        <span
-                                                            class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75"></span>
-                                                        <span
-                                                            class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                                                    </span>
-                                                @endif
-                                            </div>
-
-                                            <p
-                                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed {{ $notification->is_read ? 'opacity-75' : '' }}">
-                                                {{ $notification->message }}
-                                            </p>
-
-                                            <div class="flex items-center mt-3 space-x-4">
-                                                <span
-                                                    class="inline-flex items-center text-xs text-gray-500 dark:text-gray-500">
-                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    {{ $notification->created_at->diffForHumans() }}
-                                                </span>
-
-                                                @if ($notification->is_read)
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                                        <svg class="w-3 h-3 mr-1" fill="currentColor"
-                                                            viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd"
-                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                clip-rule="evenodd" />
-                                                        </svg>
-                                                        Sudah Dibaca
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Action Button -->
-                                        @if (!$notification->is_read)
-                                            <button onclick="markAsRead({{ $notification->id }})" type="button"
-                                                class="flex-shrink-0 inline-flex items-center px-3 py-2 border border-transparent text-xs leading-4 font-medium rounded-full text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm hover:shadow transition-all duration-200">
-                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                Tandai Dibaca
-                                            </button>
-                                        @endif
-                                    </div>
-                                </div>
+                            </div>
+                            <div>
+                                @if (!$isRead)
+                                    <button onclick="markAsRead({{ $notification->id }})"
+                                        class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-full shadow-sm transition">
+                                        Tandai Dibaca
+                                    </button>
+                                @else
+                                    <span
+                                        class="text-xs text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/20 px-3 py-1.5 rounded-full">
+                                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Sudah dibaca
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="flex flex-col items-center justify-center py-16 px-4">
-                        <div
-                            class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
-                            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                            Tidak Ada Notifikasi
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm">
-                            Anda tidak memiliki notifikasi saat ini. Notifikasi baru akan muncul di sini.
-                        </p>
+                    <div class="text-center py-16">
+                        <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-5 5v-5zM15 12V7a3 3 0 00-6 0v5l-5 5h16l-5-5z"></path>
+                        </svg>
+                        <p class="mt-4 text-gray-500">Tidak ada notifikasi.</p>
                     </div>
                 @endforelse
             </div>

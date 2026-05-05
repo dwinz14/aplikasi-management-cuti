@@ -145,11 +145,22 @@
                     return;
                 }
 
+                // Helper untuk escape HTML (mencegah XSS)
+                const escapeHtml = (str) => {
+                    if (!str) return '';
+                    return str.replace(/[&<>]/g, function(m) {
+                        if (m === '&') return '&amp;';
+                        if (m === '<') return '&lt;';
+                        if (m === '>') return '&gt;';
+                        return m;
+                    });
+                };
+
                 list.innerHTML = this.notifications.map(notification => `
-                <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 border-b border-gray-100 dark:border-gray-600 last:border-b-0 ${notification.is_read ? 'bg-gray-50/50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}" onclick="markAsRead(${notification.id})">
+                <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 border-b border-gray-100 dark:border-gray-600 last:border-b-0 ${notification.read_at !== null ? 'bg-gray-50/50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}" onclick="markAsRead(${notification.id})">
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br ${notification.is_read ? 'from-gray-400 to-gray-500' : 'from-blue-500 to-blue-600'} flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br ${notification.read_at !== null ? 'from-gray-400 to-gray-500' : 'from-blue-500 to-blue-600'} flex items-center justify-center">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM15 12V7a3 3 0 00-6 0v5l-5 5h16l-5-5z"></path>
                                 </svg>
@@ -158,14 +169,14 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : ''}">
-                                        ${notification.title}
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate ${notification.read_at !== null ? 'text-gray-600 dark:text-gray-400' : ''}">
+                                        ${notification.data?.title}
                                     </p>
                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                                        ${notification.message}
+                                        ${notification.data?.message}
                                     </p>
                                 </div>
-                                ${!notification.is_read ? '<div class="ml-2 flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>' : ''}
+                                ${!notification.read_at !== null ? '<div class="ml-2 flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>' : ''}
                             </div>
                             <div class="flex items-center justify-between mt-2">
                                 <p class="text-xs text-gray-500 dark:text-gray-500">

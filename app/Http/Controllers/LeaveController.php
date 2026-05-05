@@ -9,8 +9,10 @@ use App\Models\Approval;
 use App\Models\ApprovalHistory;
 use App\Models\LeaveType;
 use App\Models\UserLeaveBalance;
-use App\Jobs\SendNotification;
 use App\Models\Office;
+use App\Notifications\LeaveRequestSubmitted;
+use App\Notifications\RevisionAccepted;
+use App\Notifications\RevisionRejected;
 use App\Services\LeaveApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -132,9 +134,9 @@ class LeaveController extends Controller
         $user = Auth::user();
 
         $leaveType = LeaveType::findOrFail($request->leave_type_id);
+
         // Validasi masa kerja minimal untuk jenis cuti
         if ($leaveType->min_years > 0) {
-
             if (!$user->tanggal_aktif_kerja) {
                 return back()->withErrors([
                     'leave_type_id' => 'Tanggal aktif kerja belum diatur. Hubungi Admin.'
@@ -142,7 +144,6 @@ class LeaveController extends Controller
             }
 
             $masaKerjaTahun = $user->masaKerjaTahun();
-
             if ($masaKerjaTahun < $leaveType->min_years) {
                 return back()->withErrors([
                     'leave_type_id' => "Jenis cuti ini hanya untuk karyawan dengan masa kerja minimal {$leaveType->min_years} tahun."
@@ -155,7 +156,7 @@ class LeaveController extends Controller
 
         $rules = [
             'leave_type_id' => 'required|exists:leave_types,id',
-            'start_date'    => 'required|date|' . ($isSickLeave ? 'before_or_equal:today' : ''),
+            'start_date'    => 'required|date' . ($isSickLeave ? '|before_or_equal:today' : ''),
             'end_date'      => 'required|date|after_or_equal:start_date' . ($isSickLeave ? '|before_or_equal:today' : ''),
             'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()\/-]+$/'],
 
@@ -171,28 +172,27 @@ class LeaveController extends Controller
         ];
 
         $messages = [
-            'leave_type_i.required' => 'Anda harus memilih jenis cuti',
-            'start_date.required' => 'Anda harus memilih tanggal mulai cuti',
-            'end_date.required' => 'Anda harus memilih tanggal selesai cuti',
-            'alasan.required' => 'Anda harus mengisi alasan cuti',
-            'proof_image.required' => 'Anda harus menyertakan bukti surat dokter',
-            'pengganti_id.required' => 'Anda harus memilih pengganti',
-            'pengganti_id.exists'   => 'Pengganti tidak valid',
-
-            'atasan_id.required' => 'Anda harus memilih atasan',
-            'atasan_id.exists'   => 'Atasan tidak valid',
+            'leave_type_id.required' => 'Anda harus memilih jenis cuti',
+            'start_date.required'    => 'Anda harus memilih tanggal mulai cuti',
+            'end_date.required'      => 'Anda harus memilih tanggal selesai cuti',
+            'alasan.required'        => 'Anda harus mengisi alasan cuti',
+            'proof_image.required'   => 'Anda harus menyertakan bukti surat dokter',
+            'pengganti_id.required'  => 'Anda harus memilih pengganti',
+            'pengganti_id.exists'    => 'Pengganti tidak valid',
+            'atasan_id.required'     => 'Anda harus memilih atasan',
+            'atasan_id.exists'       => 'Atasan tidak valid',
         ];
 
         $request->validate($rules, $messages);
 
-        // Validate leave type availability for user
+        // Validasi ketersediaan jenis cuti untuk user
         if ($leaveType->gender && $leaveType->gender !== $user->gender) {
             return back()->withErrors(['leave_type_id' => 'Jenis cuti ini tidak tersedia untuk Anda.'])->withInput();
         }
 
         $totalHari = LeaveHelper::calculateWorkingDays($request->start_date, $request->end_date);
 
-        // Check quota for non-unlimited leave types
+        // Cek kuota (jika cuti memiliki batasan kuota)
         if ($leaveType->quota > 0) {
             $userLeaveBalance = UserLeaveBalance::where('user_id', $user->id)
                 ->where('leave_type_id', $request->leave_type_id)
@@ -204,60 +204,67 @@ class LeaveController extends Controller
             }
         }
 
-
-
+        // Cek apakah user masih punya pengajuan aktif
         if ($this->hasActivePending($user->id)) {
             return back()->withErrors(['msg' => 'Anda masih memiliki pengajuan cuti yang sedang diproses. Selesaikan terlebih dahulu sebelum mengajukan yang baru.']);
         }
 
+        // Cek tumpang tindih cuti dengan user sendiri
         if ($this->hasOverlapLeave($user->id, $request->start_date, $request->end_date)) {
             return back()->withErrors(['msg' => 'Tanggal yang dipilih bertabrakan dengan cuti yang sudah disetujui.']);
         }
 
+        // Cek tumpang tindih cuti dengan pengganti
         if ($request->pengganti_id && $this->hasOverlapLeave($request->pengganti_id, $request->start_date, $request->end_date)) {
             return back()->withErrors(['msg' => 'Pengganti yang dipilih sedang cuti di tanggal tersebut.']);
         }
 
-        if ($this->hasOverlapReplacement($request->pengganti_id, $request->start_date, $request->end_date)) {
+        // Cek apakah pengganti sudah ditugaskan di cuti lain
+        if ($request->pengganti_id && $this->hasOverlapReplacement($request->pengganti_id, $request->start_date, $request->end_date)) {
             return back()->withErrors(['msg' => 'Pengganti tersebut sudah ditugaskan pada cuti lain.']);
         }
 
+        // Cek apakah user sedang menjadi pengganti untuk cuti orang lain
         if ($this->hasOverlapReplacement($user->id, $request->start_date, $request->end_date)) {
             return back()->withErrors(['msg' => 'Anda sedang jadi pengganti di tanggal tersebut.']);
         }
 
+        // Transaction untuk insert data
         return DB::transaction(function () use ($request, $user, $totalHari, $leaveType, $isSickLeave) {
             $proofImagePath = null;
             if ($request->hasFile('proof_image')) {
                 $proofImagePath = $request->file('proof_image')->store('proof_images', 'public');
             }
 
+            // Buat record cuti
             $leave = Leave::create([
                 'user_id'       => $user->id,
                 'leave_type_id' => $request->leave_type_id,
-                'pengganti_id'   => $request->pengganti_id,
+                'pengganti_id'  => $request->pengganti_id,
                 'start_date'    => $request->start_date,
                 'end_date'      => $request->end_date,
                 'total_hari'    => $totalHari,
                 'alasan'        => $request->alasan,
                 'proof_image'   => $proofImagePath,
-                'status_final'   => 'pending',
-                'is_mendadak' => !$isSickLeave && \Carbon\Carbon::parse($request->start_date)->lt(\Carbon\Carbon::today()->addWeek()),
+                'status_final'  => 'pending',
+                'is_mendadak'   => !$isSickLeave && \Carbon\Carbon::parse($request->start_date)->lt(\Carbon\Carbon::today()->addWeek()),
             ]);
 
+            // Kasus khusus: role direksi -> langsung disetujui
             if ($user->role === 'direksi') {
                 $leave->update(['status_final' => 'approved']);
 
-                // Update leave balance for non-unlimited leave types
                 if ($leaveType->quota > 0) {
-                    $userLeaveBalance = UserLeaveBalance::where('user_id', $user->id)
+                    $balance = UserLeaveBalance::where('user_id', $user->id)
                         ->where('leave_type_id', $request->leave_type_id)
                         ->where('year', now()->year)
                         ->first();
 
-                    if ($userLeaveBalance) {
-                        $userLeaveBalance->increment('used', $totalHari);
-                        $userLeaveBalance->decrement('remaining', $totalHari);
+                    if ($balance) {
+                        $balance->update([
+                            'used'     => \DB::raw("used + {$totalHari}"),
+                            'remaining' => \DB::raw("remaining - {$totalHari}"),
+                        ]);
                     }
                 }
 
@@ -265,18 +272,18 @@ class LeaveController extends Controller
                     'leave_id'    => $leave->id,
                     'approved_by' => $user->id,
                     'role'        => $user->role,
-                    'step'        => null,
                     'status'      => 'approved',
                 ]);
 
                 return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti disetujui otomatis.');
             }
 
+            // Buat daftar approver (pengganti dan atasan)
             $penggantiId = $request->pengganti_id;
             $atasanId    = $request->atasan_id;
-
             $approvers = collect([$penggantiId, $atasanId])->filter()->values();
 
+            // Simpan approval steps
             foreach ($approvers as $index => $approverId) {
                 Approval::create([
                     'leave_id'    => $leave->id,
@@ -286,39 +293,50 @@ class LeaveController extends Controller
                 ]);
             }
 
-            // Jika pengganti dan atasan adalah orang yang sama:
-            // Step 1 (pengganti) di-auto-approve langsung saat pengajuan,
-            // sehingga approver menerima notifikasi untuk step 2 (atasan)
+            // Notifikasi ke approver pertama
+            $firstApprover = User::find($approvers->first());
+            if ($firstApprover) {
+                $firstApprover->notify(new \App\Notifications\LeaveRequestSubmitted($leave->id, $user->name));
+            }
+
+            // Kasus khusus: jika pengganti == atasan, maka step1 langsung auto-approve
             if ($penggantiId && $atasanId && $penggantiId === $atasanId) {
                 $step1 = $leave->approvals()->where('step', 1)->first();
-                $step1->update(['status' => 'approved']);
+                if ($step1) {
+                    $step1->update(['status' => 'approved']);
+                }
 
                 ApprovalHistory::create([
                     'leave_id'    => $leave->id,
                     'approved_by' => $atasanId,
-                    'role'        => \App\Models\User::find($atasanId)->role,
-                    'step'        => 1,   // ← tambah ini
+                    'role'        => User::find($atasanId)->role,
+                    'step'        => 1,
                     'status'      => 'approved',
                     'catatan'     => 'Auto-approved: pengganti dan atasan adalah orang yang sama.',
                 ]);
 
-                // Notifikasi langsung ke step 2 (atasan)
-                SendNotification::dispatch(
-                    $atasanId,
-                    'leave_request',
-                    'Pengajuan Cuti Baru',
-                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda sebagai atasan.",
-                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
-                );
-            } else {
-                // Normal: notifikasi ke step 1 (pengganti atau atasan pertama)
-                SendNotification::dispatch(
-                    $approvers->first(),
-                    'leave_request',
-                    'Pengajuan Cuti Baru',
-                    "Pengajuan cuti dari {$user->name} membutuhkan persetujuan Anda.",
-                    ['leave_id' => $leave->id, 'requester_id' => $user->id]
-                );
+                // Notifikasi ke atasan (yang juga sebagai pengganti), tetapi sekarang atasan menjadi approver step2
+                // Step2 sudah ada jika $approvers berisi 1 elemen? Jika pengganti==atasan, $approvers hanya satu elemen.
+                // Jadi perlu dibuat approval step2 sendiri? Dari kode di atas, $approvers hanya satu karena filter->values() akan unik.
+                // Karena itu, kita perlu menambahkan step2 secara manual jika diperlukan. Namun karena sistem approval mengharapkan 2 step,
+                // maka perlu penanganan khusus: jika hanya 1 approver, maka langsung final approve. Atau buat step2 dengan approver yang sama.
+                // Sesuai logika asli di ApprovalController, jika step1 auto-approve, maka atasan tetap menerima notifikasi sebagai step2.
+                // Karena $approvers hanya berisi satu user, kita harus menambahkan step2 untuk user yang sama.
+                $step2Exists = $leave->approvals()->where('step', 2)->exists();
+                if (!$step2Exists) {
+                    Approval::create([
+                        'leave_id'    => $leave->id,
+                        'approver_id' => $atasanId,
+                        'step'        => 2,
+                        'status'      => 'pending',
+                    ]);
+                }
+
+                // Kirim notifikasi ke atasan untuk step2
+                $atasan = User::find($atasanId);
+                if ($atasan) {
+                    $atasan->notify(new \App\Notifications\LeaveRequestSubmitted($leave->id, $user->name));
+                }
             }
 
             return redirect()->route('cuti.index')->with('success', 'Pengajuan cuti berhasil dibuat.');
@@ -440,26 +458,18 @@ class LeaveController extends Controller
         ]);
 
         // Kirim notifikasi ke approver
-        SendNotification::dispatch(
-            $approval->approver_id,
-            'revision_accepted',
-            'Revisi Diterima',
-            Auth::user()->name . " menyetujui revisi tanggal cuti yang Anda ajukan.",
-            ['leave_id' => $leave->id]
-        );
+        $approver = User::find($approval->approver_id);
+        $approver->notify(new RevisionAccepted($leave->id, Auth::user()->name));
 
         // Cek apakah ada approver berikutnya
         $nextApproval = $leave->approvals()->where('step', '>', $approval->step)->orderBy('step')->first();
 
         if ($nextApproval) {
             // Kirim notifikasi ke approver berikutnya
-            SendNotification::dispatch(
-                $nextApproval->approver_id,
-                'leave_request',
-                'Pengajuan Cuti Baru',
-                "Pengajuan cuti dari {$leave->user->name} membutuhkan persetujuan Anda.",
-                ['leave_id' => $leave->id, 'requester_id' => $leave->user_id]
-            );
+            $nextApprover = User::find($nextApproval->approver_id);
+            if ($nextApprover) {
+                $nextApprover->notify(new LeaveRequestSubmitted($leave->id, $leave->user->name));
+            }
         } else {
             // Final approve
             $this->finalApproveLeave($leave);
@@ -502,13 +512,8 @@ class LeaveController extends Controller
         ]);
 
         // Kirim notifikasi ke approver
-        SendNotification::dispatch(
-            $approval->approver_id,
-            'revision_rejected',
-            'Revisi Ditolak',
-            Auth::user()->name . " menolak revisi tanggal cuti yang Anda ajukan. Pengajuan cuti dibatalkan.",
-            ['leave_id' => $leave->id]
-        );
+        $approver = User::find($approval->approver_id);
+        $approver->notify(new RevisionRejected($leave->id, Auth::user()->name));
 
         return redirect()->route('cuti.index')->with('error', 'Revisi tanggal ditolak. Pengajuan cuti dibatalkan.');
     }

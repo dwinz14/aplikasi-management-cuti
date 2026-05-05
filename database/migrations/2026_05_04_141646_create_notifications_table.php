@@ -12,18 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('type'); // e.g., 'leave_request', 'leave_approved', 'leave_rejected'
-            $table->string('title');
-            $table->text('message');
-            $table->json('data')->nullable(); // additional data like leave_id, etc.
-            $table->boolean('is_read')->default(false);
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
-
-            $table->index(['user_id', 'is_read']);
-            $table->index('created_at');
         });
     }
 
