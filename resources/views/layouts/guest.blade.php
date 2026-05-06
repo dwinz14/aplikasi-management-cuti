@@ -44,12 +44,12 @@
 
                     <!-- Title -->
                     <h1 class="text-3xl xl:text-4xl font-bold mb-4 text-center text-white drop-shadow-lg">
-                        PORTAL-CUTI
+                        PORTAL-IZIN
                     </h1>
 
                     <!-- Subtitle -->
                     <p class="text-white/90 text-center text-base xl:text-lg leading-relaxed">
-                        Website Cuti Karyawan<br>
+                        Website Izin Karyawan<br>
                         <span class="text-blue-300 font-semibold">PT BPR Artha Pamenang</span>
                     </p>
                 </div>

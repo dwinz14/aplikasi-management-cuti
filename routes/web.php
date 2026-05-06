@@ -15,6 +15,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotaController;
 use App\Http\Controllers\RekapController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\BackupController;
 
 
 Route::get('/', function () {
@@ -89,12 +90,22 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
 });
 
 // route rekap cuti
-Route::middleware(['auth', 'role:hrd,super_admin'])
-    ->prefix('hrd')->name('hrd.')
-    ->group(function () {
+Route::middleware(['auth', 'role:hrd,super_admin'])->group(function () {
+
+    Route::prefix('hrd')->name('hrd.')->group(function () {
         Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
         Route::get('rekap/export', [\App\Http\Controllers\RekapController::class, 'export'])->name('rekap.export');
     });
+    // backup db
+    Route::prefix('backup')->name('backup.')->group(function () {
+        Route::get('/', [BackupController::class, 'index'])->name('index');
+        Route::post('export', [BackupController::class, 'export'])->name('export');
+        Route::post('import', [BackupController::class, 'import'])->name('import');
+        Route::get('/download/{file}', [BackupController::class, 'download'])->name('download');
+    });
+});
+
+
 // route set kuota cuti
 Route::middleware(['auth', 'role:hrd,super_admin'])->prefix('hrd')->name('hrd.')->group(function () {
     Route::get('quota', [QuotaController::class, 'index'])->name('quota.index');

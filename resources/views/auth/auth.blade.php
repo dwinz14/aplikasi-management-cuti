@@ -2,7 +2,7 @@
     <div x-data="authForm()" class="w-full space-y-4">
         <!-- Mobile Title -->
         <div class="text-center lg:hidden mb-6">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">PORTAL-CUTI</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">PORTAL-IZIN</h1>
             <p class="text-sm text-gray-600 dark:text-gray-400">PT BPR Artha Pamenang</p>
         </div>
 
