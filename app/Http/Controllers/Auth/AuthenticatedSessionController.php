@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -16,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.auth', ['mode' => 'login']);
     }
 
     /**
@@ -26,14 +27,30 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = Auth::user();
+
+        // Check if user status is approved
+        if ($user->status !== 'approved') {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['nik' => 'Akun Anda belum disetujui oleh admin.']);
+        }
+
+        // Check if user must change password
+        if ($user->must_change_password) {
+            // Redirect to force change password page
+            return redirect()->route('password.force-change');
+        }
+
+        DB::table('users')->where('id', $user->id)->update(['last_login_at' => now()]);
+
         $request->session()->regenerate();
 
-        $role = Auth::user()->role;
+        $role = $user->role;
 
         // return match ($role) {
         //     'super_admin' => redirect('/admin/dashboard'),
         //     'hrd' => redirect('/hrd/dashboard'),
-        //     'kadiv' => redirect('/kadiv/dashboard'),
+        //     'kabag' => redirect('/kabag/dashboard'),
         //     'staff' => redirect('/staff/dashboard'),
         //     default => redirect('/dashboard'),
         // };

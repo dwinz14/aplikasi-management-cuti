@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leave_approvals', function (Blueprint $table) {
+        Schema::create('user_registration_approvals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('leave_request_id')->constrained('leave_requests')->cascadeOnDelete();
-            $table->foreignId('approver_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('level', ['pengganti', 'kadiv', 'hrd']);
+            $table->string('user_name');
+            $table->string('user_email');
+            $table->string('user_role');
+            $table->string('division_name')->nullable();
+            $table->foreignId('approved_by')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['approved', 'rejected']);
-            $table->text('catatan')->nullable();
-            $table->timestamp('tanggal_approval')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_approvals');
+        Schema::dropIfExists('user_registration_approvals');
     }
 };

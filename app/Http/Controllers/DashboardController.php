@@ -11,62 +11,59 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
+        $userId = Auth::id();
 
-        // Logika untuk menentukan judul dashboard
-        $dashboardTitle = match ($user->role) {
-            'super_admin' => 'Super Admin Dashboard',
-            'direksi' => 'DIreksi Dashboard',
-            'hrd' => 'HRD Dashboard',
-            'kadiv' => 'Kepala Divisi Dashboard',
-            'kasie' => 'Kasie Dashboard',
-            'staff' => 'Staff Dashboard',
-            default => 'Dashboard',
-        };
+        $leaveQuery = Leave::forUser($userId);
 
-        // Ambil data cuti user
-        $sisaCuti = $user->sisa_cuti;
+        $totalLeaveApplications = cache()->remember(
+            "leave_count_user_{$userId}",
+            now()->addMinutes(5),
+            fn() => (clone $leaveQuery)->count()
+        );
 
-        $cutiDigunakan = Leave::where('user_id', $user->id)
-            ->where('status_final', 'approved')
-            ->sum('total_hari');
+        $recentLeaves = (clone $leaveQuery)
+            ->with(['leaveType:id,name', 'approvals.approver:id,name'])
+            ->latest()
+            ->limit(3)
+            ->get();
 
-        $menungguPersetujuan = Leave::where('user_id', $user->id)
+        $pendingLeaves = (clone $leaveQuery)
+            ->with(['leaveType:id,name', 'approvals.approver:id,name'])
             ->where('status_final', 'pending')
-            ->count();
+            ->latest()
+            ->limit(5)
+            ->get();
 
-        // Kirimkan variabel ke view
-        return view('dashboard', [
-            'dashboardTitle' => $dashboardTitle,
-            'sisaCuti' => $sisaCuti,
-            'cutiDigunakan' => $cutiDigunakan,
-            'menungguPersetujuan' => $menungguPersetujuan,
-        ]);
-    }
-
-    public function admin()
-    {
-        return view('admin.dashboard');
+        return view('dashboard', compact(
+            'totalLeaveApplications',
+            'recentLeaves',
+            'pendingLeaves'
+        ));
     }
 
-    public function direksi()
-    {
-        return view('direksi.dashboard');
-    }
-    public function hrd()
-    {
-        return view('hrd.dashboard');
-    }
-    public function kadiv()
-    {
-        return view('kadiv.dashboard');
-    }
-    public function kasie()
-    {
-        return view('kasie.dashboard');
-    }
-    public function staff()
-    {
-        return view('staff.dashboard');
-    }
+    // public function admin()
+    // {
+    //     return view('admin.dashboard');
+    // }
+
+    // public function direksi()
+    // {
+    //     return view('direksi.dashboard');
+    // }
+    // public function hrd()
+    // {
+    //     return view('hrd.dashboard');
+    // }
+    // public function kabag()
+    // {
+    //     return view('kabag.dashboard');
+    // }
+    // public function kasie()
+    // {
+    //     return view('kasie.dashboard');
+    // }
+    // public function staff()
+    // {
+    //     return view('staff.dashboard');
+    // }
 }

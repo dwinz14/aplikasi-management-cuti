@@ -13,21 +13,40 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('nik', 11)->unique()->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kadiv', 'kasie', 'staff']);
-            // $table->foreignId('division_id')->nullable()->constrained('divisions')->nullOnDelete();
+            $table->enum('role', ['super_admin', 'hrd', 'direksi', 'kabag-pincab', 'kasie', 'staff']);
+            $table->enum('gender', ['L', 'P'])->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->unsignedBigInteger('division_id')->nullable();
-            $table->integer('sisa_cuti')->default(12);
+            $table->unsignedBigInteger('position_id')->nullable();
+            $table->unsignedBigInteger('office_id')->nullable();
+            $table->date('tanggal_aktif_kerja')->nullable();
+            // $table->integer('sisa_cuti')->default(12);
+            $table->boolean('must_change_password')->default(false);
+            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
-
+            $table->softDeletes();
 
             $table->foreign('division_id')
                 ->references('id')->on('divisions')
-                ->onDelete('cascade'); // kalau divisi dihapus, user ikut kehapus
+                ->onDelete('set null');
+
+            $table->foreign('position_id')
+                ->references('id')->on('positions')
+                ->onDelete('set null');
+
+            $table->foreign('office_id')
+                ->references('id')->on('offices')
+                ->onDelete('set null');
+
+            $table->index('name');
+            $table->index('role');
+            $table->index('division_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('leave_id')->constrained()->onDelete('cascade');
             $table->foreignId('approver_id')->constrained('users')->onDelete('cascade');
             $table->unsignedTinyInteger('step'); // urutan approval
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'revision_requested', 'revision_accepted', 'revision_rejected'])->default('pending');
             $table->timestamps();
-            $table->unique(['leave_id', 'approver_id']); // cegah duplikasi approver
+            $table->unique(['leave_id', 'step'], 'approvals_leave_id_step_unique');
         });
     }
 

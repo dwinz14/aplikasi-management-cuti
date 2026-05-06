@@ -17,10 +17,16 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    Route::get('registration-pending', function () {
+        return view('auth.registration-pending');
+    })->name('registration.pending');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->middleware('prevent-back-history')
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('prevent-back-history');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -55,5 +61,6 @@ Route::middleware('auth')->group(function () {
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->middleware('prevent-back-history')
         ->name('logout');
 });

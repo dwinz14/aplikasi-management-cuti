@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_jenis_cuti');
-            $table->string('jumlah_hari');
+            $table->string('name');
+            $table->integer('quota')->default(0);
+            $table->enum('gender', ['L', 'P'])->nullable();
+            $table->unsignedInteger('min_years')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
