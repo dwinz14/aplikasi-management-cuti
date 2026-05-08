@@ -70,21 +70,23 @@ class MasterLeaveTypeController extends Controller
     public function update(Request $request, LeaveType $leaveType)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:leave_types,name,' . $leaveType->id,
-            'quota' => 'required|integer|min:0',
-            'gender' => 'nullable|in:L,P',
+            'name'      => 'required|string|max:255|unique:leave_types,name,' . $leaveType->id,
+            'quota'     => 'required|integer|min:0',
+            'gender'    => 'nullable|in:L,P',
             'min_years' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
         $leaveType->update([
-            'name' => $request->name,
-            'quota' => $request->quota,
-            'gender' => $request->gender,
+            'name'      => strtolower(strip_tags(trim($request->name))),
+            'quota'     => $request->quota,
+            'gender'    => $request->gender,
             'min_years' => $request->min_years,
+            'is_active' => $request->boolean('is_active', $leaveType->is_active),
         ]);
 
-        return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil diperbarui.');
+        return redirect()->route('admin.leave-types.index')
+            ->with('success', 'Jenis cuti berhasil diperbarui.');
     }
 
     /**

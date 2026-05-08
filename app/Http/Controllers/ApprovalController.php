@@ -72,23 +72,25 @@ class ApprovalController extends Controller
 
         $leave = $approval->leave;
         $employee = $leave->user;
+
+        // Beritahu pemohon bahwa step ini sudah disetujui
         $employee->notify(new LeaveRequestApproved($leave->id, Auth::user()->name));
 
-        $nextApproval = $approval->leave->approvals()
+        // Cek apakah masih ada step approval berikutnya
+        $nextApproval = $leave->approvals()
             ->where('step', '>', $approval->step)
             ->orderBy('step')
             ->first();
 
         if ($nextApproval) {
-            if ($nextApproval) {
-                $nextApprover = User::find($nextApproval->approver_id);
+            // Masih ada approver berikutnya, kirim notifikasi ke mereka
+            $nextApprover = User::find($nextApproval->approver_id);
+            if ($nextApprover) {
                 $nextApprover->notify(new LeaveRequestSubmitted($leave->id, $leave->user->name));
-            } else {
-                // final approve, notifikasi ke pemohon
-                $employee->notify(new LeaveFinalApproved($leave->id));
             }
         } else {
-            $this->finalApprove($approval->leave);
+            // Semua step selesai, lakukan final approval
+            $this->finalApprove($leave);
         }
 
         return back()->with('success', 'Approval disetujui.');

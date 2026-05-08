@@ -113,7 +113,7 @@ class MasterUserController extends Controller
                 'string',
                 'size:11',
                 'regex:/^[A-Z]{2}[0-9]{9}$/',
-                // 'unique:users,nik',
+                'unique:users,nik,' . $user->id,
             ],
             'name'        => ['bail', 'required', 'string', 'max:255', 'regex:/^[a-zA-Z\\s]+$/'],
             'email'       => ['required', 'email', 'unique:users,email,' . $user->id],

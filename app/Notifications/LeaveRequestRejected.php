@@ -26,8 +26,8 @@ class LeaveRequestRejected extends Notification
     public function toDatabase($notifiable)
     {
         return [
-            'type' => 'leave_approved',
-            'title' => 'Cuti Disetujui',
+            'type' => 'leave_rejected',
+            'title' => 'Cuti Ditolak',
             'message' => "Pengajuan cuti Anda telah ditolak oleh {$this->approverName}.",
             'data' => ['leave_id' => $this->leaveId],
         ];
