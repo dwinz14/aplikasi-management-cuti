@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Division;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreDivisionRequest;
+use App\Http\Requests\UpdateDivisionRequest;
 
 class DivisionController extends Controller
 {
@@ -31,20 +33,14 @@ class DivisionController extends Controller
     /**
      * Store a newly created division in storage.
      */
-    public function store(Request $request)
+    public function store(StoreDivisionRequest $request)
     {
-        $request->validate([
-            'nama_divisi' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:divisions,nama_divisi',
-        ]);
+        $nama_divisi = strtolower(trim($request->validated('nama_divisi')));
 
-        // Sanitize and normalize: trim and convert to lowercase
-        $nama_divisi = strtolower(trim($request->nama_divisi));
+        Division::create(['nama_divisi' => $nama_divisi]);
 
-        Division::create([
-            'nama_divisi' => $nama_divisi,
-        ]);
-
-        return redirect()->route('admin.divisions.index')->with('success', 'Divisi berhasil ditambahkan.');
+        return redirect()->route('admin.divisions.index')
+            ->with('success', 'Divisi berhasil ditambahkan.');
     }
 
     /**
@@ -60,20 +56,14 @@ class DivisionController extends Controller
     /**
      * Update the specified division in storage.
      */
-    public function update(Request $request, Division $division)
+    public function update(UpdateDivisionRequest $request, Division $division)
     {
-        $request->validate([
-            'nama_divisi' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/|unique:divisions,nama_divisi,' . $division->id,
-        ]);
+        $nama_divisi = strtolower(trim($request->validated('nama_divisi')));
 
-        // Sanitize and normalize: trim and convert to lowercase
-        $nama_divisi = strtolower(trim($request->nama_divisi));
+        $division->update(['nama_divisi' => $nama_divisi]);
 
-        $division->update([
-            'nama_divisi' => $nama_divisi,
-        ]);
-
-        return redirect()->route('admin.divisions.index')->with('success', 'Divisi berhasil diperbarui.');
+        return redirect()->route('admin.divisions.index')
+            ->with('success', 'Divisi berhasil diperbarui.');
     }
 
     /**

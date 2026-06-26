@@ -31,7 +31,8 @@
                     {{-- Avatar & User Info --}}
                     <div class="flex-shrink-0 mr-4">
                         <div class="relative">
-                            <img class="h-12 w-12 rounded-full border-2 border-gray-200 dark:border-gray-600"
+                            <img loading="lazy"
+                                class="h-12 w-12 rounded-full border-2 border-gray-200 dark:border-gray-600"
                                 src="{{ asset('img/user.png') }}" alt="{{ $history->leave->user->name }}">
                             {{-- Role Badge Icon --}}
                             <div

@@ -149,7 +149,7 @@
                                     {{-- Avatar + Name --}}
                                     <div class="flex items-center gap-4">
                                         <div class="relative">
-                                            <img src="{{ $user->photo_path ?? asset('img/user.png') }}"
+                                            <img loading="lazy" src="{{ $user->photo_path ?? asset('img/user.png') }}"
                                                 alt="Foto {{ $user->name }}"
                                                 class="h-16 w-16 sm:h-16 sm:w-16 rounded-full border-4 border-white/20 shadow-lg object-cover ring-1 ring-white/10"
                                                 loading="lazy">

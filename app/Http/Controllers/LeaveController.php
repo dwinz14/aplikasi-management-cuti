@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\LeaveHelper;
+use App\Http\Requests\StoreLeaveRequest;
 use App\Models\Leave;
 use App\Models\User;
 use App\Models\Approval;
@@ -129,7 +130,7 @@ class LeaveController extends Controller
         return view('leaves.create', compact('penggantiList', 'requiresReplacement', 'atasanList', 'requiresAtasan', 'leaveTypes', 'userLeaveBalances', 'user'));
     }
 
-    public function store(Request $request)
+    public function store(StoreLeaveRequest $request)
     {
         $user = Auth::user();
 
@@ -153,37 +154,6 @@ class LeaveController extends Controller
 
         $isSickLeave = in_array(strtolower($leaveType->name), ['izin sakit dengan surat dokter', 'izin sakit tanpa surat dokter']);
         $requiresProof = strtolower($leaveType->name) === 'izin sakit dengan surat dokter';
-
-        $rules = [
-            'leave_type_id' => 'required|exists:leave_types,id',
-            'start_date'    => 'required|date' . ($isSickLeave ? '|before_or_equal:today' : ''),
-            'end_date'      => 'required|date|after_or_equal:start_date' . ($isSickLeave ? '|before_or_equal:today' : ''),
-            'alasan'        => ['required', 'string', 'max:500', 'regex:/^[a-zA-Z0-9\s.,()\/-]+$/'],
-
-            'proof_image'   => ($requiresProof ? 'required' : 'nullable') . '|image|mimes:jpeg,png,jpg,gif|max:2048',
-
-            'pengganti_id' => in_array($user->role, ['staff', 'kasie', 'kabag-pincab'], true)
-                ? 'required|exists:users,id'
-                : 'nullable|exists:users,id',
-
-            'atasan_id' => !in_array($user->role, ['direksi'], true)
-                ? 'required|exists:users,id'
-                : 'nullable|exists:users,id',
-        ];
-
-        $messages = [
-            'leave_type_id.required' => 'Anda harus memilih jenis cuti',
-            'start_date.required'    => 'Anda harus memilih tanggal mulai cuti',
-            'end_date.required'      => 'Anda harus memilih tanggal selesai cuti',
-            'alasan.required'        => 'Anda harus mengisi alasan cuti',
-            'proof_image.required'   => 'Anda harus menyertakan bukti surat dokter',
-            'pengganti_id.required'  => 'Anda harus memilih pengganti',
-            'pengganti_id.exists'    => 'Pengganti tidak valid',
-            'atasan_id.required'     => 'Anda harus memilih atasan',
-            'atasan_id.exists'       => 'Atasan tidak valid',
-        ];
-
-        $request->validate($rules, $messages);
 
         // Validasi ketersediaan jenis cuti untuk user
         if ($leaveType->gender && $leaveType->gender !== $user->gender) {

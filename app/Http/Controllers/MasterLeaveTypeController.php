@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreLeaveTypeRequest;
+use App\Http\Requests\UpdateLeaveTypeRequest;
 
 class MasterLeaveTypeController extends Controller
 {
@@ -32,20 +34,12 @@ class MasterLeaveTypeController extends Controller
     /**
      * Store a newly created leave type in storage.
      */
-    public function store(Request $request)
+    public function store(StoreLeaveTypeRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:leave_types,name',
-            'quota' => 'required|integer|min:0',
-            'gender' => 'nullable|in:L,P',
-            'min_years' => 'required|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-        $validated['name'] = strtolower(strip_tags(trim($validated['name'])));
+        LeaveType::create($request->validated());
 
-        LeaveType::create($validated);
-
-        return redirect()->route('admin.leave-types.index')->with('success', 'Jenis cuti berhasil ditambahkan.');
+        return redirect()->route('admin.leave-types.index')
+            ->with('success', 'Jenis cuti berhasil ditambahkan.');
     }
 
     /**
@@ -67,23 +61,9 @@ class MasterLeaveTypeController extends Controller
     /**
      * Update the specified leave type in storage.
      */
-    public function update(Request $request, LeaveType $leaveType)
+    public function update(UpdateLeaveTypeRequest $request, LeaveType $leaveType)
     {
-        $request->validate([
-            'name'      => 'required|string|max:255|unique:leave_types,name,' . $leaveType->id,
-            'quota'     => 'required|integer|min:0',
-            'gender'    => 'nullable|in:L,P',
-            'min_years' => 'required|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
-
-        $leaveType->update([
-            'name'      => strtolower(strip_tags(trim($request->name))),
-            'quota'     => $request->quota,
-            'gender'    => $request->gender,
-            'min_years' => $request->min_years,
-            'is_active' => $request->boolean('is_active', $leaveType->is_active),
-        ]);
+        $leaveType->update($request->validated());
 
         return redirect()->route('admin.leave-types.index')
             ->with('success', 'Jenis cuti berhasil diperbarui.');
